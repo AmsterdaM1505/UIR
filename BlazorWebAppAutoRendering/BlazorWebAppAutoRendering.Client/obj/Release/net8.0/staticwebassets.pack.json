@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js"
+    },
+    {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\f7uxrr2vep.gz",
+      "PackagePath": "staticwebassets\\_framework\\blazor.webassembly.js.gz"
+    },
+    {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\appsettings.Development.json",
+      "PackagePath": "staticwebassets\\appsettings.Development.json"
+    },
+    {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\appsettings.json",
+      "PackagePath": "staticwebassets\\appsettings.json"
+    },
+    {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\img\\yyy.jpg",
+      "PackagePath": "staticwebassets\\img\\yyy.jpg"
+    },
+    {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file.js",
+      "PackagePath": "staticwebassets\\js\\file.js"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.BlazorWebAppAutoRendering.Client.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.build.BlazorWebAppAutoRendering.Client.props",
+      "PackagePath": "build\\BlazorWebAppAutoRendering.Client.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.BlazorWebAppAutoRendering.Client.props",
+      "PackagePath": "buildMultiTargeting\\BlazorWebAppAutoRendering.Client.props"
+    },
+    {
+      "Id": "obj\\Release\\net8.0\\staticwebassets\\msbuild.buildTransitive.BlazorWebAppAutoRendering.Client.props",
+      "PackagePath": "buildTransitive\\BlazorWebAppAutoRendering.Client.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

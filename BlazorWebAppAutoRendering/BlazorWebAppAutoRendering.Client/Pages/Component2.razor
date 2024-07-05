@@ -1,0 +1,34 @@
+﻿@page "/pageee"
+@rendermode InteractiveAuto
+
+<PageTitle>pageee</PageTitle>
+
+<div style="display: flex;">
+    <div style="flex: 1;">
+        <MudButton id="addRectBtn" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddBox" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
+        <MudButton id="addCircleBtn" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Circle" Color="Color.Secondary">Добавить круг</MudButton><br>
+        <MudButton id="addLineBtn" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.HorizontalRule" Color="Color.Info">Добавить линию</MudButton><br>
+        <MudButton id="delShapeBtn" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Удалить фигуру</MudButton><br>
+        <MudButton id="rotateLeftBtn" Variant="Variant.Filled" Color="Color.Info">Повернуть вправо</MudButton><br>
+        <MudButton id="rotateRightBtn" Variant="Variant.Filled" Color="Color.Error">Повернуть влево</MudButton><br>
+        <MudButton id="downloadBtn" Variant="Variant.Filled" Color="Color.Error">Скачать диаграмму</MudButton><br>
+        <input type="file" id="fileInput">
+        <pre id="fileContent"></pre>
+        <MudButton id="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary">Загрузить CSS</MudButton><br>
+        <input type="file" id="cssFileInput" accept=".css">
+    </div>
+    <div style="flex: 2;">
+        <canvas id="canvas" width="700" height="700" style="border:1px solid grey"></canvas>
+        <div id="contextMenu" class="context-menu" hidden>
+            <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Color="Color.Primary">Delete</MudButton><br>
+            <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Color="Color.Secondary">Rotate Left</MudButton><br>
+            <MudButton id="rotateRightItem" class="context-menu-item" Variant="Variant.Filled" Color="Color.Info">Rotate Right</MudButton><br>
+            <MudButton id="connect_obj" class="context-menu-item" Variant="Variant.Filled" Color="Color.Info">Connect objects</MudButton><br>
+        </div>
+    </div>
+</div>
+
+<h3>Debug Information</h3>
+<textarea id="debugOutput" rows="10" cols="100" readonly></textarea>
+
+<script src="js/file.js"></script>

@@ -1,0 +1,2 @@
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\publish\tsconfig.json
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\publish\web.config

@@ -8,7 +8,6 @@
             debugOutput.scrollTop = debugOutput.scrollHeight; // Scroll to bottom
         }
     }
-    // Получаем элемент canvas и контекст рендеринга
     document.getElementById('contextMenu').style.display = 'none';
     const canvas = document.getElementById('canvas');
     if (!canvas) {
@@ -544,7 +543,7 @@
             }
         });
         function uploadCssFile(file) {
-            const formData = new FormData();
+            const formData = new FormData(); // https://learn.javascript.ru/formdata
             formData.append('file', file);
             fetch('/api/upload/upload-css', {
                 method: 'POST',

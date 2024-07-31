@@ -60,3 +60,4 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\MudBlazor.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\tsconfig.json
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.sourcelink.json

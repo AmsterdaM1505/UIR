@@ -40,7 +40,7 @@ interface Line extends Shape {
         }
     }
 
-    // Получаем элемент canvas и контекст рендеринга
+
     document.getElementById('contextMenu').style.display = 'none';
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     if (!canvas) {
@@ -593,10 +593,10 @@ interface Line extends Shape {
         });
 
         function uploadCssFile(file: File): void {
-            const formData = new FormData();
+            const formData = new FormData(); // https://learn.javascript.ru/formdata
             formData.append('file', file);
 
-            fetch('/api/upload/upload-css', {
+            fetch('/api/upload/upload-css', { //upload это имя контроллера в program.cs
                 method: 'POST',
                 body: formData
             })

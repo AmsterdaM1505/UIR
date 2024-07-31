@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets\\appsettings.json"
     },
     {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\css\\new_app.css",
+      "PackagePath": "staticwebassets\\css\\new_app.css"
+    },
+    {
       "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\img\\yyy.jpg",
       "PackagePath": "staticwebassets\\img\\yyy.jpg"
     },

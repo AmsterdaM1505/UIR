@@ -55,7 +55,7 @@ app.Run();                                                 // Запускаем веб-прил
 // Определяем контроллер для обработки загрузки файлов
 [Route("api/[controller]")]
 [ApiController]
-public class UploadController : ControllerBase
+public class UploadController(IWebHostEnvironment envir) : ControllerBase
 {
     // Метод для обработки POST запросов на загрузку CSS файлов
     [HttpPost("upload-css")]
@@ -66,10 +66,11 @@ public class UploadController : ControllerBase
         {
             return BadRequest("No file uploaded");
         }
-
+        //var base_path = envir.WebRootPath;
+        var base_path = envir.ContentRootPath;
         // Определяем путь для сохранения файла
-        var filePath = Path.Combine("C:", "Users", "user", "source", "repos", "BlazorWebAppAutoRendering", "BlazorWebAppAutoRendering", "BlazorWebAppAutoRendering", "wwwroot", "css", "wwwroot", "css", file.FileName);
-
+        var filePath = Path.Combine(base_path, "Components", "Layout", file.FileName);
+        //var fileUrl = Path.Combine("/css", file.FileName).Replace("\\", "/");
         // Сохраняем файл на сервер
         using (var stream = new FileStream(filePath, FileMode.Create))
         {

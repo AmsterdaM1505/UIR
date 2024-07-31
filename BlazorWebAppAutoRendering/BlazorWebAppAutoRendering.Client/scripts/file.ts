@@ -580,7 +580,7 @@ interface Line extends Shape {
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         })
-
+        //пробуем сделать с загрузкой на сервер
         document.getElementById('uploadCssBtn')?.addEventListener('click', function () {
             const fileInput = document.getElementById('cssFileInput') as HTMLInputElement;
             const file = fileInput?.files?.[0];
@@ -616,9 +616,55 @@ interface Line extends Shape {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.type = 'text/css';
-            link.href = filePath;
+            //link.href = filePath;
+            link.href = "https://localhost:7172/BlazorWebAppAutoRendering.styles.css";
             document.getElementsByTagName('head')[0].appendChild(link);
         }
+
+
+        //пробуем сделать с локальным хранилищем
+        function applyCssFromLocalStorage(): void {
+            const cssContent = localStorage.getItem('uploadedCss2');
+            if (cssContent) {
+                const style = document.createElement('style');
+                style.textContent = cssContent;
+                document.head.appendChild(style);
+            } else {
+                console.error('No CSS found in local storage');
+            }
+        }
+
+        document.getElementById('uploadCssBtn2')?.addEventListener('click', function () {
+            const fileInput = document.getElementById('cssFileInput2') as HTMLInputElement;
+            const file = fileInput?.files?.[0];
+
+            if (file) {
+                applyCssFromLocalStorage();
+            } else {
+                logDebug("No file selected for upload");
+            }
+        });
+
+        //document.addEventListener('DOMContentLoaded', () => {
+        //    applyCssFromLocalStorage();
+        //});
+
+        document.getElementById('cssFileInput2')?.addEventListener('change', function (event) {
+            const input = event.target as HTMLInputElement;
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const content = e.target.result as string;
+                    localStorage.setItem('uploadedCss2', content);
+                    applyCssFromLocalStorage();
+                };
+
+                reader.readAsText(file);
+            }
+        });
+
 
 
     } else {

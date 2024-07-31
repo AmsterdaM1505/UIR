@@ -1,6 +1,6 @@
 // Оборачиваем весь код в функцию, чтобы избежать повторного объявления переменных в глобальной области видимости
 (function () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
     function logDebug(message) {
         const debugOutput = document.getElementById('debugOutput');
         if (debugOutput) {
@@ -531,6 +531,7 @@
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         });
+        //пробуем сделать с загрузкой на сервер
         (_m = document.getElementById('uploadCssBtn')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput');
@@ -564,9 +565,49 @@
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.type = 'text/css';
-            link.href = filePath;
+            //link.href = filePath;
+            link.href = "https://localhost:7172/BlazorWebAppAutoRendering.styles.css";
             document.getElementsByTagName('head')[0].appendChild(link);
         }
+        //пробуем сделать с локальным хранилищем
+        function applyCssFromLocalStorage() {
+            const cssContent = localStorage.getItem('uploadedCss2');
+            if (cssContent) {
+                const style = document.createElement('style');
+                style.textContent = cssContent;
+                document.head.appendChild(style);
+            }
+            else {
+                console.error('No CSS found in local storage');
+            }
+        }
+        (_o = document.getElementById('uploadCssBtn2')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+            var _a;
+            const fileInput = document.getElementById('cssFileInput2');
+            const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
+            if (file) {
+                applyCssFromLocalStorage();
+            }
+            else {
+                logDebug("No file selected for upload");
+            }
+        });
+        //document.addEventListener('DOMContentLoaded', () => {
+        //    applyCssFromLocalStorage();
+        //});
+        (_p = document.getElementById('cssFileInput2')) === null || _p === void 0 ? void 0 : _p.addEventListener('change', function (event) {
+            const input = event.target;
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const content = e.target.result;
+                    localStorage.setItem('uploadedCss2', content);
+                    applyCssFromLocalStorage();
+                };
+                reader.readAsText(file);
+            }
+        });
     }
     else {
         console.error("Canvas context is not supported");

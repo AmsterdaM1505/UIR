@@ -1,58 +1,4 @@
-﻿interface Shape {
-    type: string;
-    rotation?: number;
-    info?: string;
-}
-
-interface Rectangle extends Shape {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    color: string;
-}
-
-interface Circle extends Shape {
-    x: number;
-    y: number;
-    radius: number;
-    color: string;
-}
-
-interface Line extends Shape {
-    startX: number;
-    startY: number;
-    endX: number;
-    endY: number;
-    color: string;
-}
-
-
-// Оборачиваем весь код в функцию, чтобы избежать повторного объявления переменных в глобальной области видимости
-
-(function () {
-
-    function logDebug(message: string) {
-        const debugOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;
-        if (debugOutput) {
-            debugOutput.value += message + '\n';
-            debugOutput.scrollTop = debugOutput.scrollHeight; // Scroll to bottom
-        }
-    }
-
-
-    document.getElementById('contextMenu').style.display = 'none';
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-    if (!canvas) {
-        logDebug("Canvas element not found");
-        return;
-    } else {
-        canvas.oncontextmenu = () => false;
-        logDebug("Canvas element found");
-    }
-
-    let objects: Shape[] = [];
-
+﻿(function () {
     document.getElementById('fileInput')?.addEventListener('change', function (event) {
         try {
             const input = event.target as HTMLInputElement;
@@ -79,11 +25,23 @@ interface Line extends Shape {
         }
     });
 
+    document.getElementById('contextMenu').style.display = 'none';
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+
+    if (!canvas) {
+        logDebug("Canvas element not found");
+        return;
+    } else {
+        canvas.oncontextmenu = () => false;
+        logDebug("Canvas element found");
+    }
+
+    let objects: Shape[] = [];
+
     function processFileContent(content: string) {
         try {
             const sizeMatch = content.match(/Size:({[^}]+})/);
             const objectsMatch = content.match(/Objects:\(([^)]+)\)/);
-
             if (sizeMatch && objectsMatch) {
                 const size = JSON.parse(sizeMatch[1]);
                 const shapes = JSON.parse(`[${objectsMatch[1]}]`);
@@ -95,6 +53,21 @@ interface Line extends Shape {
                         return obj as Circle;
                     } else if (obj.type === 'line') {
                         return obj as Line;
+                    } else {
+                        throw new Error('Unknown shape type');
+                    }
+                });
+            } else if (sizeMatch && (objectsMatch == null)) {
+                const size = JSON.parse(sizeMatch[1]);
+                const shapes = objectsMatch ? JSON.parse(`[${objectsMatch[1]}]`) : [];
+
+                objects = shapes.map((obj) => {
+                    if (obj.type === 'rectangle') {
+                        return obj;
+                    } else if (obj.type === 'circle') {
+                        return obj;
+                    } else if (obj.type === 'line') {
+                        return obj;
                     } else {
                         throw new Error('Unknown shape type');
                     }
@@ -112,9 +85,9 @@ interface Line extends Shape {
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
         if (!ctx) {
-            //logDebug("Failed to get canvas context");
+            logDebug("Failed to get canvas context");
         } else {
-            //logDebug("Canvas context obtained");
+            logDebug("Canvas context obtained");
         }
 
         const img = new Image();
@@ -152,14 +125,17 @@ interface Line extends Shape {
             logDebug("Add rectangle button clicked");
             addRect();
         });
+
         document.getElementById('addCircleBtn')?.addEventListener('click', function () {
             logDebug("Add circle button clicked");
             addCircle();
         });
+
         document.getElementById('addLineBtn')?.addEventListener('click', function () {
             logDebug("Add line button clicked");
             addLine();
         });
+
         document.getElementById('delShapeBtn')?.addEventListener('click', function () {
             logDebug("Delete shape button clicked");
             deleteShape();
@@ -170,6 +146,7 @@ interface Line extends Shape {
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
         });
+
         document.getElementById('rotateRightBtn')?.addEventListener('click', function () {
             logDebug("Rotate right button clicked");
             rotateSelectedObject(10);
@@ -183,6 +160,7 @@ interface Line extends Shape {
             selectedObject_buf = null;
             //hideContextMenu();
         });
+
         document.getElementById('rotateLeftItem')?.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(-10);
@@ -502,7 +480,6 @@ interface Line extends Shape {
             }
         }
 
-
         function onMouseMove(e: MouseEvent) {
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
@@ -573,18 +550,19 @@ interface Line extends Shape {
             link.click();
             document.body.removeChild(link);
         }
-
+        
         document.getElementById('downloadBtn')?.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
             const shapes = JSON.stringify(objects, null, 2);
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         })
+
         //пробуем сделать с загрузкой на сервер
         document.getElementById('uploadCssBtn')?.addEventListener('click', function () {
             const fileInput = document.getElementById('cssFileInput') as HTMLInputElement;
             const file = fileInput?.files?.[0];
-
+        
             if (file) {
                 uploadCssFile(file);
             } else {
@@ -624,8 +602,10 @@ interface Line extends Shape {
 
         //пробуем сделать с локальным хранилищем
         function applyCssFromLocalStorage(): void {
+            logDebug("entering into applyCssFromLocalStorage");
             const cssContent = localStorage.getItem('uploadedCss2');
             if (cssContent) {
+                logDebug(`Mouse move at (${cssContent}`);
                 const style = document.createElement('style');
                 style.textContent = cssContent;
                 document.head.appendChild(style);
@@ -665,7 +645,34 @@ interface Line extends Shape {
             }
         });
 
+        // Сохранение схемы между перезагрузками
+        // Функция для сохранения схемы в локальное хранилище
+        function saveToLocalStorage() {
+            const size = { width: canvas.width, height: canvas.height };
+            const shapes = JSON.stringify(objects, null, 2);
+            const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
+            localStorage.setItem('savedSchema', content);
+        }
 
+        // Функция для восстановления схемы из локального хранилища
+        function loadFromLocalStorage() {
+            logDebug(`enteringInto_loadFromLocalStorage`);
+            
+            const savedSchema = localStorage.getItem('savedSchema');
+            logDebug(`Mouse down at (${savedSchema}`);
+            if (savedSchema) {
+                logDebug("something_wrong");
+                processFileContent(savedSchema);
+                //drawObjects();
+            }
+        }
+
+        // Восстановление схемы при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('load', loadFromLocalStorage);
+        });
+        // Запуск автосохранения каждую минуту
+        setInterval(saveToLocalStorage, 60000);
 
     } else {
         console.error("Canvas context is not supported");

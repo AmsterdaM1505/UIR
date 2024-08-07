@@ -1,8 +1,19 @@
 ﻿@page "/"
+@using Microsoft.JSInterop
 @rendermode InteractiveAuto
+@inject IJSRuntime JS
+@using MudBlazor
+@using MudBlazor.Services
 
 <PageTitle>pageee</PageTitle>
-@* Style="background-color: yellowgreen; color: white; width: 200px; height: 60px;" *@
+<style>
+    .custom-border {
+        border: 1px solid black;
+        border-radius: 4px;
+    }
+</style>
+
+
 <div style="display: flex;">
     <div style="flex: 1; flex-direction: row;">
         <MudButton id="addRectBtn" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
@@ -36,6 +47,56 @@
 </div>
 
 <h3>Debug Information</h3>
-<textarea id="debugOutput" rows="10" cols="150" readonly></textarea>
+<textarea id="debugOutput" rows="10" cols="150" class="custom-border" readonly></textarea>
 
+<h3>Cookies Management</h3>
+
+<div>
+    <label>Cookie Name: </label><br>
+    <input @bind="cookieName" class="custom-border" />
+</div>
+<div>
+    <label>Cookie Value: </label><br>
+    <input @bind="cookieValue" class="custom-border" />
+</div>
+<div>
+    <label>Days (optional): </label><br>
+    <input type="number" @bind="days" class="custom-border" />
+</div>
+<div>
+    <MudButton @onclick="SetCookie" Variant="Variant.Filled" Style="width: 100px; height: 60px;" Color="Color.Info">Set Cookie</MudButton>
+    <MudButton @onclick="GetCookie" Variant="Variant.Filled" Style="width: 100px; height: 60px;" Color="Color.Error">Get Cookie</MudButton>
+    <MudButton @onclick="EraseCookie" Variant="Variant.Filled" Style="width: 100px; height: 60px;" Color="Color.Error">Erase Cookie</MudButton><br>
+</div>
+
+<div>
+    <p>Cookie Result: @cookieResult</p>
+</div>
+
+@code {
+    private string cookieName;
+    private string cookieValue;
+    private int? days;
+    private string cookieResult;
+
+    private async Task SetCookie()
+    {
+        await JS.InvokeVoidAsync("cookiesInterop.setCookie", cookieName, cookieValue, days);
+        cookieResult = $"Cookie {cookieName} set.";
+    }
+
+    private async Task GetCookie()
+    {
+        cookieResult = await JS.InvokeAsync<string>("cookiesInterop.getCookie", cookieName);
+    }
+
+    private async Task EraseCookie()
+    {
+        await JS.InvokeVoidAsync("cookiesInterop.eraseCookie", cookieName);
+        cookieResult = $"Cookie {cookieName} erased.";
+    }
+}
+
+<script src="js/CookiesServ.js"></script>
+<script src="js/interface.js"></script>
 <script src="js/file.js"></script>

@@ -1028,7 +1028,6 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\9eiq2arw7h.gz
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\aplftsb6qb.gz
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\bin\Debug\net8.0\tsconfig.json
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\f7uxrr2vep.gz
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\bin\Debug\net8.0\wwwroot\_framework\dotnet.native.8.0.5.wzrvnrj7no.js
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\bin\Debug\net8.0\wwwroot\_framework\dotnet.runtime.8.0.5.uvzh0smb3p.js
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\bin\Debug\net8.0\wwwroot\_framework\dotnet.runtime.8.0.5.uvzh0smb3p.js.gz
@@ -1043,3 +1042,4 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\kouynk9fwj.gz
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\ps0njgl21h.gz
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\1mpcoo0nwr.gz
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\obj\Debug\net8.0\compressed\xycu92z8sk.gz

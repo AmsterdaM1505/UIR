@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "nsxjNirujd0S+cIn28zehSE+Mcdehow3tzcJ6Ug8FjI=",
+  "Hash": "BRs06wDBZ206Cjs6NanJRpNjAPlR06uGSEhqZfP6jsE=",
   "Source": "BlazorWebAppAutoRendering.Client",
   "BasePath": "/",
   "Mode": "Default",
@@ -17,10 +17,10 @@
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.css",
+      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\7.5.0\\staticwebassets\\MudBlazor.min.css",
       "SourceId": "MudBlazor",
       "SourceType": "Package",
-      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\",
+      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\7.5.0\\staticwebassets\\",
       "BasePath": "_content/MudBlazor",
       "RelativePath": "MudBlazor.min.css",
       "AssetKind": "All",
@@ -33,13 +33,13 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.css"
+      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\7.5.0\\staticwebassets\\MudBlazor.min.css"
     },
     {
-      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.js",
+      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\7.5.0\\staticwebassets\\MudBlazor.min.js",
       "SourceId": "MudBlazor",
       "SourceType": "Package",
-      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\",
+      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\7.5.0\\staticwebassets\\",
       "BasePath": "_content/MudBlazor",
       "RelativePath": "MudBlazor.min.js",
       "AssetKind": "All",
@@ -52,7 +52,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.js"
+      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\7.5.0\\staticwebassets\\MudBlazor.min.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.boot.json",
@@ -90,7 +90,7 @@
       "AssetTraitValue": "boot",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\8.0.5\\build\\net8.0\\blazor.webassembly.js"
+      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\8.0.7\\build\\net8.0\\blazor.webassembly.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\BlazorWebAppAutoRendering.Client.pdb",
@@ -5527,25 +5527,6 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\System.Threading.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Debug\\net8.0\\compressed\\f7uxrr2vep.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/blazor.webassembly.js.gz",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Debug\\net8.0\\compressed\\fex0xgacao.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -7693,6 +7674,25 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\System.Security.Cryptography.OpenSsl.wasm"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Debug\\net8.0\\compressed\\xycu92z8sk.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/blazor.webassembly.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Debug\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Debug\\net8.0\\compressed\\xz6lbef9e7.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -7959,25 +7959,6 @@
       "OriginalItemSpec": "wwwroot\\appsettings.json"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\css\\new_app.css",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "css/new_app.css",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\new_app.css"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\img\\yyy.jpg",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Discovered",
@@ -7997,6 +7978,25 @@
       "OriginalItemSpec": "wwwroot\\img\\yyy.jpg"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\CookiesServ.js",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "js/CookiesServ.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\CookiesServ.js"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file.js",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Discovered",
@@ -8014,6 +8014,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\file.js"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\interface.js",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "js/interface.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\interface.js"
     }
   ]
 }

@@ -1,24 +1,5 @@
-// Оборачиваем весь код в функцию, чтобы избежать повторного объявления переменных в глобальной области видимости
 (function () {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
-    function logDebug(message) {
-        const debugOutput = document.getElementById('debugOutput');
-        if (debugOutput) {
-            debugOutput.value += message + '\n';
-            debugOutput.scrollTop = debugOutput.scrollHeight; // Scroll to bottom
-        }
-    }
-    document.getElementById('contextMenu').style.display = 'none';
-    const canvas = document.getElementById('canvas');
-    if (!canvas) {
-        logDebug("Canvas element not found");
-        return;
-    }
-    else {
-        canvas.oncontextmenu = () => false;
-        logDebug("Canvas element found");
-    }
-    let objects = [];
     (_a = document.getElementById('fileInput')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', function (event) {
         var _a;
         try {
@@ -45,6 +26,17 @@
             console.error('Error reading file:', error);
         }
     });
+    document.getElementById('contextMenu').style.display = 'none';
+    const canvas = document.getElementById('canvas');
+    if (!canvas) {
+        logDebug("Canvas element not found");
+        return;
+    }
+    else {
+        canvas.oncontextmenu = () => false;
+        logDebug("Canvas element found");
+    }
+    let objects = [];
     function processFileContent(content) {
         try {
             const sizeMatch = content.match(/Size:({[^}]+})/);
@@ -52,6 +44,24 @@
             if (sizeMatch && objectsMatch) {
                 const size = JSON.parse(sizeMatch[1]);
                 const shapes = JSON.parse(`[${objectsMatch[1]}]`);
+                objects = shapes.map((obj) => {
+                    if (obj.type === 'rectangle') {
+                        return obj;
+                    }
+                    else if (obj.type === 'circle') {
+                        return obj;
+                    }
+                    else if (obj.type === 'line') {
+                        return obj;
+                    }
+                    else {
+                        throw new Error('Unknown shape type');
+                    }
+                });
+            }
+            else if (sizeMatch && (objectsMatch == null)) {
+                const size = JSON.parse(sizeMatch[1]);
+                const shapes = objectsMatch ? JSON.parse(`[${objectsMatch[1]}]`) : [];
                 objects = shapes.map((obj) => {
                     if (obj.type === 'rectangle') {
                         return obj;
@@ -79,10 +89,10 @@
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
         if (!ctx) {
-            //logDebug("Failed to get canvas context");
+            logDebug("Failed to get canvas context");
         }
         else {
-            //logDebug("Canvas context obtained");
+            logDebug("Canvas context obtained");
         }
         const img = new Image();
         img.onload = function () {
@@ -571,8 +581,10 @@
         }
         //пробуем сделать с локальным хранилищем
         function applyCssFromLocalStorage() {
+            logDebug("entering into applyCssFromLocalStorage");
             const cssContent = localStorage.getItem('uploadedCss2');
             if (cssContent) {
+                logDebug(`Mouse move at (${cssContent}`);
                 const style = document.createElement('style');
                 style.textContent = cssContent;
                 document.head.appendChild(style);
@@ -608,6 +620,31 @@
                 reader.readAsText(file);
             }
         });
+        // Сохранение схемы между перезагрузками
+        // Функция для сохранения схемы в локальное хранилище
+        function saveToLocalStorage() {
+            const size = { width: canvas.width, height: canvas.height };
+            const shapes = JSON.stringify(objects, null, 2);
+            const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
+            localStorage.setItem('savedSchema', content);
+        }
+        // Функция для восстановления схемы из локального хранилища
+        function loadFromLocalStorage() {
+            logDebug(`enteringInto_loadFromLocalStorage`);
+            const savedSchema = localStorage.getItem('savedSchema');
+            logDebug(`Mouse down at (${savedSchema}`);
+            if (savedSchema) {
+                logDebug("something_wrong");
+                processFileContent(savedSchema);
+                //drawObjects();
+            }
+        }
+        // Восстановление схемы при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('load', loadFromLocalStorage);
+        });
+        // Запуск автосохранения каждую минуту
+        setInterval(saveToLocalStorage, 60000);
     }
     else {
         console.error("Canvas context is not supported");

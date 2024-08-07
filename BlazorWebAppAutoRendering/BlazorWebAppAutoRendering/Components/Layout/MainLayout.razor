@@ -1,14 +1,27 @@
 ﻿@inherits LayoutComponentBase
+@using MudBlazor
+@using MudBlazor.Services
+
+<style>
+    .custom-a {
+        margin-left: 0 !important;
+    }
+</style>
 
 <div class="page">
-    <div class="sidebar">
+@*     <div class="sidebar">
         <NavMenu />
-    </div>
+    </div> *@
+
 
     <main>
-
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <a href="/" target="_blank" class="custom-a">App</a>
+            <label>/</label>
+            <a href="reg" target="_blank" class="custom-a">Sign up</a>
+            <label>/</label>
+            <a href="auth" target="_blank" class="custom-a">Sign in</a>
+            <a href="https://mephi.ru/" target="_blank">About us</a>
         </div>
 
         <article class="content px-4">

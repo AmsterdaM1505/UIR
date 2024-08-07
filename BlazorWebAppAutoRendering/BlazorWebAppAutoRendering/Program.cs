@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor.Services;
+
+
 
 // Создаем и настраиваем билдера веб-приложения
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +22,7 @@ builder.Services.AddRazorComponents()                      // Добавляем поддержк
 
 builder.Services.AddCors();                                // Добавляем поддержку CORS (Cross-Origin Resource Sharing)
 builder.Services.AddControllers();                         // Добавляем поддержку контроллеров для API
+builder.Services.AddMudServices();
 
 // Строим веб-приложение
 var app = builder.Build();
@@ -82,36 +86,4 @@ public class UploadController(IWebHostEnvironment envir) : ControllerBase
     }
 }
 
-// Сервис для работы с куками
-public class CookieService
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    // Конструктор, принимающий IHttpContextAccessor для доступа к текущему HTTP контексту
-    public CookieService(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    // Метод для установки куки
-    public void SetCookie(string key, string value, int? expireTime)
-    {
-        CookieOptions option = new CookieOptions();
-
-        // Устанавливаем время истечения куки
-        if (expireTime.HasValue)
-            option.Expires = DateTime.Now.AddMinutes(expireTime.Value);
-        else
-            option.Expires = DateTime.Now.AddDays(7);
-
-        // Добавляем куки в ответ
-        _httpContextAccessor.HttpContext.Response.Cookies.Append(key, value, option);
-    }
-
-    // Метод для получения значения куки
-    public string GetCookie(string key)
-    {
-        // Возвращаем значение куки из запроса
-        return _httpContextAccessor.HttpContext.Request.Cookies[key];
-    }
-}

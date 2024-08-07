@@ -1,0 +1,96 @@
+﻿@page "/auth"
+@rendermode InteractiveAuto
+@using MudBlazor
+@using MudBlazor.Services
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+
+<style>
+    .custom-border {
+        border: 1px solid black;
+        border-radius: 4px;
+    }
+
+    .custom-inputbox {
+        border-bottom: 2px solid black;
+    }
+
+    .custom-grid {
+        border: 1px solid black;
+        border-radius: 4px;
+        padding-right: 24px;
+        padding-bottom: 24px;
+    }
+</style>
+
+<MudGrid Class="pa-4">
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8"></MudPaper>
+    </MudItem>
+    <MudFlexBreak />
+    <MudItem xs="6" sm="3">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8"></MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" Class="custom-border; custom-grid">
+        <h3>Авторизация</h3>
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" class="custom-inputbox" />
+                <MudTextField T="string" Label="Password" @ref="pwField1"
+                              InputType="InputType.Password"
+                              Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                              RequiredError="Password is required!" class="custom-inputbox" />
+                <div class="d-flex">
+                    <MudRadioGroup T="string" Required="true" RequiredError="Account type is required!">
+                        <MudRadio Value="@("Personal")">Personal</MudRadio>
+                        <MudRadio Value="@("Professional")">Professional</MudRadio>
+                    </MudRadioGroup>
+                </div>
+                <div class="d-flex align-center justify-space-between">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)">Войти</MudButton>
+                </div>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+    @* <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+            <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
+            @foreach (var error in errors)
+            {
+                <MudText Color="@Color.Error">@error</MudText>
+            }
+        </MudPaper>
+    </MudItem> *@
+</MudGrid>
+@code {
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
+    }
+
+}

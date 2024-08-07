@@ -52,7 +52,7 @@
           "dependencies": {
             "Microsoft.AspNetCore.Components.WebAssembly": {
               "target": "Package",
-              "version": "[8.0.5, )"
+              "version": "[8.0.7, )"
             },
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
@@ -63,18 +63,18 @@
             "Microsoft.NET.Sdk.WebAssembly.Pack": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.5, )",
+              "version": "[8.0.7, )",
               "autoReferenced": true
             },
             "Microsoft.TypeScript.MSBuild": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[5.4.4, )"
+              "version": "[5.5.3, )"
             },
             "MudBlazor": {
               "target": "Package",
-              "version": "[6.19.1, )"
+              "version": "[7.5.0, )"
             }
           },
           "imports": [
@@ -88,12 +88,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-              "version": "[8.0.5, 8.0.5]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
@@ -160,17 +154,17 @@
           "dependencies": {
             "Microsoft.AspNetCore.Components.WebAssembly.Server": {
               "target": "Package",
-              "version": "[8.0.5, )"
+              "version": "[8.0.7, )"
             },
             "Microsoft.TypeScript.MSBuild": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[5.4.4, )"
+              "version": "[5.5.3, )"
             },
             "MudBlazor": {
               "target": "Package",
-              "version": "[6.19.1, )"
+              "version": "[7.5.0, )"
             }
           },
           "imports": [

@@ -1,3 +1,4 @@
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\tsconfig.json
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\BlazorWebAppAutoRendering.Client.staticwebassets.runtime.json
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\appsettings.json
@@ -26,9 +27,14 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.AspNetCore.Components.WebAssembly.Server.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.AspNetCore.Metadata.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Localization.dll
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Localization.Abstractions.dll
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.JSInterop.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.JSInterop.WebAssembly.dll
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\MudBlazor.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\BlazorWebAppAutoRendering.Client.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\BlazorWebAppAutoRendering.Client.pdb
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.csproj.AssemblyReference.cache
@@ -37,6 +43,7 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.AssemblyInfo.cs
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.csproj.CoreCompileInputs.cache
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.sourcelink.json
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\staticwebassets\msbuild.BlazorWebAppAutoRendering.Microsoft.AspNetCore.StaticWebAssets.props
@@ -54,10 +61,3 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.pdb
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.genruntimeconfig.cache
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\ref\BlazorWebAppAutoRendering.dll
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Localization.dll
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Localization.Abstractions.dll
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\MudBlazor.dll
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\tsconfig.json
-C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\obj\Debug\net8.0\BlazorWebAppAutoRendering.sourcelink.json

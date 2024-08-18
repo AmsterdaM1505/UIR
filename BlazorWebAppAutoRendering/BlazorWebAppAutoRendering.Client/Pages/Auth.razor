@@ -66,8 +66,8 @@
 @code {
     bool success;
     string[] errors = { };
-    MudTextField<string> pwField1;
-    MudForm form;
+    MudTextField<string> pwField1 = new MudTextField<string>();
+    MudForm form = new MudForm();
 
     private IEnumerable<string> PasswordStrength(string pw)
     {
@@ -90,7 +90,7 @@
     {
         if (pwField1.Value != arg)
             return "Passwords don't match";
-        return null;
+        return string.Empty;
     }
 
 }

@@ -1,5 +1,19 @@
 (function () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+    let objects = [];
+    let ctx = null;
+    // Переменные для хранения информации о текущем выбранном объекте и его начальной позиции
+    let selectedObject = null;
+    let selectedObject_canv = null;
+    let selectedObject_buf = null;
+    let selectedLineEnd = null; // Новая переменная для хранения конца линии
+    let startX, startY;
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    let mouse_meaning_check = 0;
     (_a = document.getElementById('fileInput')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', function (event) {
         var _a;
         try {
@@ -36,7 +50,6 @@
         canvas.oncontextmenu = () => false;
         logDebug("Canvas element found");
     }
-    let objects = [];
     function processFileContent(content) {
         try {
             const sizeMatch = content.match(/Size:({[^}]+})/);
@@ -85,7 +98,6 @@
             console.error('Error processing file content:', error);
         }
     }
-    let ctx = null;
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -94,6 +106,9 @@
         else {
             logDebug("Canvas context obtained");
         }
+        window.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('DOMContentLoaded', loadFromLocalStorage);
+        });
         const img = new Image();
         img.onload = function () {
             //logDebug("Image loaded");
@@ -103,11 +118,6 @@
             //logDebug("Failed to load image");
         };
         img.src = 'img/yyy.jpg';
-        // Переменные для хранения информации о текущем выбранном объекте и его начальной позиции
-        let selectedObject = null;
-        let selectedObject_buf = null;
-        let selectedLineEnd = null; // Новая переменная для хранения конца линии
-        let startX, startY;
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e) {
             //logDebug("Mouse down");
@@ -138,7 +148,6 @@
             logDebug("Delete shape button clicked");
             deleteShape();
         });
-        // Добавляем кнопки для вращения фигур
         (_f = document.getElementById('rotateLeftBtn')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
@@ -203,10 +212,12 @@
             menu.hidden = true;
         }
         // Инициализация отрисовки объектов на холсте
-        drawObjects();
+        //drawObjects();
         function drawObjects() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.translate(offsetX, offsetY);
                 for (const obj of objects) {
                     logDebug(`Drawing object: ${JSON.stringify(obj)}`);
                     ctx.save();
@@ -367,8 +378,11 @@
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
             const mouse_meaning = e.button;
+            if (mouse_meaning === 1) {
+                mouse_meaning_check = 1;
+            }
             logDebug(`Mouse down at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
-            if (mouse_meaning == 0) {
+            if (mouse_meaning === 0 && mouse_meaning_check != 1) {
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
                     if (obj.type === 'rectangle') {
@@ -400,7 +414,9 @@
                         // Simplified line hit detection for example purposes
                         const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
                         const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
-                        if (distStart < 5 || distEnd < 5) {
+                        const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                            Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
+                        if (distStart < 5 || distEnd < 5 || distToLine < 10) {
                             selectedObject = line;
                             selectedObject_buf = line;
                             startX = mouseX;
@@ -416,7 +432,7 @@
                 }
                 drawObjects();
             }
-            else if (mouse_meaning == 2 && selectedObject_buf != null) { // тут селект объект равен нулю
+            else if (mouse_meaning == 2 && selectedObject_buf != null && mouse_meaning_check != 1) { // тут селект объект равен нулю
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
                     if (obj.type === 'rectangle') {
@@ -448,7 +464,9 @@
                         // Simplified line hit detection for example purposes
                         const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
                         const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
-                        if (distStart < 5 || distEnd < 5) {
+                        const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                            Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
+                        if (distStart < 5 || distEnd < 5 || distToLine < 10) {
                             selectedObject = line;
                             selectedObject_buf = line;
                             startX = mouseX;
@@ -460,15 +478,52 @@
                     }
                 }
             }
+            else if (mouse_meaning_check === 1) {
+                logDebug(`Button pressed id - 1 - (${mouse_meaning})`);
+                e.preventDefault();
+                startX = e.offsetX;
+                startY = e.offsetY;
+                if (e.button === 1) {
+                    isPanning = true;
+                    panStartX = e.clientX;
+                    panStartY = e.clientY;
+                    canvas.style.cursor = 'move';
+                    return;
+                }
+                selectedObject_canv = objects.find(obj => {
+                    switch (obj.type) {
+                        case 'rectangle':
+                            const rect = obj;
+                            return startX >= rect.x && startX <= rect.x + rect.width && startY >= rect.y && startY <= rect.y + rect.height;
+                        case 'circle':
+                            const circle = obj;
+                            const dx = startX - circle.x;
+                            const dy = startY - circle.y;
+                            return dx * dx + dy * dy <= circle.radius * circle.radius;
+                        case 'line':
+                            const line = obj;
+                            const length = Math.sqrt(Math.pow((line.endX - line.startX), 2) + Math.pow((line.endY - line.startY), 2));
+                            const dotProduct = ((startX - line.startX) * (line.endX - line.startX) + (startY - line.startY) * (line.endY - line.startY)) / Math.pow(length, 2);
+                            const closestX = line.startX + dotProduct * (line.endX - line.startX);
+                            const closestY = line.startY + dotProduct * (line.endY - line.startY);
+                            const distX = startX - closestX;
+                            const distY = startY - closestY;
+                            const distance = Math.sqrt(distX * distX + distY * distY);
+                            return distance <= 10;
+                        default:
+                            return false;
+                    }
+                }) || null;
+                drawObjects();
+            }
         }
         function onMouseMove(e) {
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
             const mouse_meaning = e.button;
             logDebug(`Mouse move at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
-            if (selectedObject && (mouse_meaning == 0)) {
+            if (selectedObject && (mouse_meaning === 0) && mouse_meaning_check != 1) {
                 logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
-                //displayCursorCoordinates(e);
                 if (selectedObject.type === 'rectangle') {
                     const rect = selectedObject;
                     rect.x = mouseX - startX;
@@ -483,6 +538,9 @@
                     const line = selectedObject;
                     const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
                     const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
+                    // Расчет расстояния от точки до линии
+                    const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                        Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
                     if (distStart < 20) {
                         const dx = mouseX - startX;
                         const dy = mouseY - startY;
@@ -503,37 +561,99 @@
                         drawObjects();
                         logDebug(`Line selected end`);
                     }
+                    else if (distToLine < 10) { // Проверка на близость к линии
+                        const dx = mouseX - startX;
+                        const dy = mouseY - startY;
+                        line.startX += dx;
+                        line.startY += dy;
+                        line.endX += dx;
+                        line.endY += dy;
+                        startX = mouseX;
+                        startY = mouseY;
+                        drawObjects();
+                        logDebug(`Line selected body`);
+                    }
                     else {
-                        logDebug(`GGWP1`);
+                        //logDebug(`GGWP1`);
                     }
                 }
                 drawObjects();
             }
+            else if (mouse_meaning_check === 1) {
+                logDebug(`Button moved id - 1`);
+                e.preventDefault();
+                if (isPanning) {
+                    const dx = e.clientX - panStartX;
+                    const dy = e.clientY - panStartY;
+                    offsetX += dx;
+                    offsetY += dy;
+                    panStartX = e.clientX;
+                    panStartY = e.clientY;
+                    drawObjects();
+                    return;
+                }
+                if (selectedObject_canv && (e.buttons & 1) === 1) {
+                    const dx = e.offsetX - startX;
+                    const dy = e.offsetY - startY;
+                    switch (selectedObject_canv.type) {
+                        case 'rectangle':
+                            const rect = selectedObject_canv;
+                            rect.x += dx;
+                            rect.y += dy;
+                            break;
+                        case 'circle':
+                            const circle = selectedObject_canv;
+                            circle.x += dx;
+                            circle.y += dy;
+                            break;
+                        case 'line':
+                            const line = selectedObject_canv;
+                            line.startX += dx;
+                            line.startY += dy;
+                            line.endX += dx;
+                            line.endY += dy;
+                            break;
+                    }
+                    startX = e.offsetX;
+                    startY = e.offsetY;
+                    drawObjects();
+                }
+            }
             else {
-                logDebug(`GGWP2`);
+                //logDebug(`GGWP2`);
             }
         }
         function onMouseUp(e) {
             let mouse_meaning = e.button;
-            if (selectedObject && (mouse_meaning == 0)) {
+            if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
                 logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
             }
-            else if (mouse_meaning == 0) {
+            else if (mouse_meaning == 0 && mouse_meaning_check != 1) {
                 logDebug("Mouse up, no object selected");
                 selectedObject_buf = null;
                 drawObjects();
+            }
+            else if (mouse_meaning_check === 1) {
+                logDebug(`Button unpressed id - 1`);
+                e.preventDefault();
+                if (isPanning && mouse_meaning === 1) {
+                    isPanning = false;
+                    canvas.style.cursor = 'default';
+                }
+                selectedObject_canv = null;
+                mouse_meaning_check = 0;
             }
             selectedObject = null;
             selectedLineEnd = null;
         }
         function downloadFile(filename, content) {
-            const blob = new Blob([content], { type: 'text/plain' });
+            const blob = new Blob([content], { type: 'text/plain' }); //Создание нового объекта Blob (Binary Large Object)
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
+            link.href = URL.createObjectURL(blob); //Создание временного URL для объекта blob
             link.download = filename;
             document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.click(); // Программное кликанье по ссылке
+            document.body.removeChild(link); //Удаление ссылки из документа. Это делается для очистки DOM после скачивания файла, так как ссылка больше не нужна
         }
         (_l = document.getElementById('downloadBtn')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
@@ -636,15 +756,123 @@
             if (savedSchema) {
                 logDebug("something_wrong");
                 processFileContent(savedSchema);
-                //drawObjects();
+                drawObjects();
             }
         }
-        // Восстановление схемы при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            window.addEventListener('load', loadFromLocalStorage);
+        // Запуск периодического сохранения и восстановления
+        setInterval(saveToLocalStorage, 6000);
+        function processOWLFileContent(content) {
+            try {
+                // Пример простой обработки OWL файла
+                // В реальной жизни вам, вероятно, понадобится парсер OWL для этого
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(content, "application/xml");
+                const sizeElement = xmlDoc.getElementsByTagName('size')[0];
+                const objectsElements = xmlDoc.getElementsByTagName('object');
+                const size = {
+                    width: parseInt(sizeElement.getAttribute('width') || '0'),
+                    height: parseInt(sizeElement.getAttribute('height') || '0')
+                };
+                objects = Array.from(objectsElements).map((elem) => {
+                    const type = elem.getAttribute('type');
+                    if (type === 'rectangle') {
+                        return {
+                            type,
+                            x: parseFloat(elem.getAttribute('x') || '0'),
+                            y: parseFloat(elem.getAttribute('y') || '0'),
+                            width: parseFloat(elem.getAttribute('width') || '0'),
+                            height: parseFloat(elem.getAttribute('height') || '0'),
+                            color: elem.getAttribute('color') || '#000',
+                            rotation: parseFloat(elem.getAttribute('rotation') || '0'),
+                        };
+                    }
+                    else if (type === 'circle') {
+                        return {
+                            type,
+                            x: parseFloat(elem.getAttribute('x') || '0'),
+                            y: parseFloat(elem.getAttribute('y') || '0'),
+                            radius: parseFloat(elem.getAttribute('radius') || '0'),
+                            color: elem.getAttribute('color') || '#000',
+                            rotation: parseFloat(elem.getAttribute('rotation') || '0'),
+                        };
+                    }
+                    else if (type === 'line') {
+                        return {
+                            type,
+                            startX: parseFloat(elem.getAttribute('startX') || '0'),
+                            startY: parseFloat(elem.getAttribute('startY') || '0'),
+                            endX: parseFloat(elem.getAttribute('endX') || '0'),
+                            endY: parseFloat(elem.getAttribute('endY') || '0'),
+                            color: elem.getAttribute('color') || '#000',
+                            rotation: parseFloat(elem.getAttribute('rotation') || '0'),
+                        };
+                    }
+                    else {
+                        throw new Error('Unknown shape type');
+                    }
+                });
+                drawObjects();
+            }
+            catch (error) {
+                console.error('Error processing OWL file content:', error);
+            }
+        }
+        (_q = document.getElementById('fileInput3')) === null || _q === void 0 ? void 0 : _q.addEventListener('change', function (event) {
+            var _a;
+            try {
+                const input = event.target;
+                const file = (_a = input.files) === null || _a === void 0 ? void 0 : _a[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        var _a;
+                        try {
+                            const content = (_a = e.target) === null || _a === void 0 ? void 0 : _a.result;
+                            if (typeof content === 'string') {
+                                // Detect file extension or content type to process accordingly
+                                if (file.name.endsWith('.owl')) {
+                                    processOWLFileContent(content);
+                                }
+                                else {
+                                    processFileContent(content);
+                                }
+                            }
+                        }
+                        catch (error) {
+                            console.error('Error processing file content:', error);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            }
+            catch (error) {
+                console.error('Error reading file:', error);
+            }
         });
-        // Запуск автосохранения каждую минуту
-        setInterval(saveToLocalStorage, 60000);
+        function convertObjectsToOWL(objects) {
+            const size = { width: canvas.width, height: canvas.height };
+            const sizeXML = `<size width="${size.width}" height="${size.height}"/>`;
+            const objectsXML = objects.map(obj => {
+                switch (obj.type) {
+                    case 'rectangle':
+                        const rect = obj;
+                        return `<object type="rectangle" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" color="${rect.color}" rotation="${rect.rotation || 0}"/>`;
+                    case 'circle':
+                        const circle = obj;
+                        return `<object type="circle" x="${circle.x}" y="${circle.y}" radius="${circle.radius}" color="${circle.color}" rotation="${circle.rotation || 0}"/>`;
+                    case 'line':
+                        const line = obj;
+                        return `<object type="line" startX="${line.startX}" startY="${line.startY}" endX="${line.endX}" endY="${line.endY}" color="${line.color}" rotation="${line.rotation || 0}"/>`;
+                    default:
+                        throw new Error('Unknown object type');
+                }
+            }).join('\n');
+            return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
+        }
+        (_r = document.getElementById('downloadBtn3')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
+            const owlContent = convertObjectsToOWL(objects);
+            downloadFile('shapes.owl', owlContent);
+        });
     }
     else {
         console.error("Canvas context is not supported");

@@ -1,3 +1,4 @@
+// функции составления, получения и удаления
 window.cookiesInterop = {
     setCookie: function (name, value, days) {
         var expires = "";

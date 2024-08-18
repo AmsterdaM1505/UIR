@@ -8,6 +8,8 @@
 <PageTitle>pageee</PageTitle>
 <style>
     .custom-border {
+        flex: 1 !important;
+        display: flex;
         border: 1px solid black;
         border-radius: 4px;
     }
@@ -15,7 +17,7 @@
 
 
 <div style="display: flex;">
-    <div style="flex: 1; flex-direction: row;">
+@*     <div style="flex: 1; flex-direction: row;">
         <MudButton id="addRectBtn" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
         <MudButton id="addCircleBtn" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Secondary">Добавить круг</MudButton><br>
         <MudButton id="addLineBtn" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Info">Добавить линию</MudButton><br>
@@ -34,9 +36,32 @@
 
         <MudButton id="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary">Загрузить CSS</MudButton><br>
         <input type="file" id="cssFileInput" accept=".css"><br>
+    </div> *@
+    <div style="flex: 1; flex-direction: column; height: 600px; overflow-y: auto; align-items: center; width: 80px; border: 1px solid grey; padding: 15px; margin-right:10px">
+        <MudButton id="addRectBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
+        <MudButton id="addCircleBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Secondary">Добавить круг</MudButton><br>
+        <MudButton id="addLineBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Добавить линию</MudButton><br>
+        <MudButton id="delShapeBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Удалить фигуру</MudButton><br>
+        <MudButton id="rotateLeftBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Повернуть вправо</MudButton><br>
+        <MudButton id="rotateRightBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Повернуть влево</MudButton><br>
+        <MudButton id="downloadBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Скачать диаграмму</MudButton><br>
+
+        <MudButton id="downloadBtn3" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">OWL скачивание</MudButton><br>
+        <input type="file" id="fileInput3" name="fileInput3" style="width: 70%; margin-bottom: 10px;"><br>
+
+        <label for="fileInput" class="custom-file-upload" style="display: block; width: 70%; text-align: center; margin-bottom: 10px;">
+            Загрузить диаграмму
+        </label>
+        <input type="file" id="fileInput" name="fileInput" style="width: 70%; margin-bottom: 10px;"><br>
+
+        <MudButton id="uploadCssBtn2" Variant="Variant.Filled" Color="Color.Primary" Style="width: 70%; height: 60px;">Загрузить еще CSS(лх)</MudButton><br>
+        <input type="file" id="cssFileInput2" accept=".css" style="width: 70%; margin-bottom: 10px;"><br>
+
+        <MudButton id="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 70%; height: 60px;">Загрузить CSS</MudButton><br>
+        <input type="file" id="cssFileInput" accept=".css" style="width: 70%;"><br>
     </div>
     <div style="flex: 2;">
-        <canvas id="canvas" width="700" height="500" style="border:1px solid grey"></canvas>
+        <canvas id="canvas" width="698" height="598" style="border:1px solid grey"></canvas>
         <div id="contextMenu" class="context-menu" hidden>
             <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Primary">Delete</MudButton><br>
             <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Secondary">Rotate Left</MudButton><br>
@@ -74,10 +99,10 @@
 </div>
 
 @code {
-    private string cookieName;
-    private string cookieValue;
+    private string cookieName = string.Empty;
+    private string cookieValue = string.Empty;
     private int? days;
-    private string cookieResult;
+    private string cookieResult = string.Empty;
 
     private async Task SetCookie()
     {

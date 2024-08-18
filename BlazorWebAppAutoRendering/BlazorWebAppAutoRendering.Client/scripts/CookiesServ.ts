@@ -5,7 +5,7 @@
         eraseCookie: (name: string) => void;
     };
 }
-
+// функции составления, получения и удаления
 window.cookiesInterop = {
     setCookie: function (name, value, days) { //ключ значение, срок хранения
         var expires = "";

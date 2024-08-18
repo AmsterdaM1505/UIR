@@ -26,6 +26,7 @@ interface Line extends Shape {
     endY: number;
     color: string;
 }
+type GraphObject = Rectangle | Circle | Line;
 
 function logDebug(message: string) {
     const debugOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;

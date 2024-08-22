@@ -16,27 +16,27 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = BlazorWebAppAutoRendering.Client
 build_property.RootNamespace = BlazorWebAppAutoRendering.Client
-build_property.ProjectDir = C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\
+build_property.ProjectDir = c:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client
+build_property.MSBuildProjectDirectory = c:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Auth.razor]
+[c:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Auth.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Component2.razor]
+[c:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Component2.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50Mi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Registr.razor]
+[c:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Registr.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/_Imports.razor]
+[c:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

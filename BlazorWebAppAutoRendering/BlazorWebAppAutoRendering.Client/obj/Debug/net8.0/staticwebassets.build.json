@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "7ffUdBN+mg3Cjz4LVaObJ0VyNfzuQd9ELhsumFx2N1k=",
+  "Hash": "+d7pWcsPohF7Owj4DqFsXPKjMCIKE5+XuuPMc73/BSA=",
   "Source": "BlazorWebAppAutoRendering.Client",
   "BasePath": "/",
   "Mode": "Default",
@@ -8014,6 +8014,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\file.js"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file1.js",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "js/file1.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\file1.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\interface.js",

@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets\\js\\file.js"
     },
     {
+      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file1.js",
+      "PackagePath": "staticwebassets\\js\\file1.js"
+    },
+    {
       "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\interface.js",
       "PackagePath": "staticwebassets\\js\\interface.js"
     },

@@ -1,11 +1,13 @@
 (function () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
+    //import { v4 as uuidv4 } from 'uuid';
     let objects = [];
     let ctx = null;
     // Переменные для хранения информации о текущем выбранном объекте и его начальной позиции
     let selectedObject = null;
     let selectedObject_canv = null;
     let selectedObject_buf = null;
+    let selectedObject_buf_connect = null;
     let selectedLineEnd = null; // Новая переменная для хранения конца линии
     let startX, startY;
     let isPanning = false;
@@ -14,6 +16,17 @@
     let offsetX = 0;
     let offsetY = 0;
     let mouse_meaning_check = 0;
+    let connectionServ = 2;
+    const container = document.getElementById('table-container');
+    function generateRandomId(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
     (_a = document.getElementById('fileInput')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', function (event) {
         var _a;
         try {
@@ -120,17 +133,13 @@
         img.src = 'img/yyy.jpg';
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e) {
-            //logDebug("Mouse down");
             onMouseDown(e);
         });
         canvas.addEventListener('mousemove', function (e) {
-            //logDebug("Mouse move");
             onMouseMove(e);
         });
         canvas.addEventListener('mouseup', function (e) {
-            //logDebug("Mouse up");
             onMouseUp(e);
-            //onRightClickUp();
         });
         (_b = document.getElementById('addRectBtn')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', function () {
             logDebug("Add rectangle button clicked");
@@ -144,41 +153,59 @@
             logDebug("Add line button clicked");
             addLine();
         });
-        (_e = document.getElementById('delShapeBtn')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', function () {
+        (_e = document.getElementById('addCloudBtn')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', function () {
+            logDebug("Add cloud button clicked");
+            addCloud();
+        });
+        (_f = document.getElementById('addStarBtn')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
+            logDebug("Add star button clicked");
+            addStar();
+        });
+        (_g = document.getElementById('delShapeBtn')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', function () {
             logDebug("Delete shape button clicked");
             deleteShape();
         });
-        (_f = document.getElementById('rotateLeftBtn')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
+        (_h = document.getElementById('rotateLeftBtn')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
         });
-        (_g = document.getElementById('rotateRightBtn')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', function () {
+        (_j = document.getElementById('rotateRightBtn')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
             logDebug("Rotate right button clicked");
             rotateSelectedObject(10);
         });
-        ////////////////////
-        (_h = document.getElementById('deleteItem')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
+        (_k = document.getElementById('deleteItem')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
             if (selectedObject_buf) {
                 deleteShape();
             }
             selectedObject_buf = null;
-            //hideContextMenu();
         });
-        (_j = document.getElementById('rotateLeftItem')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
+        (_l = document.getElementById('rotateLeftItem')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(-10);
             }
             selectedObject_buf = null;
             drawObjects();
-            //hideContextMenu();
         });
-        (_k = document.getElementById('rotateRightItem')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
+        (_m = document.getElementById('rotateRightItem')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(10);
             }
             selectedObject_buf = null;
             drawObjects();
             //hideContextMenu();
+        });
+        (_o = document.getElementById('connect_objects')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+            logDebug(`connectionObjects button clicked`);
+            connectionServ = 1;
+            connectionObjects();
+        });
+        (_p = document.getElementById('remove_connection')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
+            logDebug(`remove_connection button clicked`);
+            connectionServ = 0;
+            removeObjects();
+        });
+        (_q = document.getElementById('additionInfo')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
+            addInfoclick();
         });
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
@@ -212,24 +239,71 @@
             menu.hidden = true;
         }
         // Инициализация отрисовки объектов на холсте
-        //drawObjects();
+        drawObjects();
         function drawObjects() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
+                // Сначала отрисовываем связи между объектами
+                for (const obj of objects) {
+                    if (obj.linkedObjects) {
+                        obj.linkedObjects.forEach(linkedId => {
+                            const linkedObj = objects.find(o => o.id === linkedId);
+                            if (linkedObj) {
+                                ctx.beginPath();
+                                // Получаем центральные координаты текущего объекта
+                                const [startX, startY] = getObjectCenter(obj);
+                                // Получаем центральные координаты связанного объекта
+                                const [endX, endY] = getObjectCenter(linkedObj);
+                                // Рисуем линию от текущего объекта к связанному объекту
+                                ctx.moveTo(startX, startY);
+                                ctx.lineTo(endX, endY);
+                                ctx.strokeStyle = 'black';
+                                ctx.lineWidth = 2;
+                                ctx.stroke();
+                                //const newLine: Line = {
+                                //    id: generateRandomId(16),
+                                //    type: 'line',
+                                //    startX: startX,
+                                //    startY: startY,
+                                //    endX: endX,
+                                //    endY: endY,
+                                //    color: getRandomColor(),
+                                //    rotation: 0
+                                //};
+                                //objects.push(newLine);
+                            }
+                        });
+                    }
+                }
+                // Затем отрисовываем сами объекты
                 for (const obj of objects) {
                     logDebug(`Drawing object: ${JSON.stringify(obj)}`);
                     ctx.save();
+                    let centerX = 0;
+                    let centerY = 0;
                     if (obj.rotation) {
-                        const centerX = obj.type === 'rectangle' ? obj.x + obj.width / 2
-                            : obj.type === 'circle' ? obj.x
-                                : obj.type === 'line' ? (obj.startX + obj.endX) / 2
-                                    : 0;
-                        const centerY = obj.type === 'rectangle' ? obj.y + obj.height / 2
-                            : obj.type === 'circle' ? obj.y
-                                : obj.type === 'line' ? (obj.startY + obj.endY) / 2
-                                    : 0;
+                        if (obj.type === 'rectangle') {
+                            centerX = obj.x + obj.width / 2;
+                            centerY = obj.y + obj.height / 2;
+                        }
+                        else if (obj.type === 'circle') {
+                            centerX = obj.x;
+                            centerY = obj.y;
+                        }
+                        else if (obj.type === 'line') {
+                            centerX = (obj.startX + obj.endX) / 2;
+                            centerY = (obj.startY + obj.endY) / 2;
+                        }
+                        else if (obj.type === 'star') {
+                            centerX = obj.x_C;
+                            centerY = obj.y_C;
+                        }
+                        else if (obj.type === 'cloud') {
+                            centerX = obj.x_C;
+                            centerY = obj.y_C;
+                        }
                         ctx.translate(centerX, centerY);
                         ctx.rotate((obj.rotation * Math.PI) / 180);
                         ctx.translate(-centerX, -centerY);
@@ -242,11 +316,8 @@
                             if (selectedObject_buf == rect) {
                                 ctx.fillStyle = 'black';
                                 ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
-                                ctx.fillStyle = 'black';
                                 ctx.fillRect(rect.x + 45, rect.y - 5, 10, 10);
-                                ctx.fillStyle = 'black';
                                 ctx.fillRect(rect.x - 5, rect.y + 45, 10, 10);
-                                ctx.fillStyle = 'black';
                                 ctx.fillRect(rect.x + 45, rect.y + 45, 10, 10);
                             }
                             break;
@@ -294,6 +365,14 @@
                                 ctx.fill();
                             }
                             break;
+                        case 'star':
+                            const star = obj;
+                            drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
+                            break;
+                        case 'cloud':
+                            const cloud = obj;
+                            drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
+                            break;
                         default:
                             logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
                     }
@@ -304,8 +383,144 @@
                 logDebug("Canvas context is not available");
             }
         }
+        function getObjectCenter(obj) {
+            switch (obj.type) {
+                case 'rectangle':
+                    const rect = obj;
+                    return [rect.x + rect.width / 2, rect.y + rect.height / 2];
+                case 'circle':
+                    const circle = obj;
+                    return [circle.x, circle.y];
+                case 'line':
+                    const line = obj;
+                    return [(line.startX + line.endX) / 2, (line.startY + line.endY) / 2];
+                case 'star':
+                    const star = obj;
+                    return [star.x_C, star.y_C];
+                case 'cloud':
+                    const cloud = obj;
+                    return [cloud.x_C, cloud.y_C];
+                default:
+                    return [0, 0];
+            }
+        }
+        // Функция для добавления связи между объектами
+        function addLink(obj1, obj2) {
+            if (!obj1.linkedObjects)
+                obj1.linkedObjects = [];
+            if (!obj2.linkedObjects)
+                obj2.linkedObjects = [];
+            if (!obj1.linkedObjects.includes(obj2.id)) {
+                obj1.linkedObjects.push(obj2.id);
+            }
+            if (!obj2.linkedObjects.includes(obj1.id)) {
+                obj2.linkedObjects.push(obj1.id);
+            }
+        }
+        // Функция для удаления связи между объектами
+        function removeLink(obj1, obj2) {
+            if (obj1.linkedObjects) {
+                obj1.linkedObjects = obj1.linkedObjects.filter(id => id !== obj2.id);
+            }
+            if (obj2.linkedObjects) {
+                obj2.linkedObjects = obj2.linkedObjects.filter(id => id !== obj1.id);
+            }
+        }
+        function connectionObjects() {
+            if (selectedObject_buf) {
+                selectedObject_buf_connect = selectedObject_buf;
+                logDebug(`connectionObjects inside`);
+                logDebug(`connectionObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`connectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+            }
+        }
+        function removeObjects() {
+            if (selectedObject_buf) {
+                selectedObject_buf_connect = selectedObject_buf;
+                logDebug(`removeObjects inside`);
+                logDebug(`removeObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+            }
+        }
+        function addStar() {
+            const newStar = {
+                id: generateRandomId(16),
+                type: 'star',
+                x_C: Math.random() * (canvas.width - 200),
+                y_C: Math.random() * (canvas.width - 200),
+                rad: 100,
+                amount_points: 6,
+                m: 0.5,
+                color: getRandomColor(),
+                rotation: 0
+            };
+            objects.push(newStar);
+            logDebug(`Star added: ${JSON.stringify(newStar)}`);
+            drawObjects();
+        }
+        function addCloud() {
+            const newStar = {
+                id: generateRandomId(16),
+                type: 'cloud',
+                x_C: Math.random() * (canvas.width - 200),
+                y_C: Math.random() * (canvas.width - 200),
+                width: 200,
+                height: 120,
+                color: getRandomColor(),
+                rotation: 0
+            };
+            objects.push(newStar);
+            logDebug(`Cloud added: ${JSON.stringify(newStar)}`);
+            drawObjects();
+        }
+        function drawSquare(ctx, x, y, size) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(x - size / 2, y - size / 2, size, size);
+        }
+        function drawStar(ctx, x_C, y_C, rad, amount_points, m, obj) {
+            ctx.beginPath();
+            let points = [];
+            ctx.moveTo(x_C, y_C + rad);
+            for (let i = 0; i < 2 * amount_points; i++) {
+                let angle = Math.PI * i / amount_points;
+                let radius = i % 2 === 0 ? rad : rad * m;
+                let x = x_C + radius * Math.sin(angle);
+                let y = y_C + radius * Math.cos(angle);
+                points.push({ x, y });
+                ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = obj.color;
+            ctx.fill();
+            if (selectedObject_buf == obj) {
+                points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+            }
+        }
+        function drawCloud(ctx, x_C, y_C, width, height, obj) {
+            ctx.beginPath();
+            let startX_Cloud = x_C - width / 2;
+            let startY_Cloud = y_C - height / 2;
+            let points = [
+                { x: startX_Cloud + 0.25 * width, y: startY_Cloud + 0.25 * height },
+                { x: startX_Cloud + 0.75 * width, y: startY_Cloud + 0.25 * height },
+                { x: startX_Cloud + 0.75 * width, y: startY_Cloud + 0.75 * height },
+                { x: startX_Cloud + 0.25 * width, y: startY_Cloud + 0.75 * height }
+            ];
+            ctx.moveTo(points[0].x, points[0].y);
+            ctx.bezierCurveTo(points[0].x, startY_Cloud, points[1].x, startY_Cloud, points[1].x, points[1].y);
+            ctx.bezierCurveTo(startX_Cloud + width, points[1].y, startX_Cloud + width, points[2].y, points[2].x, points[2].y);
+            ctx.bezierCurveTo(points[2].x, startY_Cloud + height, points[3].x, startY_Cloud + height, points[3].x, points[3].y);
+            ctx.bezierCurveTo(startX_Cloud, points[3].y, startX_Cloud, points[0].y, points[0].x, points[0].y);
+            ctx.closePath();
+            ctx.fillStyle = obj.color;
+            ctx.fill();
+            if (selectedObject_buf == obj) {
+                points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+            }
+        }
         function addRect() {
             const newRect = {
+                id: generateRandomId(16),
                 type: 'rectangle',
                 x: Math.random() * (canvas.width - 50),
                 y: Math.random() * (canvas.height - 50),
@@ -320,6 +535,7 @@
         }
         function addCircle() {
             const newCircle = {
+                id: generateRandomId(16),
                 type: 'circle',
                 x: Math.random() * (canvas.width - 50) + 25,
                 y: Math.random() * (canvas.height - 50) + 25,
@@ -333,6 +549,7 @@
         }
         function addLine() {
             const newLine = {
+                id: generateRandomId(16),
                 type: 'line',
                 startX: Math.random() * canvas.width,
                 startY: Math.random() * canvas.height,
@@ -366,6 +583,14 @@
                 drawObjects();
             }
         }
+        function addInfoclick() {
+            addInfo(selectedObject_buf);
+        }
+        function addInfo(selectedObject_buf_) {
+            showPrompt("Введите текст:");
+            selectedObject_buf_.info = userInput;
+            //logDebug(`additionInfo pressed - ${JSON.stringify(userInput)}`);
+        }
         function getRandomColor() {
             const letters = '0123456789ABCDEF';
             let color = '#';
@@ -373,6 +598,44 @@
                 color += letters[Math.floor(Math.random() * 16)];
             }
             return color;
+        }
+        function pointInPolygon(x, y, points) {
+            let inside = false;
+            for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+                const xi = points[i].x, yi = points[i].y;
+                const xj = points[j].x, yj = points[j].y;
+                const intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                if (intersect)
+                    inside = !inside;
+            }
+            return inside;
+        }
+        function selectionCheck(selectedObject_buf_connect_, selectedObject_buf_, connectionServ_) {
+            if (selectedObject_buf_connect_ && connectionServ_ == 1) {
+                logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                addLink(selectedObject_buf_connect_, selectedObject_buf_);
+                selectedObject_buf_connect_ = null;
+            }
+            else if (selectedObject_buf_connect_ && connectionServ_ == 0) {
+                logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                removeLink(selectedObject_buf_connect_, selectedObject_buf_);
+                selectedObject_buf_connect_ = null;
+            }
+            return selectedObject_buf_connect_;
+        }
+        function tableObjectCheck(selectedObject_buf_) {
+            if (selectedObject_buf_) {
+                const table = createVerticalTable(selectedObject_buf_);
+                //if (table && table.parentElement) {
+                //    table.parentElement.removeChild(table);
+                //}
+                if (container) {
+                    while (container.firstChild) {
+                        container.removeChild(container.firstChild);
+                    }
+                }
+                container === null || container === void 0 ? void 0 : container.appendChild(table);
+            }
         }
         function onMouseDown(e) {
             const mouseX = e.clientX - canvas.offsetLeft;
@@ -393,6 +656,14 @@
                             startX = mouseX - rect.x;
                             startY = mouseY - rect.y;
                             logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+                            //if (selectedObject_buf_connect) {
+                            //    logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect)})`);
+                            //    addLink(selectedObject_buf_connect, selectedObject_buf);
+                            //    selectedObject_buf_connect = null;
+                            //}
+                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                            connectionServ == 2;
+                            tableObjectCheck(selectedObject_buf);
                             break;
                         }
                     }
@@ -406,12 +677,14 @@
                             startX = dx;
                             startY = dy;
                             logDebug(`Selected circle: ${JSON.stringify(circle)}`);
+                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                            connectionServ == 2;
+                            tableObjectCheck(selectedObject_buf);
                             break;
                         }
                     }
                     else if (obj.type === 'line') {
                         const line = obj;
-                        // Simplified line hit detection for example purposes
                         const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
                         const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
                         const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
@@ -422,6 +695,47 @@
                             startX = mouseX;
                             startY = mouseY;
                             logDebug(`Selected line: ${JSON.stringify(line)}`);
+                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                            connectionServ == 2;
+                            tableObjectCheck(selectedObject_buf);
+                            break;
+                        }
+                    }
+                    else if (obj.type === 'star') {
+                        const star = obj;
+                        const points = [];
+                        for (let i = 0; i < 2 * star.amount_points; i++) {
+                            let angle = Math.PI * i / star.amount_points;
+                            let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
+                            let x = star.x_C + radius * Math.sin(angle);
+                            let y = star.y_C + radius * Math.cos(angle);
+                            points.push({ x, y });
+                        }
+                        if (pointInPolygon(mouseX, mouseY, points)) {
+                            selectedObject = star;
+                            selectedObject_buf = star;
+                            startX = mouseX - star.x_C;
+                            startY = mouseY - star.y_C;
+                            logDebug(`Selected star: ${JSON.stringify(star)}`);
+                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                            connectionServ == 2;
+                            tableObjectCheck(selectedObject_buf);
+                            break;
+                        }
+                    }
+                    else if (obj.type === 'cloud') {
+                        const cloud = obj;
+                        let startX_Cloud = cloud.x_C - cloud.width / 2;
+                        let startY_Cloud = cloud.y_C - cloud.height / 2;
+                        if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
+                            selectedObject = cloud;
+                            selectedObject_buf = cloud;
+                            startX_Cloud = mouseX - cloud.x_C;
+                            startY_Cloud = mouseY - cloud.y_C;
+                            logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                            connectionServ == 2;
+                            tableObjectCheck(selectedObject_buf);
                             break;
                         }
                     }
@@ -476,6 +790,38 @@
                             break;
                         }
                     }
+                    else if (obj.type === 'star') {
+                        const star = obj;
+                        const points = [];
+                        for (let i = 0; i < 2 * star.amount_points; i++) {
+                            let angle = Math.PI * i / star.amount_points;
+                            let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
+                            let x = star.x_C + radius * Math.sin(angle);
+                            let y = star.y_C + radius * Math.cos(angle);
+                            points.push({ x, y });
+                        }
+                        if (pointInPolygon(mouseX, mouseY, points)) {
+                            selectedObject_buf = star;
+                            startX = mouseX - star.x_C;
+                            startY = mouseY - star.y_C;
+                            showContextMenu(e.clientX, e.clientY);
+                            logDebug(`Selected star: ${JSON.stringify(star)}`);
+                            break;
+                        }
+                    }
+                    else if (obj.type === 'cloud') {
+                        const cloud = obj;
+                        let startX_Cloud = cloud.x_C - cloud.width / 2;
+                        let startY_Cloud = cloud.y_C - cloud.height / 2;
+                        if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
+                            selectedObject_buf = cloud;
+                            startX_Cloud = mouseX - cloud.x_C;
+                            startY_Cloud = mouseY - cloud.y_C;
+                            showContextMenu(e.clientX, e.clientY);
+                            logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                            break;
+                        }
+                    }
                 }
             }
             else if (mouse_meaning_check === 1) {
@@ -510,6 +856,22 @@
                             const distY = startY - closestY;
                             const distance = Math.sqrt(distX * distX + distY * distY);
                             return distance <= 10;
+                        case 'star':
+                            const star = obj;
+                            const points = [];
+                            for (let i = 0; i < 2 * star.amount_points; i++) {
+                                let angle = Math.PI * i / star.amount_points;
+                                let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
+                                let x = star.x_C + radius * Math.sin(angle);
+                                let y = star.y_C + radius * Math.cos(angle);
+                                points.push({ x, y });
+                            }
+                            return pointInPolygon(mouseX, mouseY, points);
+                        case 'cloud':
+                            const cloud = obj;
+                            let startX_Cloud = cloud.x_C - cloud.width / 2;
+                            let startY_Cloud = cloud.y_C - cloud.height / 2;
+                            return startX >= startX_Cloud && startX <= startX_Cloud + cloud.width && startY >= startY_Cloud && startY <= startY_Cloud + cloud.height;
                         default:
                             return false;
                     }
@@ -577,6 +939,16 @@
                         //logDebug(`GGWP1`);
                     }
                 }
+                else if (selectedObject.type === 'star') {
+                    const star = selectedObject;
+                    star.x_C = mouseX - startX;
+                    star.y_C = mouseY - startY;
+                }
+                else if (selectedObject.type === 'cloud') {
+                    const cloud = selectedObject;
+                    cloud.x_C = mouseX - startX;
+                    cloud.y_C = mouseY - startY;
+                }
                 drawObjects();
             }
             else if (mouse_meaning_check === 1) {
@@ -612,6 +984,16 @@
                             line.startY += dy;
                             line.endX += dx;
                             line.endY += dy;
+                            break;
+                        case 'cloud':
+                            const cloud = selectedObject_canv;
+                            cloud.x_C += dx;
+                            cloud.y_C += dy;
+                            break;
+                        case 'star':
+                            const star = selectedObject_canv;
+                            star.x_C += dx;
+                            star.y_C += dy;
                             break;
                     }
                     startX = e.offsetX;
@@ -655,14 +1037,14 @@
             link.click(); // Программное кликанье по ссылке
             document.body.removeChild(link); //Удаление ссылки из документа. Это делается для очистки DOM после скачивания файла, так как ссылка больше не нужна
         }
-        (_l = document.getElementById('downloadBtn')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
+        (_r = document.getElementById('downloadBtn')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
             const shapes = JSON.stringify(objects, null, 2);
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         });
         //пробуем сделать с загрузкой на сервер
-        (_m = document.getElementById('uploadCssBtn')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
+        (_s = document.getElementById('uploadCssBtn')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -713,7 +1095,7 @@
                 console.error('No CSS found in local storage');
             }
         }
-        (_o = document.getElementById('uploadCssBtn2')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+        (_t = document.getElementById('uploadCssBtn2')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput2');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -727,7 +1109,7 @@
         //document.addEventListener('DOMContentLoaded', () => {
         //    applyCssFromLocalStorage();
         //});
-        (_p = document.getElementById('cssFileInput2')) === null || _p === void 0 ? void 0 : _p.addEventListener('change', function (event) {
+        (_u = document.getElementById('cssFileInput2')) === null || _u === void 0 ? void 0 : _u.addEventListener('change', function (event) {
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -817,7 +1199,7 @@
                 console.error('Error processing OWL file content:', error);
             }
         }
-        (_q = document.getElementById('fileInput3')) === null || _q === void 0 ? void 0 : _q.addEventListener('change', function (event) {
+        (_v = document.getElementById('fileInput3')) === null || _v === void 0 ? void 0 : _v.addEventListener('change', function (event) {
             var _a;
             try {
                 const input = event.target;
@@ -869,10 +1251,32 @@
             }).join('\n');
             return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
         }
-        (_r = document.getElementById('downloadBtn3')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
+        (_w = document.getElementById('downloadBtn3')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
             const owlContent = convertObjectsToOWL(objects);
             downloadFile('shapes.owl', owlContent);
         });
+        function createVerticalTable(object) {
+            const table = document.createElement('table');
+            table.style.border = '1px solid black';
+            table.style.borderCollapse = 'collapse';
+            // Перебираем свойства объекта
+            for (const key in object) {
+                if (object.hasOwnProperty(key)) {
+                    const row = table.insertRow();
+                    const cellKey = row.insertCell();
+                    cellKey.style.border = '1px solid black';
+                    cellKey.style.padding = '5px';
+                    cellKey.innerText = key;
+                    const cellValue = row.insertCell();
+                    cellValue.style.border = '1px solid black';
+                    cellValue.style.padding = '5px';
+                    cellValue.innerText = object[key]; // Получаем значение свойства
+                }
+            }
+            return table;
+        }
+        // Контейнер для таблиц
+        // Перебираем объекты и создаем таблицы
     }
     else {
         console.error("Canvas context is not supported");

@@ -4,6 +4,9 @@
 @inject IJSRuntime JS
 @using MudBlazor
 @using MudBlazor.Services
+@using System;
+@using System.Text;
+@inject IDialogService DialogService
 
 <PageTitle>pageee</PageTitle>
 <style>
@@ -13,6 +16,44 @@
         border: 1px solid black;
         border-radius: 4px;
     }
+
+    .context-menu {
+        position: absolute;
+        background-color: #333; /* Темный фон */
+        color: #fff; /* Белый текст */
+        border: 1px solid #555; /* Темная граница */
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        font-size: 14px; /* Размер шрифта */
+        z-index: 1000; /* Размещаем поверх других элементов */
+        display: none; /* Скрыто по умолчанию */
+    }
+
+    /* Стиль для каждого элемента контекстного меню */
+    .context-menu-item {
+        display: block;
+        padding: 10px 20px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    /* Изменяем фон и текст при наведении */
+    .context-menu-item:hover {
+        background-color: #555;
+    }
+
+    /* Стили для кнопок */
+    .context-menu-item.MudButton {
+        margin: 0;
+        border: none;
+        color: #fff;
+        background-color: #444;
+    }
+
+    .context-menu-item.MudButton:hover {
+        background-color: #666;
+    }
+
 </style>
 
 
@@ -41,35 +82,142 @@
         <MudButton id="addRectBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
         <MudButton id="addCircleBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Secondary">Добавить круг</MudButton><br>
         <MudButton id="addLineBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Добавить линию</MudButton><br>
+        <MudButton id="addStarBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Добавить звезду</MudButton><br>
+        <MudButton id="addCloudBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Добавить облако</MudButton><br>
         <MudButton id="delShapeBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Удалить фигуру</MudButton><br>
-        <MudButton id="rotateLeftBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Повернуть вправо</MudButton><br>
-        <MudButton id="rotateRightBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Повернуть влево</MudButton><br>
-        <MudButton id="downloadBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Скачать диаграмму</MudButton><br>
+        <MudButton id="rotateLeftBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Повернуть влево</MudButton><br>
+        <MudButton id="rotateRightBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Повернуть вправо</MudButton><br>
+        <MudButton id="connect_objects" Variant="Variant.Filled" Style="width: 35%; height: 60px;" Color="Color.Info">Соед. фигуры</MudButton>
+        <MudButton id="remove_connection" Variant="Variant.Filled" Style="width: 35%; height: 60px;" Color="Color.Info">Удалить соединение</MudButton><br>
+        <MudButton OnClick="ShowDialog" id="additionInfo" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Info">Добавить описание</MudButton><br>
+        
 
+        @* Пробую загрузить диаграмму в виде OWL *@
         <MudButton id="downloadBtn3" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">OWL скачивание</MudButton><br>
+        <label for="fileInput3" class="custom-file-upload" style="display: block; width: 70%; margin-bottom: 10px;">
+            Загрузить диаграмму в виде OWL
+        </label>
         <input type="file" id="fileInput3" name="fileInput3" style="width: 70%; margin-bottom: 10px;"><br>
 
-        <label for="fileInput" class="custom-file-upload" style="display: block; width: 70%; text-align: center; margin-bottom: 10px;">
-            Загрузить диаграмму
+        @* Загрузка диаграммы в обычном виде *@
+        <MudButton id="downloadBtn" Variant="Variant.Filled" Style="width: 70%; height: 60px;" Color="Color.Error">Скачать диаграмму</MudButton><br>
+        <label for="fileInput" class="custom-file-upload" style="display: block; width: 70%; margin-bottom: 10px;">
+            Загрузить диаграмму в обычном виде
         </label>
         <input type="file" id="fileInput" name="fileInput" style="width: 70%; margin-bottom: 10px;"><br>
 
+        @* Пробую загрузить css через локальное хранилище *@
         <MudButton id="uploadCssBtn2" Variant="Variant.Filled" Color="Color.Primary" Style="width: 70%; height: 60px;">Загрузить еще CSS(лх)</MudButton><br>
+        <label for="cssFileInput2" class="custom-file-upload" style="display: block; width: 70%; margin-bottom: 10px;">
+            Загрузить файл css с (ЛХ)
+        </label>
         <input type="file" id="cssFileInput2" accept=".css" style="width: 70%; margin-bottom: 10px;"><br>
 
+        @* Пробую загрузить css через сервер *@
         <MudButton id="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 70%; height: 60px;">Загрузить CSS</MudButton><br>
+        <label for="cssFileInput2" class="custom-file-upload" style="display: block; width: 70%; margin-bottom: 10px;">
+            Загрузить файл css
+        </label>
         <input type="file" id="cssFileInput" accept=".css" style="width: 70%;"><br>
     </div>
     <div style="flex: 2;">
+        @* <canvas id="canvas" width="698" height="598" style="border:1px solid grey"></canvas> *@
         <canvas id="canvas" width="698" height="598" style="border:1px solid grey"></canvas>
         <div id="contextMenu" class="context-menu" hidden>
-            <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Primary">Delete</MudButton><br>
-            <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Secondary">Rotate Left</MudButton><br>
-            <MudButton id="rotateRightItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Info">Rotate Right</MudButton><br>
-            <MudButton id="connect_obj" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 60px;" Color="Color.Info">Connect objects (connectionvsvsdv)</MudButton><br>
+            <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Primary">Удалить</MudButton>
+            <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Secondary">Поверн. влево</MudButton>
+            <MudButton id="rotateRightItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Info">Поверн. вправо</MudButton>
+            <MudButton id="connect_objects" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Info">Соед. фигуры</MudButton>
         </div>
     </div>
+    <div id="table-container"></div>
+    @* <div>*@
+        @* <h3>Свойства</h3>
+        <textarea id="propertiesOutput" rows="150" cols="10" class="custom-border" readonly></textarea> *@
+    @* <MudTable Items="@Elements" Hover="true">
+            <HeaderContent>
+                <MudTh>Field</MudTh>
+                <MudTh>Value</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Field">Nr</MudTd>
+                <MudTd DataLabel="Value">@context.Number</MudTd>
+            </RowTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="Field">Sign</MudTd>
+                <MudTd DataLabel="Value">@context.Sign</MudTd>
+            </RowTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="Field">Name</MudTd>
+                <MudTd DataLabel="Value">@context.Name</MudTd>
+            </RowTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="Field">Position</MudTd>
+                <MudTd DataLabel="Value">@context.Position</MudTd>
+            </RowTemplate>
+            <RowTemplate>
+                <MudTd DataLabel="Field">Molar mass</MudTd>
+                <MudTd DataLabel="Value">@context.Molar</MudTd>
+            </RowTemplate>
+        </MudTable>
+
+    </div> *@
 </div>
+
+@code {
+    private async Task ShowDialog()
+    {
+        try
+        {
+            // Вызов функции showPrompt из TypeScript
+            var userInput_ = await JS.InvokeAsync<string>("addInfoclick", "Введите текст:");
+
+            // Обработка пользовательского ввода
+            Console.WriteLine($"User input: {userInput_}");
+        }
+        catch (Exception ex)
+        {
+            // Обработка случая, когда пользователь отменил диалог
+            Console.WriteLine("Prompt was cancelled or an error occurred: " + ex.Message);
+        }
+    }
+}
+
+@* <MudButton @onclick="OpenDialogAsync" Variant="Variant.Filled" Color="Color.Primary">
+    Open Simple Dialog
+</MudButton>
+@code {
+
+    private Task OpenDialogAsync()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<DialogUsageExample_Dialog>("Simple Dialog", options);
+    }
+}
+
+<MudDialog>
+    <TitleContent>
+        Dialog Title
+    </TitleContent>
+    <DialogContent>
+        Dialog Content
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; }
+
+    private void Submit() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog.Cancel();
+} *@
+
+
 
 <h3>Debug Information</h3>
 <textarea id="debugOutput" rows="10" cols="150" class="custom-border" readonly></textarea>
@@ -125,3 +273,4 @@
 <script src="js/CookiesServ.js"></script>
 <script src="js/interface.js"></script>
 <script src="js/file.js"></script>
+<script src="js/file1.js"></script>

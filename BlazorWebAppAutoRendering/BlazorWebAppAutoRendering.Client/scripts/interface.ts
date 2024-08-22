@@ -4,6 +4,9 @@
     rotation?: number;
     info?: string;
     linkedObjects?: string[];
+    outgoingLinks?: string[];
+    incomingLinks?: string[];
+    color: string;
 }
 
 interface Rectangle extends Shape {
@@ -11,14 +14,14 @@ interface Rectangle extends Shape {
     y: number;
     width: number;
     height: number;
-    color: string;
+
 }
 
 interface Circle extends Shape {
     x: number;
     y: number;
     radius: number;
-    color: string;
+
 }
 
 interface Line extends Shape {
@@ -26,7 +29,7 @@ interface Line extends Shape {
     startY: number;
     endX: number;
     endY: number;
-    color: string;
+
 }
 
 interface Star extends Shape {
@@ -35,7 +38,7 @@ interface Star extends Shape {
     rad: number;
     amount_points: number;
     m: number;
-    color: string;
+
 }
 
 interface Cloud extends Shape {
@@ -43,7 +46,7 @@ interface Cloud extends Shape {
     y_C: number;
     width: number;
     height: number;
-    color: string;
+
 }
 type GraphObject = Rectangle | Circle | Line | Star | Cloud;
 

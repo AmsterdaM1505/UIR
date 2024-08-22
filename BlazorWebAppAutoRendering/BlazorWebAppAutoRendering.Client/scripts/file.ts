@@ -1,4 +1,5 @@
 ﻿(function () {
+
     //import { v4 as uuidv4 } from 'uuid';
     let objects: Shape[] = [];
     let ctx: CanvasRenderingContext2D | null = null;
@@ -17,6 +18,7 @@
     let mouse_meaning_check = 0;
     let connectionServ = 2;
     const container = document.getElementById('table-container');
+    let cyclePath = null;
 
     function generateRandomId(length: number): string {
         let result = '';
@@ -203,6 +205,18 @@
             drawObjects();
             //hideContextMenu();
         });
+        
+        document.getElementById('cycleCheck')?.addEventListener('click', function () {
+            /*const hasCycle = detectCycles(objects);*/
+            cyclePath = detectCycles(objects);
+            if (cyclePath) {
+                console.log("Цикл найден:", cyclePath);
+                highlightCycle(cyclePath, objects);
+            } else {
+                console.log("Цикл не найден");
+            }
+            //logDebug(`connectionObjects button clicked ${JSON.stringify(hasCycle)}`);
+        });
 
         document.getElementById('connect_objects')?.addEventListener('click', function () {
             logDebug(`connectionObjects button clicked`);
@@ -216,6 +230,18 @@
             removeObjects();
         });
 
+        document.getElementById('outgoing_connect')?.addEventListener('click', function () {
+            logDebug(`outgoingConnectionObjects button clicked`);
+            connectionServ = 3;
+            connectionObjects();
+        });
+
+        document.getElementById('remove_outgoing_connection')?.addEventListener('click', function () {
+            logDebug(`remove_connection button clicked`);
+            connectionServ = 4;
+            removeObjects();
+        });
+
         document.getElementById('additionInfo')?.addEventListener('click', function () {
             addInfoclick();
         });
@@ -225,6 +251,59 @@
             //showContextMenu(e.clientX, e.clientY);
             onMouseDown(e);
         });
+
+        //function drawDirectedLine(ctx, startX, startY, endX, endY, color) {
+        //    ctx.beginPath();
+        //    ctx.moveTo(startX, startY);
+        //    ctx.lineTo(endX, endY);
+        //    ctx.strokeStyle = color;
+        //    ctx.stroke();
+
+        //    // Рисуем стрелку
+        //    const headlen = 10; // длина головы стрелки
+        //    const angle = Math.atan2(endY - startY, endX - startX);
+        //    ctx.beginPath();
+        //    ctx.moveTo(endX, endY);
+        //    ctx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 6), endY - headlen * Math.sin(angle - Math.PI / 6));
+        //    ctx.lineTo(endX - headlen * Math.cos(angle + Math.PI / 6), endY - headlen * Math.sin(angle + Math.PI / 6));
+        //    ctx.lineTo(endX, endY);
+        //    ctx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 6), endY - headlen * Math.sin(angle - Math.PI / 6));
+        //    ctx.strokeStyle = color;
+        //    ctx.stroke();
+        //    ctx.fillStyle = color;
+        //    ctx.fill();
+        //}
+        function drawDirectedLine(ctx, startX, startY, endX, endY, color) {
+            // Рисуем линию
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = color;
+            ctx.stroke();
+
+            // Вычисляем середину линии
+            const midX = (startX + endX) / 2;
+            const midY = (startY + endY) / 2;
+
+            // Вычисляем угол наклона линии
+            const angle = Math.atan2(endY - startY, endX - startX);
+
+            // Длина головы стрелки
+            const headlen = 10;
+
+            // Рисуем стрелку в середине линии
+            ctx.beginPath();
+            ctx.moveTo(midX, midY);
+            ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(midX - headlen * Math.cos(angle + Math.PI / 6), midY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.lineTo(midX, midY);
+            ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.strokeStyle = color;
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
 
         document.addEventListener('click', function () {
             hideContextMenu();
@@ -285,19 +364,17 @@
                                 ctx.strokeStyle = 'black';
                                 ctx.lineWidth = 2;
                                 ctx.stroke();
+                            }
+                        });
+                    }
+                    if (obj.outgoingLinks) {
+                        obj.outgoingLinks.forEach(linkedId => {
+                            const linkedObj = objects.find(o => o.id === linkedId);
+                            if (linkedObj) {
+                                const [startX, startY] = getObjectCenter(obj);
+                                const [endX, endY] = getObjectCenter(linkedObj);
 
-                                //const newLine: Line = {
-                                //    id: generateRandomId(16),
-                                //    type: 'line',
-                                //    startX: startX,
-                                //    startY: startY,
-                                //    endX: endX,
-                                //    endY: endY,
-                                //    color: getRandomColor(),
-                                //    rotation: 0
-                                //};
-                                //objects.push(newLine);
-
+                                drawDirectedLine(ctx, startX, startY, endX, endY, 'blue');
                             }
                         });
                     }
@@ -429,6 +506,40 @@
             }
         }
 
+        function addDirectedLink(fromObj: Shape, toObj: Shape): void {
+            // Инициализируем массивы, если они не существуют
+            if (!fromObj.outgoingLinks) {
+                fromObj.outgoingLinks = [];
+            }
+            if (!toObj.incomingLinks) {
+                toObj.incomingLinks = [];
+            }
+
+            // Проверяем, чтобы не было дублирования
+            if (!fromObj.outgoingLinks.includes(toObj.id)) {
+                fromObj.outgoingLinks.push(toObj.id);
+                logDebug(`Added directed link from ${fromObj.id} to ${toObj.id}`);
+            }
+
+            // Проверяем, чтобы не было дублирования во входящих ссылках
+            if (!toObj.incomingLinks.includes(fromObj.id)) {
+                toObj.incomingLinks.push(fromObj.id);
+                logDebug(`Added incoming link to ${toObj.id} from ${fromObj.id}`);
+            }
+        }
+        function removeDirectedLink(fromObj: Shape, toObj: Shape): void {
+            // Удаляем исходящую ссылку из fromObj
+            if (fromObj.outgoingLinks) {
+                fromObj.outgoingLinks = fromObj.outgoingLinks.filter(id => id !== toObj.id);
+                logDebug(`Removed directed link from ${fromObj.id} to ${toObj.id}`);
+            }
+
+            // Удаляем входящую ссылку в toObj
+            if (toObj.incomingLinks) {
+                toObj.incomingLinks = toObj.incomingLinks.filter(id => id !== fromObj.id);
+                logDebug(`Removed incoming link to ${toObj.id} from ${fromObj.id}`);
+            }
+        }
 
         // Функция для добавления связи между объектами
         function addLink(obj1: Shape, obj2: Shape): void {
@@ -469,6 +580,24 @@
                 logDebug(`removeObjects inside`);
                 logDebug(`removeObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
                 logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+            }
+        }
+
+        function directedConnectionObjects() {
+            if (selectedObject_buf) {
+                selectedObject_buf_connect = selectedObject_buf;
+                logDebug(`directedConnectionObjects inside`);
+                logDebug(`directedConnectionObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`directedConnectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+            }
+        }
+
+        function directedRemoveObjects() {
+            if (selectedObject_buf) {
+                selectedObject_buf_connect = selectedObject_buf;
+                logDebug(`directedRemoveObjects inside`);
+                logDebug(`directedRemoveObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`directedRemoveObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
 
@@ -624,12 +753,49 @@
             drawObjects();
         }
 
+        //function deleteShape() {
+        //    if (selectedObject_buf) {
+        //        const indexToRemove = objects.indexOf(selectedObject_buf);
+        //        if (indexToRemove !== -1) {
+        //            logDebug(`Deleting shape: ${JSON.stringify(objects[indexToRemove])}`);
+        //            objects.splice(indexToRemove, 1);
+        //            drawObjects();
+        //            selectedObject_buf = null;
+        //        }
+        //    } else {
+        //        logDebug("No shape selected to delete");
+        //    }
+        //}
+
         function deleteShape() {
             if (selectedObject_buf) {
                 const indexToRemove = objects.indexOf(selectedObject_buf);
                 if (indexToRemove !== -1) {
-                    logDebug(`Deleting shape: ${JSON.stringify(objects[indexToRemove])}`);
+                    const shapeToRemove = objects[indexToRemove];
+
+                    logDebug(`Deleting shape: ${JSON.stringify(shapeToRemove)}`);
+
+                    // Удаляем ссылки на удаляемую фигуру из других объектов
+                    for (const obj of objects) {
+                        // Удаление из linkedObjects
+                        if (obj.linkedObjects) {
+                            obj.linkedObjects = obj.linkedObjects.filter(id => id !== shapeToRemove.id);
+                        }
+
+                        // Удаление из outgoingLinks
+                        if (obj.outgoingLinks) {
+                            obj.outgoingLinks = obj.outgoingLinks.filter(id => id !== shapeToRemove.id);
+                        }
+
+                        // Удаление из incomingLinks
+                        if (obj.incomingLinks) {
+                            obj.incomingLinks = obj.incomingLinks.filter(id => id !== shapeToRemove.id);
+                        }
+                    }
+
+                    // Удаляем сам объект из массива objects
                     objects.splice(indexToRemove, 1);
+
                     drawObjects();
                     selectedObject_buf = null;
                 }
@@ -645,8 +811,6 @@
                 drawObjects();
             }
         }
-
-
 
         function addInfoclick() {
             addInfo(selectedObject_buf);
@@ -687,6 +851,14 @@
                 logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
                 removeLink(selectedObject_buf_connect_, selectedObject_buf_);
                 selectedObject_buf_connect_ = null;
+            } else if (selectedObject_buf_connect_ && connectionServ_ == 3) {
+                logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                addDirectedLink(selectedObject_buf_connect_, selectedObject_buf_);
+                selectedObject_buf_connect_ = null;
+            } else if (selectedObject_buf_connect_ && connectionServ_ == 4) {
+                logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                removeDirectedLink(selectedObject_buf_connect_, selectedObject_buf_);
+                selectedObject_buf_connect_ = null;
             }
             return selectedObject_buf_connect_;
         }
@@ -705,7 +877,6 @@
                 container?.appendChild(table);
             }
         }
-        
         function onMouseDown(e: MouseEvent) {
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
@@ -947,8 +1118,6 @@
                 drawObjects();
             }
         }
-
-
         function onMouseMove(e: MouseEvent) {
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
@@ -1358,13 +1527,110 @@
             return table;
         }
 
-        // Контейнер для таблиц
-        
+       
+        //// Функция для проверки циклов с использованием DFS
+        //function detectCycles(graph: Shape[]): boolean {
+        //    const visited: Set<string> = new Set();  // Множество посещенных вершин
+        //    const recStack: Set<string> = new Set(); // Множество вершин на текущем стеке вызовов
 
-        // Перебираем объекты и создаем таблицы
+        //    for (const node of graph) {
+        //        if (dfsCycleDetection(node, graph, visited, recStack)) {
+        //            return true; // Цикл найден
+        //        }
+        //    }
+        //    return false; // Циклы не найдены
+        //}
 
-        
-        
+        //// Рекурсивная функция для выполнения DFS и обнаружения циклов
+        //function dfsCycleDetection(
+        //    node: Shape,
+        //    graph: Shape[],
+        //    visited: Set<string>,
+        //    recStack: Set<string>
+        //): boolean {
+        //    if (recStack.has(node.id)) {
+        //        return true; // Цикл найден
+        //    }
+
+        //    if (visited.has(node.id)) {
+        //        return false; // Вершина уже обработана, циклов не найдено
+        //    }
+
+        //    visited.add(node.id);
+        //    recStack.add(node.id);
+
+        //    const neighbors = node.outgoingLinks || []; // Соседние вершины (выходящие ребра)
+        //    for (const neighborId of neighbors) {
+        //        const neighbor = graph.find(n => n.id === neighborId);
+        //        if (neighbor && dfsCycleDetection(neighbor, graph, visited, recStack)) {
+        //            return true;
+        //        }
+        //    }
+
+        //    recStack.delete(node.id); // Удаляем вершину из стека вызовов, так как она завершена
+        //    return false;
+        //}
+
+        function detectCycles(graph: Shape[]): string[] | null {
+            const visited: Set<string> = new Set();
+            const recStack: Set<string> = new Set();
+            const path: string[] = []; // Для хранения пути
+
+            for (const node of graph) {
+                if (dfsCycleDetection(node, graph, visited, recStack, path)) {
+                    return path; // Возвращаем путь при нахождении цикла
+                }
+            }
+            return null; // Цикл не найден
+        }
+
+        function dfsCycleDetection(
+            node: Shape,
+            graph: Shape[],
+            visited: Set<string>,
+            recStack: Set<string>,
+            path: string[]
+        ): boolean {
+            if (recStack.has(node.id)) {
+                path.push(node.id); // Добавляем текущий узел в путь
+                return true; // Цикл найден
+            }
+
+            if (visited.has(node.id)) {
+                return false; // Узел уже обработан
+            }
+
+            visited.add(node.id);
+            recStack.add(node.id);
+            path.push(node.id); // Добавляем текущий узел в путь
+
+            const neighbors = node.outgoingLinks || [];
+            for (const neighborId of neighbors) {
+                const neighbor = graph.find(n => n.id === neighborId);
+                if (neighbor && dfsCycleDetection(neighbor, graph, visited, recStack, path)) {
+                    return true;
+                }
+            }
+
+            recStack.delete(node.id); // Удаляем узел из стека
+            path.pop(); // Убираем текущий узел из пути
+            return false;
+        }
+
+        function highlightCycle(cyclePath: string[], graph: Shape[]): void {
+            for (const nodeId of cyclePath) {
+                const node = graph.find(n => n.id === nodeId);
+                if (node) {
+                    // Например, меняем цвет линии или фигуры на красный
+                    if (node.type === 'line') {
+                        (node as Line).color = 'red';
+                    } else if (node.type === 'rectangle' || node.type === 'circle' || node.type === 'star' || node.type === 'cloud') {
+                        node.color = 'red';
+                    }
+                }
+            }
+            drawObjects(); // Перерисовываем объекты на холсте
+        }
 
 
     } else {

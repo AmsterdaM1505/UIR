@@ -38,7 +38,6 @@ interface Star extends Shape {
     rad: number;
     amount_points: number;
     m: number;
-
 }
 
 interface Cloud extends Shape {

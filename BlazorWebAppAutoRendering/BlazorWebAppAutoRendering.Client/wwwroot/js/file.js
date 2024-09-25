@@ -280,27 +280,27 @@
             }
         });
         (_p = document.getElementById('longWayCheck')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
-            //logDebug(`longWayCheck button clicked`);
+            logDebug(`longWayCheck button clicked`);
             connectionServ = 5;
             waySelection();
         });
         (_q = document.getElementById('connect_objects')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
-            //logDebug(`connectionObjects button clicked`);
+            logDebug(`connectionObjects button clicked`);
             connectionServ = 1;
             connectionObjects();
         });
         (_r = document.getElementById('remove_connection')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
-            //logDebug(`remove_connection button clicked`);
+            logDebug(`remove_connection button clicked`);
             connectionServ = 0;
             removeObjects();
         });
         (_s = document.getElementById('outgoing_connect')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
-            //logDebug(`outgoingConnectionObjects button clicked`);
+            logDebug(`outgoingConnectionObjects button clicked`);
             connectionServ = 3;
             connectionObjects();
         });
         (_t = document.getElementById('remove_outgoing_connection')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
-            //logDebug(`remove_connection button clicked`);
+            logDebug(`remove_connection button clicked`);
             connectionServ = 4;
             removeObjects();
         });
@@ -443,7 +443,7 @@
                 }
                 // Затем отрисовываем сами объекты
                 for (const obj of objects) {
-                    //logDebug(`Drawing object: ${JSON.stringify(obj)}`);
+                    logDebug(`Drawing object: ${JSON.stringify(obj)}`);
                     ctx.save();
                     let centerX = 0;
                     let centerY = 0;
@@ -538,7 +538,7 @@
                             drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
                             break;
                         default:
-                        //logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
+                            logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
                     }
                     // Выделяем объект, если он входит в цикл
                     highlighting(obj, ctx);
@@ -582,24 +582,24 @@
             // Проверяем, чтобы не было дублирования
             if (!fromObj.outgoingLinks.includes(toObj.id)) {
                 fromObj.outgoingLinks.push(toObj.id);
-                //logDebug(`Added directed link from ${fromObj.id} to ${toObj.id}`);
+                logDebug(`Added directed link from ${fromObj.id} to ${toObj.id}`);
             }
             // Проверяем, чтобы не было дублирования во входящих ссылках
             if (!toObj.incomingLinks.includes(fromObj.id)) {
                 toObj.incomingLinks.push(fromObj.id);
-                //logDebug(`Added incoming link to ${toObj.id} from ${fromObj.id}`);
+                logDebug(`Added incoming link to ${toObj.id} from ${fromObj.id}`);
             }
         }
         function removeDirectedLink(fromObj, toObj) {
             // Удаляем исходящую ссылку из fromObj
             if (fromObj.outgoingLinks) {
                 fromObj.outgoingLinks = fromObj.outgoingLinks.filter(id => id !== toObj.id);
-                //logDebug(`Removed directed link from ${fromObj.id} to ${toObj.id}`);
+                logDebug(`Removed directed link from ${fromObj.id} to ${toObj.id}`);
             }
             // Удаляем входящую ссылку в toObj
             if (toObj.incomingLinks) {
                 toObj.incomingLinks = toObj.incomingLinks.filter(id => id !== fromObj.id);
-                //logDebug(`Removed incoming link to ${toObj.id} from ${fromObj.id}`);
+                logDebug(`Removed incoming link to ${toObj.id} from ${fromObj.id}`);
             }
         }
         // Функция для добавления связи между объектами
@@ -627,41 +627,41 @@
         function connectionObjects() {
             if (selectedObject_buf) {
                 selectedObject_buf_connect = selectedObject_buf;
-                //logDebug(`connectionObjects inside`);
-                //logDebug(`connectionObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
-                //logDebug(`connectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+                logDebug(`connectionObjects inside`);
+                logDebug(`connectionObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`connectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
         function waySelection() {
             if (selectedObject_buf) {
                 selectedObject_buf_connect = selectedObject_buf;
-                //logDebug(`waySelection inside`);
-                //logDebug(`waySelection_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
-                //logDebug(`waySelection_buf - (${JSON.stringify(selectedObject_buf)})`);
+                logDebug(`waySelection inside`);
+                logDebug(`waySelection_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`waySelection_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
         function removeObjects() {
             if (selectedObject_buf) {
                 selectedObject_buf_connect = selectedObject_buf;
-                //logDebug(`removeObjects inside`);
-                //logDebug(`removeObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
-                //logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+                logDebug(`removeObjects inside`);
+                logDebug(`removeObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+                logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
         //function directedConnectionObjects() {
         //    if (selectedObject_buf) {
         //        selectedObject_buf_connect = selectedObject_buf;
-        //        //logDebug(`directedConnectionObjects inside`);
-        //        //logDebug(`directedConnectionObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
-        //        //logDebug(`directedConnectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+        //        logDebug(`directedConnectionObjects inside`);
+        //        logDebug(`directedConnectionObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+        //        logDebug(`directedConnectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
         //    }
         //}
         //function directedRemoveObjects() {
         //    if (selectedObject_buf) {
         //        selectedObject_buf_connect = selectedObject_buf;
-        //        //logDebug(`directedRemoveObjects inside`);
-        //        //logDebug(`directedRemoveObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
-        //        //logDebug(`directedRemoveObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
+        //        logDebug(`directedRemoveObjects inside`);
+        //        logDebug(`directedRemoveObjects_buf_connect - (${JSON.stringify(selectedObject_buf_connect)})`);
+        //        logDebug(`directedRemoveObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
         //    }
         //}
         function addStar() {
@@ -677,7 +677,7 @@
                 rotation: 0
             };
             objects.push(newStar);
-            //logDebug(`Star added: ${JSON.stringify(newStar)}`);
+            logDebug(`Star added: ${JSON.stringify(newStar)}`);
             drawObjects();
         }
         function addCloud() {
@@ -692,7 +692,7 @@
                 rotation: 0
             };
             objects.push(newStar);
-            //logDebug(`Cloud added: ${JSON.stringify(newStar)}`);
+            logDebug(`Cloud added: ${JSON.stringify(newStar)}`);
             drawObjects();
         }
         function drawSquare(ctx, x, y, size) {
@@ -752,7 +752,7 @@
                 rotation: 0
             };
             objects.push(newRect);
-            //logDebug(`Rectangle added: ${JSON.stringify(newRect)}`);
+            logDebug(`Rectangle added: ${JSON.stringify(newRect)}`);
             drawObjects();
         }
         function addCircle() {
@@ -766,7 +766,7 @@
                 rotation: 0
             };
             objects.push(newCircle);
-            //logDebug(`Circle added: ${JSON.stringify(newCircle)}`);
+            logDebug(`Circle added: ${JSON.stringify(newCircle)}`);
             drawObjects();
         }
         function addLine() {
@@ -781,7 +781,7 @@
                 rotation: 0
             };
             objects.push(newLine);
-            //logDebug(`Line added: ${JSON.stringify(newLine)}`);
+            logDebug(`Line added: ${JSON.stringify(newLine)}`);
             drawObjects();
         }
         function deleteShape() {
@@ -789,7 +789,7 @@
                 const indexToRemove = objects.indexOf(selectedObject_buf);
                 if (indexToRemove !== -1) {
                     const shapeToRemove = objects[indexToRemove];
-                    //logDebug(`Deleting shape: ${JSON.stringify(shapeToRemove)}`);
+                    logDebug(`Deleting shape: ${JSON.stringify(shapeToRemove)}`);
                     // Удаляем ссылки на удаляемую фигуру из других объектов
                     for (const obj of objects) {
                         // Удаление из linkedObjects
@@ -821,7 +821,7 @@
         function rotateSelectedObject(angle) {
             if (selectedObject_buf) {
                 selectedObject_buf.rotation = (selectedObject_buf.rotation || 0) + angle;
-                //logDebug(`Rotated object: ${JSON.stringify(selectedObject_buf)}`);
+                logDebug(`Rotated object: ${JSON.stringify(selectedObject_buf)}`);
                 drawObjects();
             }
         }
@@ -831,7 +831,7 @@
         function addInfo(selectedObject_buf_) {
             showPrompt("Введите текст:");
             selectedObject_buf_.info = userInput;
-            ////logDebug(`additionInfo pressed - ${JSON.stringify(userInput)}`);
+            //logDebug(`additionInfo pressed - ${JSON.stringify(userInput)}`);
         }
         function getRandomColor() {
             const letters = '0123456789ABCDEF';
@@ -854,38 +854,38 @@
         }
         function selectionCheck(selectedObject_buf_connect_, selectedObject_buf_, connectionServ_) {
             if (selectedObject_buf_connect_ && connectionServ_ == 1) {
-                //logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
                 addLink(selectedObject_buf_connect_, selectedObject_buf_);
                 selectedObject_buf_connect_ = null;
             }
             else if (selectedObject_buf_connect_ && connectionServ_ == 0) {
-                //logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
                 removeLink(selectedObject_buf_connect_, selectedObject_buf_);
                 selectedObject_buf_connect_ = null;
             }
             else if (selectedObject_buf_connect_ && connectionServ_ == 3) {
-                //logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                logDebug(`Selected object to connect_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
                 addDirectedLink(selectedObject_buf_connect_, selectedObject_buf_);
                 selectedObject_buf_connect_ = null;
             }
             else if (selectedObject_buf_connect_ && connectionServ_ == 4) {
-                //logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
                 removeDirectedLink(selectedObject_buf_connect_, selectedObject_buf_);
                 selectedObject_buf_connect_ = null;
             }
             else if (selectedObject_buf_connect_ && connectionServ_ == 5) {
-                //logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
+                logDebug(`Selected object to remove_mouse_down - (${JSON.stringify(selectedObject_buf_connect_)})`);
                 londWayCheck(objects, selectedObject_buf_connect_, selectedObject_buf_);
                 selectedObject_buf_connect_ = null;
             }
             return selectedObject_buf_connect_;
         }
         function londWayCheck(objects_, selectedObject_buf_connect_, selectedObject_buf_) {
-            //logDebug(`londWayCheck - (${JSON.stringify(selectedObject_buf_connect_)})`);
-            //logDebug(`londWayCheck - (${JSON.stringify(selectedObject_buf_)})`);
-            //logDebug(`londWayCheck - (${JSON.stringify(objects_)})`);
+            logDebug(`londWayCheck - (${JSON.stringify(selectedObject_buf_connect_)})`);
+            logDebug(`londWayCheck - (${JSON.stringify(selectedObject_buf_)})`);
+            logDebug(`londWayCheck - (${JSON.stringify(objects_)})`);
             const shortestPath = bfsShortestPath(objects_, selectedObject_buf_connect_.id, selectedObject_buf_.id);
-            //logDebug(`londWayCheck - (${JSON.stringify(selectedObject_buf_connect_)})`);
+            logDebug(`londWayCheck - (${JSON.stringify(selectedObject_buf_connect_)})`);
             if (shortestPath) {
                 console.log('Кратчайший путь найден:', shortestPath);
             }
@@ -923,11 +923,11 @@
             if (mouse_meaning === 1) {
                 mouse_meaning_check = 1;
             }
-            //logDebug(`Mouse down at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
+            logDebug(`Mouse down at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
             if (mouse_meaning === 0 && mouse_meaning_check != 1) {
                 if (highlight.length != 0) {
                     console.log("i am here");
-                    //logDebug(`highlight - (${highlight})`);
+                    logDebug(`highlight - (${highlight})`);
                     highlight = [];
                 }
                 for (let i = objects.length - 1; i >= 0; i--) {
@@ -939,7 +939,7 @@
                             selectedObject_buf = rect;
                             startX = mouseX - rect.x;
                             startY = mouseY - rect.y;
-                            //logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+                            logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
                             selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                             connectionServ == 2;
                             tableObjectCheck(selectedObject_buf);
@@ -955,7 +955,7 @@
                             selectedObject_buf = circle;
                             startX = dx;
                             startY = dy;
-                            //logDebug(`Selected circle: ${JSON.stringify(circle)}`);
+                            logDebug(`Selected circle: ${JSON.stringify(circle)}`);
                             selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                             connectionServ == 2;
                             tableObjectCheck(selectedObject_buf);
@@ -973,7 +973,7 @@
                             selectedObject_buf = line;
                             startX = mouseX;
                             startY = mouseY;
-                            //logDebug(`Selected line: ${JSON.stringify(line)}`);
+                            logDebug(`Selected line: ${JSON.stringify(line)}`);
                             selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                             connectionServ == 2;
                             tableObjectCheck(selectedObject_buf);
@@ -995,7 +995,7 @@
                             selectedObject_buf = star;
                             startX = mouseX - star.x_C;
                             startY = mouseY - star.y_C;
-                            //logDebug(`Selected star: ${JSON.stringify(star)}`);
+                            logDebug(`Selected star: ${JSON.stringify(star)}`);
                             selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                             connectionServ == 2;
                             tableObjectCheck(selectedObject_buf);
@@ -1011,7 +1011,7 @@
                             selectedObject_buf = cloud;
                             startX_Cloud = mouseX - cloud.x_C;
                             startY_Cloud = mouseY - cloud.y_C;
-                            //logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                            logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
                             selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                             connectionServ == 2;
                             tableObjectCheck(selectedObject_buf);
@@ -1035,7 +1035,7 @@
                             startX = mouseX - rect.x;
                             startY = mouseY - rect.y;
                             showContextMenu(e.clientX, e.clientY);
-                            //logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+                            logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
                             break;
                         }
                     }
@@ -1048,7 +1048,7 @@
                             startX = dx;
                             startY = dy;
                             showContextMenu(e.clientX, e.clientY);
-                            //logDebug(`Selected circle: ${JSON.stringify(circle)}`);
+                            logDebug(`Selected circle: ${JSON.stringify(circle)}`);
                             break;
                         }
                     }
@@ -1065,7 +1065,7 @@
                             startX = mouseX;
                             startY = mouseY;
                             showContextMenu(e.clientX, e.clientY);
-                            //logDebug(`Selected line: ${JSON.stringify(line)}`);
+                            logDebug(`Selected line: ${JSON.stringify(line)}`);
                             break;
                         }
                     }
@@ -1084,7 +1084,7 @@
                             startX = mouseX - star.x_C;
                             startY = mouseY - star.y_C;
                             showContextMenu(e.clientX, e.clientY);
-                            //logDebug(`Selected star: ${JSON.stringify(star)}`);
+                            logDebug(`Selected star: ${JSON.stringify(star)}`);
                             break;
                         }
                     }
@@ -1097,14 +1097,14 @@
                             startX_Cloud = mouseX - cloud.x_C;
                             startY_Cloud = mouseY - cloud.y_C;
                             showContextMenu(e.clientX, e.clientY);
-                            //logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                            logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
                             break;
                         }
                     }
                 }
             }
             else if (mouse_meaning_check === 1) {
-                //logDebug(`Button pressed id - 1 - (${mouse_meaning})`);
+                logDebug(`Button pressed id - 1 - (${mouse_meaning})`);
                 e.preventDefault();
                 startX = e.offsetX;
                 startY = e.offsetY;
@@ -1162,9 +1162,9 @@
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
             const mouse_meaning = e.button;
-            ////logDebug(`Mouse move at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
+            //logDebug(`Mouse move at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
             if (selectedObject && (mouse_meaning === 0) && mouse_meaning_check != 1) {
-                //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
+                logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
                 if (selectedObject.type === 'rectangle') {
                     const rect = selectedObject;
                     rect.x = mouseX - startX;
@@ -1190,7 +1190,7 @@
                         startX = mouseX;
                         startY = mouseY;
                         drawObjects();
-                        //logDebug(`Line selected start`);
+                        logDebug(`Line selected start`);
                     }
                     else if (distEnd < 20) {
                         const dx = mouseX - startX;
@@ -1200,7 +1200,7 @@
                         startX = mouseX;
                         startY = mouseY;
                         drawObjects();
-                        //logDebug(`Line selected end`);
+                        logDebug(`Line selected end`);
                     }
                     else if (distToLine < 10) { // Проверка на близость к линии
                         const dx = mouseX - startX;
@@ -1212,10 +1212,10 @@
                         startX = mouseX;
                         startY = mouseY;
                         drawObjects();
-                        //logDebug(`Line selected body`);
+                        logDebug(`Line selected body`);
                     }
                     else {
-                        ////logDebug(`GGWP1`);
+                        //logDebug(`GGWP1`);
                     }
                 }
                 else if (selectedObject.type === 'star') {
@@ -1231,7 +1231,7 @@
                 drawObjects();
             }
             else if (mouse_meaning_check === 1) {
-                //logDebug(`Button moved id - 1`);
+                logDebug(`Button moved id - 1`);
                 e.preventDefault();
                 if (isPanning) {
                     const dx = e.clientX - panStartX;
@@ -1281,13 +1281,13 @@
                 }
             }
             else {
-                ////logDebug(`GGWP2`);
+                //logDebug(`GGWP2`);
             }
         }
         function onMouseUp(e) {
             let mouse_meaning = e.button;
             if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
-                //logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
+                logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
             }
             else if (mouse_meaning == 0 && mouse_meaning_check != 1) {
                 logDebug("Mouse up, no object selected");
@@ -1295,7 +1295,7 @@
                 drawObjects();
             }
             else if (mouse_meaning_check === 1) {
-                //logDebug(`Button unpressed id - 1`);
+                logDebug(`Button unpressed id - 1`);
                 e.preventDefault();
                 if (isPanning && mouse_meaning === 1) {
                     isPanning = false;
@@ -1343,13 +1343,13 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                //logDebug(`File uploaded successfully: ${JSON.stringify(data)}`);
+                logDebug(`File uploaded successfully: ${JSON.stringify(data)}`);
                 // Optionally, you can apply the CSS dynamically if needed
                 applyCssFile(data.filePath);
             })
                 .catch(error => {
                 console.error('Error uploading file:', error);
-                //logDebug(`Error uploading file: ${error}`);
+                logDebug(`Error uploading file: ${error}`);
             });
         }
         function applyCssFile(filePath) {
@@ -1365,7 +1365,7 @@
             logDebug("entering into applyCssFromLocalStorage");
             const cssContent = localStorage.getItem('uploadedCss2');
             if (cssContent) {
-                //logDebug(`Mouse move at (${cssContent}`);
+                logDebug(`Mouse move at (${cssContent}`);
                 const style = document.createElement('style');
                 style.textContent = cssContent;
                 document.head.appendChild(style);
@@ -1411,9 +1411,9 @@
         }
         // Функция для восстановления схемы из локального хранилища
         function loadFromLocalStorage() {
-            //logDebug(`enteringInto_loadFromLocalStorage`);
+            logDebug(`enteringInto_loadFromLocalStorage`);
             const savedSchema = localStorage.getItem('savedSchema');
-            //logDebug(`Mouse down at (${savedSchema}`);
+            logDebug(`Mouse down at (${savedSchema}`);
             if (savedSchema) {
                 logDebug("something_wrong");
                 processFileContent(savedSchema);

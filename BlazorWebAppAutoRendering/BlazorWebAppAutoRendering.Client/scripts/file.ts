@@ -103,49 +103,6 @@
 
     // Рисуем сетку на фоновом холсте
     drawGrid(gridCtx, gridCanvas.width, gridCanvas.height, 20);
-
-    //function processFileContent(content: string) {
-    //    try {
-    //        const sizeMatch = content.match(/Size:({[^}]+})/);
-    //        const objectsMatch = content.match(/Objects:\(([^)]+)\)/);
-    //        if (sizeMatch && objectsMatch) {
-    //            const size = JSON.parse(sizeMatch[1]);
-    //            const shapes = JSON.parse(`[${objectsMatch[1]}]`);
-
-    //            objects = shapes.map((obj: any) => {
-    //                if (obj.type === 'rectangle') {
-    //                    return obj as Rectangle;
-    //                } else if (obj.type === 'circle') {
-    //                    return obj as Circle;
-    //                } else if (obj.type === 'line') {
-    //                    return obj as Line;
-    //                } else {
-    //                    throw new Error('Unknown shape type');
-    //                }
-    //            });
-    //        } else if (sizeMatch && (objectsMatch == null)) {
-    //            const size = JSON.parse(sizeMatch[1]);
-    //            const shapes = objectsMatch ? JSON.parse(`[${objectsMatch[1]}]`) : [];
-
-    //            objects = shapes.map((obj) => {
-    //                if (obj.type === 'rectangle') {
-    //                    return obj;
-    //                } else if (obj.type === 'circle') {
-    //                    return obj;
-    //                } else if (obj.type === 'line') {
-    //                    return obj;
-    //                } else {
-    //                    throw new Error('Unknown shape type');
-    //                }
-    //            });
-    //        } else {
-    //            throw new Error('Invalid file format');
-    //        }
-    //    } catch (error) {
-    //        console.error('Error processing file content:', error);
-    //    }
-    //}
-
     function processFileContent(content: string) {
         try {
             const sizeMatch = content.match(/Size:({[^}]+})/);

@@ -107,10 +107,12 @@
      <div style="flex: 2;"> 
         <canvas id="canvas" width="698" height="598" style="border:1px solid grey"></canvas>
         <div id="contextMenu" class="context-menu" hidden>
-            <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Primary">Удалить</MudButton>
-            <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Secondary">Поверн. влево</MudButton>
-            <MudButton id="rotateRightItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Info">Поверн. вправо</MudButton>
-            <MudButton id="connect_objects" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 40px;" Color="Color.Info">Соед. фигуры</MudButton>
+            <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Primary">Удалить</MudButton>
+            <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Secondary">Поверн. влево</MudButton>
+            <MudButton id="rotateRightItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Info">Поверн. вправо</MudButton>
+            <MudButton id="connect_objects" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Info">Соед. фигуры</MudButton>
+            <MudButton id="insert_img" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Info">Вставить изображение</MudButton>
+            <input type="file" id="imageInput" style="display: none;">
         </div>
     </div>
     <div id="table-container"></div>

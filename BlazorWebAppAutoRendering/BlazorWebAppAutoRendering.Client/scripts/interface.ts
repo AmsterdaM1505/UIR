@@ -7,6 +7,8 @@
     outgoingLinks?: string[];
     incomingLinks?: string[];
     color: string;
+    image?: HTMLImageElement;
+    //imageSrc?: string;
 }
 
 interface Rectangle extends Shape {

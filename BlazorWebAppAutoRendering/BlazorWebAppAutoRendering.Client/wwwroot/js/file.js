@@ -174,15 +174,6 @@
         }
         //console.log(objects);
         drawObjects();
-        const img = new Image();
-        img.onload = function () {
-            //logDebug("Image loaded");
-            drawObjects();
-        };
-        img.onerror = function () {
-            //logDebug("Failed to load image");
-        };
-        img.src = 'img/yyy.jpg';
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e) {
             onMouseDown(e);
@@ -1403,6 +1394,9 @@
             // Перебираем свойства объекта
             for (const key in object) {
                 if (object.hasOwnProperty(key)) {
+                    if (key === "imageSrc") {
+                        continue;
+                    }
                     const row = table.insertRow();
                     const cellKey = row.insertCell();
                     cellKey.style.border = '1px solid black';

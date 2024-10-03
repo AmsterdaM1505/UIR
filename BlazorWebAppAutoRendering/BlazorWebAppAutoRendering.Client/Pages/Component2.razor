@@ -104,7 +104,7 @@
         </label>
         <input type="file" id="cssFileInput" accept=".css" style="width: 100%;"><br>
     </div>
-     <div style="flex: 2;"> 
+    <div style="display: flex; flex: 2; flex-direction: row;">
         <canvas id="canvas" width="698" height="598" style="border:1px solid grey"></canvas>
         <div id="contextMenu" class="context-menu" hidden>
             <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Primary">Удалить</MudButton>
@@ -114,8 +114,9 @@
             <MudButton id="insert_img" class="context-menu-item" Variant="Variant.Filled" Style="width: 150px; height: 35px;" Color="Color.Info">Вставить изображение</MudButton>
             <input type="file" id="imageInput" style="display: none;">
         </div>
+        <div style="margin-left:1px" id="table-container"></div>
     </div>
-    <div id="table-container"></div>
+    
 </div>
 
 @code {

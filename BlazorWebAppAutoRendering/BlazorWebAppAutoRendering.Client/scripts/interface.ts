@@ -8,7 +8,7 @@
     incomingLinks?: string[];
     color: string;
     image?: HTMLImageElement;
-    //imageSrc?: string;
+    imageSrc?: string;
 }
 
 interface Rectangle extends Shape {
@@ -23,7 +23,6 @@ interface Circle extends Shape {
     x: number;
     y: number;
     radius: number;
-
 }
 
 interface Line extends Shape {
@@ -31,7 +30,6 @@ interface Line extends Shape {
     startY: number;
     endX: number;
     endY: number;
-
 }
 
 interface Star extends Shape {

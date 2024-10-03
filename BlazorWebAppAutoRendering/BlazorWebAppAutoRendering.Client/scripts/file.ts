@@ -212,15 +212,6 @@
         }
         //console.log(objects);
         drawObjects();
-        const img = new Image();
-        img.onload = function () {
-            //logDebug("Image loaded");
-            drawObjects();
-        };
-        img.onerror = function () {
-            //logDebug("Failed to load image");
-        };
-        img.src = 'img/yyy.jpg';
 
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e: MouseEvent) {
@@ -520,6 +511,8 @@
         drawObjects();
 
 
+
+
         function getObjectCenter(obj: Shape): [number, number] {
             switch (obj.type) {
                 case 'rectangle':
@@ -541,7 +534,6 @@
                     return [0, 0];
             }
         }
-
         function addDirectedLink(fromObj: Shape, toObj: Shape): void {
             // Инициализируем массивы, если они не существуют
             if (!fromObj.outgoingLinks) {
@@ -609,7 +601,6 @@
                 logDebug(`connectionObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
-
         function waySelection() {
             if (selectedObject_buf) {
                 selectedObject_buf_connect = selectedObject_buf;
@@ -618,7 +609,6 @@
                 logDebug(`waySelection_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
-
         function removeObjects() {
             if (selectedObject_buf) {
                 selectedObject_buf_connect = selectedObject_buf;
@@ -627,7 +617,6 @@
                 logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
-
         function addStar() {
             const newStar: Star = {
                 id: generateRandomId(16),
@@ -1550,6 +1539,9 @@
             // Перебираем свойства объекта
             for (const key in object) {
                 if (object.hasOwnProperty(key)) {
+                    if (key === "imageSrc") {
+                        continue;
+                    }
                     const row = table.insertRow();
 
                     const cellKey = row.insertCell();

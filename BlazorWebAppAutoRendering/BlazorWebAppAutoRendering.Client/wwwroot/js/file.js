@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 (function () {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
     //import { v4 as uuidv4 } from 'uuid';
@@ -53,10 +62,10 @@
                         //imageSrc: obj.imageScr || []
                     };
                     if (obj.type === 'rectangle') {
-                        return Object.assign(Object.assign({}, baseProps), { x: obj.x, y: obj.y, width: obj.width, height: obj.height });
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x, y_C: obj.y, width: obj.width, height: obj.height });
                     }
                     else if (obj.type === 'circle') {
-                        return Object.assign(Object.assign({}, baseProps), { x: obj.x, y: obj.y, radius: obj.radius });
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x, y_C: obj.y, radius: obj.radius });
                     }
                     else if (obj.type === 'line') {
                         return Object.assign(Object.assign({}, baseProps), { startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY });
@@ -113,19 +122,32 @@
         }
     });
     document.getElementById('contextMenu').style.display = 'none';
+    //window.addEventListener('DOMContentLoaded', () => {
+    //    setTimeout(() => {
+    //        if (objects.length === 0) {
+    //            const savedSchema = localStorage.getItem('savedSchema');
+    //            objects = processFileContent(savedSchema, objects);
+    //            setTimeout(() => {
+    //                drawObjects();
+    //            }, 1000);
+    //        }
+    //    }, 4000);
+    //});
     // Сохранение схемы между перезагрузками
     // Функция для сохранения схемы в локальное хранилище
     function saveToLocalStorage() {
-        if ((objects && objects.length) === 0) {
-            console.warn("Cannot save: no objects present");
-            return;
-        }
-        localStorage.removeItem('savedSchema');
-        const size = { width: canvas.width, height: canvas.height };
-        const shapes = JSON.stringify(objects, null, 2);
-        const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
-        localStorage.setItem('savedSchema', content);
-        console.log("Schema saved");
+        return __awaiter(this, void 0, void 0, function* () {
+            if ((objects && objects.length) === 0) {
+                //console.warn("Cannot save: no objects present");
+                return;
+            }
+            localStorage.removeItem('savedSchema');
+            const size = { width: canvas.width, height: canvas.height };
+            const shapes = JSON.stringify(objects, null, 2);
+            const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
+            yield localStorage.setItem('savedSchema', content);
+            console.log("Schema saved");
+        });
     }
     // Запуск периодического сохранения и восстановления
     setInterval(saveToLocalStorage, 9000);
@@ -308,6 +330,100 @@
                 console.error("Не выбран объект или файл.");
             }
         });
+        canvas.addEventListener('dblclick', function (event) {
+            // Получаем координаты клика относительно канваса
+            const canvasRect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - canvasRect.left;
+            const mouseY = event.clientY - canvasRect.top;
+            // Поиск объекта, по которому сделан двойной клик
+            const clickedObject = objects.find(obj => {
+                switch (obj.type) {
+                    case 'rectangle':
+                        const rect = obj;
+                        return mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height;
+                    case 'circle':
+                        const circle = obj;
+                        const dx = mouseX - circle.x_C;
+                        const dy = mouseY - circle.y_C;
+                        return dx * dx + dy * dy <= circle.radius * circle.radius;
+                    // Добавьте другие типы объектов по аналогии
+                    default:
+                        return false;
+                }
+            });
+            if (clickedObject) {
+                // Запрашиваем текст у пользователя с помощью prompt
+                const text = prompt("Введите текст для объекта", clickedObject.info || "");
+                if (text !== null) {
+                    // Сохраняем введенный текст в объекте
+                    clickedObject.info = text;
+                    drawObjects(); // Перерисовываем холст с новым текстом
+                }
+            }
+        });
+        //canvas.addEventListener('dblclick', function (event: MouseEvent) {
+        //    const mouseX = event.clientX - canvas.offsetLeft;
+        //    const mouseY = event.clientY - canvas.offsetTop;
+        //    // Поиск объекта, по которому сделан двойной клик
+        //    const clickedObject = objects.find(obj => {
+        //        switch (obj.type) {
+        //            case 'rectangle':
+        //                const rect = obj as Rectangle;
+        //                return mouseX >= rect.x && mouseX <= rect.x + rect.width && mouseY >= rect.y && mouseY <= rect.y + rect.height;
+        //            case 'circle':
+        //                const circle = obj as Circle;
+        //                const dx = mouseX - circle.x;
+        //                const dy = mouseY - circle.y;
+        //                return dx * dx + dy * dy <= circle.radius * circle.radius;
+        //            // Добавьте другие типы объектов по аналогии
+        //            default:
+        //                return false;
+        //        }
+        //    });
+        //    if (clickedObject) {
+        //        // Создаем текстовое поле для ввода
+        //        const input = document.createElement('input');
+        //        input.type = 'text';
+        //        // Устанавливаем прозрачность и убираем границу
+        //        input.style.background = 'transparent';
+        //        input.style.border = 'none';
+        //        input.style.outline = 'none';
+        //        // Настраиваем позицию и размеры input в соответствии с объектом
+        //        input.style.position = 'absolute';
+        //        //input.style.left = `${event.clientX}px`;
+        //        //input.style.top = `${event.clientY}px`;
+        //        const [x, y] = getObjectCenter(clickedObject);
+        //        console.log(x, y, canvas);
+        //        input.style.left = `${x}px`;
+        //        input.style.top = `${y}px`;
+        //        if (clickedObject.type === 'rectangle') {
+        //            const rect = clickedObject as Rectangle;
+        //            input.style.width = `${rect.width}px`;
+        //            input.style.height = `${rect.height}px`;
+        //        } else if (clickedObject.type === 'circle') {
+        //            const circle = clickedObject as Circle;
+        //            input.style.width = `${circle.radius * 2}px`;
+        //            input.style.height = `${circle.radius * 2}px`;
+        //        }
+        //        // Текущий текст объекта (если есть) добавляется в input
+        //        input.value = clickedObject.info || '';
+        //        // Добавляем input в документ
+        //        document.body.appendChild(input);
+        //        input.focus();
+        //        // Обработчик для завершения ввода текста
+        //        input.addEventListener('blur', () => {
+        //            clickedObject.info = input.value;  // Сохраняем текст в объекте
+        //            document.body.removeChild(input);  // Удаляем input
+        //            drawObjects();  // Перерисовываем объекты на холсте
+        //        });
+        //        // Обработка нажатия Enter для завершения ввода
+        //        input.addEventListener('keydown', (e) => {
+        //            if (e.key === 'Enter') {
+        //                input.blur();  // Снимаем фокус с input, вызывая обработчик blur
+        //            }
+        //        });
+        //    }
+        //});
         //function insertionImageFromFile(shape: Shape) {
         //    const img = new Image();
         //    if (!shape) {
@@ -402,12 +518,12 @@
                 ctx_.lineWidth = 4; // Толщина контура
                 if (obj_.type === 'rectangle') {
                     const rect = obj_;
-                    ctx_.strokeRect(rect.x, rect.y, rect.width, rect.height);
+                    ctx_.strokeRect(rect.x_C, rect.y_C, rect.width, rect.height);
                 }
                 else if (obj_.type === 'circle') {
                     const circle = obj_;
                     ctx_.beginPath();
-                    ctx_.arc(circle.x, circle.y, circle.radius + 2, 0, 2 * Math.PI); // Добавляем 2 пикселя к радиусу для контурного выделения
+                    ctx_.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI); // Добавляем 2 пикселя к радиусу для контурного выделения
                     ctx_.stroke();
                 }
                 else if (obj_.type === 'line') {
@@ -439,10 +555,10 @@
             switch (obj.type) {
                 case 'rectangle':
                     const rect = obj;
-                    return [rect.x + rect.width / 2, rect.y + rect.height / 2];
+                    return [rect.x_C + rect.width / 2, rect.y_C + rect.height / 2];
                 case 'circle':
                     const circle = obj;
-                    return [circle.x, circle.y];
+                    return [circle.x_C, circle.y_C];
                 case 'line':
                     const line = obj;
                     return [(line.startX + line.endX) / 2, (line.startY + line.endY) / 2];
@@ -584,7 +700,26 @@
             ctx.fillStyle = obj.color;
             ctx.fill();
             if (selectedObject_buf == obj) {
-                points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+                // Отрисовка голубой пунктирной рамки
+                ctx.save();
+                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                points.forEach((point, index) => {
+                    if (index === 0) {
+                        ctx.moveTo(point.x, point.y);
+                    }
+                    else {
+                        ctx.lineTo(point.x, point.y);
+                    }
+                });
+                ctx.closePath();
+                ctx.stroke();
+                ctx.setLineDash([]); // Сбрасываем пунктир
+                ctx.restore();
+                // Отрисовка квадратов на вершинах звезды
+                //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
             }
         }
         function drawCloud(ctx, x_C, y_C, width, height, obj) {
@@ -606,15 +741,24 @@
             ctx.fillStyle = obj.color;
             ctx.fill();
             if (selectedObject_buf == obj) {
-                points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+                // Отрисовка голубой пунктирной рамки
+                ctx.save();
+                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+                ctx.strokeRect(startX_Cloud - 2, startY_Cloud - 2, width + 1, height + 1);
+                ctx.setLineDash([]); // Сбрасываем пунктир
+                ctx.restore();
+                // Отрисовка квадратов на контрольных точках
+                //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
             }
         }
         function addRect() {
             const newRect = {
                 id: generateRandomId(16),
                 type: 'rectangle',
-                x: Math.random() * (canvas.width - 50),
-                y: Math.random() * (canvas.height - 50),
+                x_C: Math.random() * (canvas.width - 50),
+                y_C: Math.random() * (canvas.height - 50),
                 width: 50,
                 height: 50,
                 color: getRandomColor(),
@@ -628,8 +772,8 @@
             const newCircle = {
                 id: generateRandomId(16),
                 type: 'circle',
-                x: Math.random() * (canvas.width - 50) + 25,
-                y: Math.random() * (canvas.height - 50) + 25,
+                x_C: Math.random() * (canvas.width - 50) + 25,
+                y_C: Math.random() * (canvas.height - 50) + 25,
                 radius: 25,
                 color: getRandomColor(),
                 rotation: 0
@@ -639,15 +783,21 @@
             drawObjects();
         }
         function addLine() {
+            const startX = Math.random() * canvas.width;
+            const startY = Math.random() * canvas.height;
+            const endX = Math.random() * canvas.width;
+            const endY = Math.random() * canvas.height;
             const newLine = {
                 id: generateRandomId(16),
                 type: 'line',
-                startX: Math.random() * canvas.width,
-                startY: Math.random() * canvas.height,
-                endX: Math.random() * canvas.width,
-                endY: Math.random() * canvas.height,
+                startX: startX,
+                startY: startY,
+                endX: endX,
+                endY: endY,
                 color: getRandomColor(),
-                rotation: 0
+                rotation: 0,
+                x_C: (startX + endX) / 2, // Вычисляем центр по X
+                y_C: (startY + endY) / 2 // Вычисляем центр по Y
             };
             objects.push(newLine);
             logDebug(`Line added: ${JSON.stringify(newLine)}`);
@@ -686,6 +836,19 @@
             else {
                 logDebug("No shape selected to delete");
             }
+        }
+        let isSelecting = false;
+        let selectionStartX = 0;
+        let selectionStartY = 0;
+        let selectionEndX = 0;
+        let selectionEndY = 0;
+        // Функция для отрисовки рамки выделения
+        function drawSelectionBox() {
+            ctx.setLineDash([5, 3]); // Делаем линию пунктирной
+            ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(Math.min(selectionStartX, selectionEndX), Math.min(selectionStartY, selectionEndY), Math.abs(selectionEndX - selectionStartX), Math.abs(selectionEndY - selectionStartY));
+            ctx.setLineDash([]); // Сбрасываем пунктир
         }
         function rotateSelectedObject(angle) {
             if (selectedObject_buf) {
@@ -785,10 +948,6 @@
             }
         }
         function onMouseDown(e) {
-            if (objects.length === 0) {
-                savedSchema = localStorage.getItem('savedSchema');
-                objects = processFileContent(savedSchema, objects);
-            }
             logDebug(`(${objects})`);
             const mouseX = e.clientX - canvas.offsetLeft;
             const mouseY = e.clientY - canvas.offsetTop;
@@ -803,15 +962,24 @@
                     logDebug(`highlight - (${highlight})`);
                     highlight = [];
                 }
+                if (objects.length === 0) {
+                    const savedSchema = localStorage.getItem('savedSchema');
+                    objects = processFileContent(savedSchema, objects);
+                }
+                isSelecting = true;
+                selectionStartX = mouseX;
+                selectionStartY = mouseY;
+                selectionEndX = mouseX;
+                selectionEndY = mouseY;
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
                     if (obj.type === 'rectangle') {
                         const rect = obj;
-                        if (mouseX >= rect.x && mouseX <= rect.x + rect.width && mouseY >= rect.y && mouseY <= rect.y + rect.height) {
+                        if (mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height) {
                             selectedObject = rect;
                             selectedObject_buf = rect;
-                            startX = mouseX - rect.x;
-                            startY = mouseY - rect.y;
+                            startX = mouseX - rect.x_C;
+                            startY = mouseY - rect.y_C;
                             logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
                             selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                             connectionServ == 2;
@@ -821,8 +989,8 @@
                     }
                     else if (obj.type === 'circle') {
                         const circle = obj;
-                        const dx = mouseX - circle.x;
-                        const dy = mouseY - circle.y;
+                        const dx = mouseX - circle.x_C;
+                        const dy = mouseY - circle.y_C;
                         if (dx * dx + dy * dy <= circle.radius * circle.radius) {
                             selectedObject = circle;
                             selectedObject_buf = circle;
@@ -903,10 +1071,10 @@
                     const obj = objects[i];
                     if (obj.type === 'rectangle') {
                         const rect = obj;
-                        if (mouseX >= rect.x && mouseX <= rect.x + rect.width && mouseY >= rect.y && mouseY <= rect.y + rect.height) {
+                        if (mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height) {
                             selectedObject_buf = rect;
-                            startX = mouseX - rect.x;
-                            startY = mouseY - rect.y;
+                            startX = mouseX - rect.x_C;
+                            startY = mouseY - rect.y_C;
                             showContextMenu(e.clientX, e.clientY);
                             logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
                             break;
@@ -914,8 +1082,8 @@
                     }
                     else if (obj.type === 'circle') {
                         const circle = obj;
-                        const dx = mouseX - circle.x;
-                        const dy = mouseY - circle.y;
+                        const dx = mouseX - circle.x_C;
+                        const dy = mouseY - circle.y_C;
                         if (dx * dx + dy * dy <= circle.radius * circle.radius) {
                             selectedObject_buf = circle;
                             startX = dx;
@@ -992,11 +1160,11 @@
                     switch (obj.type) {
                         case 'rectangle':
                             const rect = obj;
-                            return startX >= rect.x && startX <= rect.x + rect.width && startY >= rect.y && startY <= rect.y + rect.height;
+                            return startX >= rect.x_C && startX <= rect.x_C + rect.width && startY >= rect.y_C && startY <= rect.y_C + rect.height;
                         case 'circle':
                             const circle = obj;
-                            const dx = startX - circle.x;
-                            const dy = startY - circle.y;
+                            const dx = startX - circle.x_C;
+                            const dy = startY - circle.y_C;
                             return dx * dx + dy * dy <= circle.radius * circle.radius;
                         case 'line':
                             const line = obj;
@@ -1036,17 +1204,23 @@
             const mouseY = e.clientY - canvas.offsetTop;
             const mouse_meaning = e.button;
             //logDebug(`Mouse move at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
+            if (isSelecting) {
+                selectionEndX = e.clientX - canvas.offsetLeft;
+                selectionEndY = e.clientY - canvas.offsetTop;
+                drawObjects(); // Перерисовываем объекты
+                drawSelectionBox(); // Рисуем текущую рамку выделения
+            }
             if (selectedObject && (mouse_meaning === 0) && mouse_meaning_check != 1) {
                 //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
                 if (selectedObject.type === 'rectangle') {
                     const rect = selectedObject;
-                    rect.x = mouseX - startX;
-                    rect.y = mouseY - startY;
+                    rect.x_C = mouseX - startX;
+                    rect.y_C = mouseY - startY;
                 }
                 else if (selectedObject.type === 'circle') {
                     const circle = selectedObject;
-                    circle.x = mouseX - startX;
-                    circle.y = mouseY - startY;
+                    circle.x_C = mouseX - startX;
+                    circle.y_C = mouseY - startY;
                 }
                 else if (selectedObject.type === 'line') {
                     const line = selectedObject;
@@ -1125,13 +1299,13 @@
                     switch (selectedObject_canv.type) {
                         case 'rectangle':
                             const rect = selectedObject_canv;
-                            rect.x += dx;
-                            rect.y += dy;
+                            rect.x_C += dx;
+                            rect.y_C += dy;
                             break;
                         case 'circle':
                             const circle = selectedObject_canv;
-                            circle.x += dx;
-                            circle.y += dy;
+                            circle.x_C += dx;
+                            circle.y_C += dy;
                             break;
                         case 'line':
                             const line = selectedObject_canv;
@@ -1162,6 +1336,11 @@
         }
         function onMouseUp(e) {
             let mouse_meaning = e.button;
+            if (isSelecting) {
+                isSelecting = false;
+                //selectedObjects = getObjectsInSelectionBox();  // Получаем выделенные объекты
+                //drawObjects();  // Перерисовываем объекты с учетом выделения
+            }
             if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
                 logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
             }
@@ -1298,10 +1477,10 @@
                         incomingLinks: ((_c = elem.getAttribute('incomingLinks')) === null || _c === void 0 ? void 0 : _c.split(',')) || []
                     };
                     if (type === 'rectangle') {
-                        return Object.assign(Object.assign({}, baseProps), { x: parseFloat(elem.getAttribute('x') || '0'), y: parseFloat(elem.getAttribute('y') || '0'), width: parseFloat(elem.getAttribute('width') || '0'), height: parseFloat(elem.getAttribute('height') || '0') });
+                        return Object.assign(Object.assign({}, baseProps), { x_C: parseFloat(elem.getAttribute('x') || '0'), y_C: parseFloat(elem.getAttribute('y') || '0'), width: parseFloat(elem.getAttribute('width') || '0'), height: parseFloat(elem.getAttribute('height') || '0') });
                     }
                     else if (type === 'circle') {
-                        return Object.assign(Object.assign({}, baseProps), { x: parseFloat(elem.getAttribute('x') || '0'), y: parseFloat(elem.getAttribute('y') || '0'), radius: parseFloat(elem.getAttribute('radius') || '0') });
+                        return Object.assign(Object.assign({}, baseProps), { x_C: parseFloat(elem.getAttribute('x') || '0'), y_C: parseFloat(elem.getAttribute('y') || '0'), radius: parseFloat(elem.getAttribute('radius') || '0') });
                     }
                     else if (type === 'line') {
                         return Object.assign(Object.assign({}, baseProps), { startX: parseFloat(elem.getAttribute('startX') || '0'), startY: parseFloat(elem.getAttribute('startY') || '0'), endX: parseFloat(elem.getAttribute('endX') || '0'), endY: parseFloat(elem.getAttribute('endY') || '0') });
@@ -1331,10 +1510,10 @@
                 switch (obj.type) {
                     case 'rectangle':
                         const rect = obj;
-                        return `<object ${baseProps} x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}"/>`;
+                        return `<object ${baseProps} x="${rect.x_C}" y="${rect.y_C}" width="${rect.width}" height="${rect.height}"/>`;
                     case 'circle':
                         const circle = obj;
-                        return `<object ${baseProps} x="${circle.x}" y="${circle.y}" radius="${circle.radius}"/>`;
+                        return `<object ${baseProps} x="${circle.x_C}" y="${circle.y_C}" radius="${circle.radius}"/>`;
                     case 'line':
                         const line = obj;
                         return `<object ${baseProps} startX="${line.startX}" startY="${line.startY}" endX="${line.endX}" endY="${line.endY}"/>`;
@@ -1394,7 +1573,7 @@
             // Перебираем свойства объекта
             for (const key in object) {
                 if (object.hasOwnProperty(key)) {
-                    if (key === "imageSrc") {
+                    if (key === "imageSrc" || object[key] === "") {
                         continue;
                     }
                     const row = table.insertRow();
@@ -1504,6 +1683,21 @@
                 return null;
             }
             return path;
+        }
+        function enteringText(obj) {
+            if (obj.info) {
+                ctx.fillStyle = 'black';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
+                let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
+                if (obj.type === "rectangle") {
+                    textX = obj.x_C + obj.width / 2;
+                    textY = obj.y_C + obj.height / 2;
+                }
+                ctx.fillText(obj.info, textX, textY, 70);
+            }
         }
         //function drawObjects() {
         //    if (ctx) {
@@ -1685,18 +1879,18 @@
                 }
                 // Затем отрисовываем сами объекты
                 for (const obj of objects) {
-                    logDebug(`Drawing object: ${JSON.stringify(obj)}`);
+                    //logDebug(`Drawing object: ${JSON.stringify(obj)}`);
                     ctx.save();
                     let centerX = 0;
                     let centerY = 0;
                     if (obj.rotation) {
                         if (obj.type === 'rectangle') {
-                            centerX = obj.x + obj.width / 2;
-                            centerY = obj.y + obj.height / 2;
+                            centerX = obj.x_C /*+ (obj as Rectangle).width / 2*/;
+                            centerY = obj.y_C /*+ (obj as Rectangle).height / 2*/;
                         }
                         else if (obj.type === 'circle') {
-                            centerX = obj.x;
-                            centerY = obj.y;
+                            centerX = obj.x_C;
+                            centerY = obj.y_C;
                         }
                         else if (obj.type === 'line') {
                             centerX = (obj.startX + obj.endX) / 2;
@@ -1718,51 +1912,65 @@
                         case 'rectangle':
                             const rect = obj;
                             ctx.fillStyle = rect.color;
-                            ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+                            ctx.fillRect(rect.x_C, rect.y_C, rect.width, rect.height);
                             if (rect.image) {
-                                ctx.drawImage(rect.image, rect.x, rect.y, rect.width, rect.height);
+                                ctx.drawImage(rect.image, rect.x_C, rect.y_C, rect.width, rect.height);
                             }
                             if (selectedObject_buf == rect) {
-                                ctx.fillStyle = 'black';
-                                ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
-                                ctx.fillRect(rect.x + rect.width - 5, rect.y - 5, 10, 10);
-                                ctx.fillRect(rect.x - 5, rect.y + rect.height - 5, 10, 10);
-                                ctx.fillRect(rect.x + rect.width - 5, rect.y + rect.height - 5, 10, 10);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
+                                //ctx.fillRect(rect.x + rect.width - 5, rect.y - 5, 10, 10);
+                                //ctx.fillRect(rect.x - 5, rect.y + rect.height - 5, 10, 10);
+                                //ctx.fillRect(rect.x + rect.width - 5, rect.y + rect.height - 5, 10, 10);
+                                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([5, 3]); // Длина штриха и промежутка
+                                ctx.strokeRect(rect.x_C - 2, rect.y_C - 2, rect.width + 4, rect.height + 4);
+                                ctx.setLineDash([]); // Сбрасываем пунктир
                             }
+                            enteringText(obj);
                             break;
                         case 'circle':
                             const circle = obj;
                             ctx.beginPath();
-                            ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                            ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
                             ctx.fillStyle = circle.color;
                             ctx.fill();
                             if (circle.image) {
                                 // Клипируем область круга, чтобы ограничить изображение
                                 ctx.save();
                                 ctx.beginPath();
-                                ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                                ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
                                 ctx.clip();
-                                ctx.drawImage(circle.image, circle.x - circle.radius, circle.y - circle.radius, circle.radius * 2, circle.radius * 2);
+                                ctx.drawImage(circle.image, circle.x_C - circle.radius, circle.y_C - circle.radius, circle.radius * 2, circle.radius * 2);
                                 ctx.restore();
                             }
                             if (selectedObject_buf == circle) {
+                                //ctx.beginPath();
+                                //ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fill();
+                                //ctx.beginPath();
+                                //ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fill();
+                                //ctx.beginPath();
+                                //ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fill();
+                                //ctx.beginPath();
+                                //ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fill();
+                                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([5, 3]);
                                 ctx.beginPath();
-                                ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'black';
-                                ctx.fill();
-                                ctx.beginPath();
-                                ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'black';
-                                ctx.fill();
-                                ctx.beginPath();
-                                ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'black';
-                                ctx.fill();
-                                ctx.beginPath();
-                                ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'black';
-                                ctx.fill();
+                                ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
+                                ctx.stroke();
+                                ctx.setLineDash([]); // Сбрасываем пунктир
                             }
+                            enteringText(obj);
                             break;
                         case 'line':
                             const line = obj;
@@ -1774,19 +1982,29 @@
                             ctx.stroke();
                             // Линии не поддерживают изображение, но можно добавить, если требуется
                             if (selectedObject_buf == line) {
+                                //ctx.beginPath();
+                                //ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fill();
+                                //ctx.beginPath();
+                                //ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
+                                //ctx.fillStyle = 'black';
+                                //ctx.fill();
+                                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                                ctx.lineWidth = 2;
+                                ctx.setLineDash([5, 3]);
                                 ctx.beginPath();
-                                ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'black';
-                                ctx.fill();
-                                ctx.beginPath();
-                                ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
-                                ctx.fillStyle = 'black';
-                                ctx.fill();
+                                ctx.moveTo(line.startX, line.startY);
+                                ctx.lineTo(line.endX, line.endY);
+                                ctx.stroke();
+                                ctx.setLineDash([]); // Сбрасываем пунктир
                             }
+                            enteringText(obj);
                             break;
                         case 'star':
                             const star = obj;
                             drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
+                            enteringText(obj);
                             // Звезды тоже могут поддерживать изображение при необходимости
                             break;
                         case 'cloud':
@@ -1796,6 +2014,7 @@
                             //if (cloud.image) {
                             //    ctx.drawImage(cloud.image, cloud.x_C - cloud.width / 2, cloud.y_C - cloud.height / 2, cloud.width, cloud.height);
                             //}
+                            enteringText(obj);
                             break;
                         default:
                             logDebug(`Unknown object type: ${JSON.stringify(obj)}`);

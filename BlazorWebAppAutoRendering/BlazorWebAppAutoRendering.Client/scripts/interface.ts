@@ -9,19 +9,21 @@
     color: string;
     image?: HTMLImageElement;
     imageSrc?: string;
+    x_C: number;
+    y_C: number;
+    connectors?: number[];
 }
 
 interface Rectangle extends Shape {
-    x: number;
-    y: number;
+    //x: number;
+    //y: number;
     width: number;
     height: number;
-
 }
 
 interface Circle extends Shape {
-    x: number;
-    y: number;
+    //x: number;
+    //y: number;
     radius: number;
 }
 
@@ -33,16 +35,16 @@ interface Line extends Shape {
 }
 
 interface Star extends Shape {
-    x_C: number;
-    y_C: number;
+    //x_C: number;
+    //y_C: number;
     rad: number;
     amount_points: number;
     m: number;
 }
 
 interface Cloud extends Shape {
-    x_C: number;
-    y_C: number;
+    //x_C: number;
+    //y_C: number;
     width: number;
     height: number;
 

@@ -5,13 +5,6 @@ function logDebug(message) {
         debugOutput.scrollTop = debugOutput.scrollHeight;
     }
 }
-//function logProperties(message: string) {
-//    const propertiesOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;
-//    if (propertiesOutput) {
-//        propertiesOutput.value += message + '\n';
-//        propertiesOutput.scrollTop = propertiesOutput.scrollHeight;
-//    }
-//}
 function generateUniqueId() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const charactersLength = characters.length;

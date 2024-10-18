@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 (function () {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2;
-    //import { v4 as uuidv4 } from 'uuid';
     let objects = [];
     let highlight = [];
     let ctx = null;
@@ -25,6 +24,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     let panStartY = 0;
     let offsetX = 0;
     let offsetY = 0;
+    let canvas_offsetX = 0;
+    let canvas_offsetY = 0;
     let mouse_meaning_check = 0;
     let connectionServ = 2;
     const container = document.getElementById('table-container');
@@ -164,13 +165,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     const gridCtx = gridCanvas.getContext('2d');
     gridCanvas.width = canvas.width;
     gridCanvas.height = canvas.height;
-    // Функция для рисования сетки
+    //console.log(canvas.width, canvas.height);
+    //Функция для рисования сетки
     function drawGrid(ctx, width, height, gridSize) {
         //ctx.clearRect(0, 0, width, height); // Очищаем холст перед рисованием
         ctx.strokeStyle = '#e0e0e0'; // Цвет линий сетки
         ctx.lineWidth = 1;
         // Вертикальные линии
-        for (let x = 0; x <= width; x += gridSize) {
+        for (let x = 0; x <= width + width; x += gridSize) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
             ctx.lineTo(x, height);
@@ -263,7 +265,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
             selectedObject_buf = null;
             drawObjects();
-            //hideContextMenu();
         });
         (_o = document.getElementById('cycleCheck')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
             const cycles = detectCycles(objects); // Находим все циклы
@@ -333,8 +334,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         canvas.addEventListener('dblclick', function (event) {
             // Получаем координаты клика относительно канваса
             const canvasRect = canvas.getBoundingClientRect();
-            const mouseX = event.clientX - canvasRect.left;
-            const mouseY = event.clientY - canvasRect.top;
+            const mouseX = event.clientX - canvasRect.left - offsetX;
+            const mouseY = event.clientY - canvasRect.top - offsetY;
             // Поиск объекта, по которому сделан двойной клик
             const clickedObject = objects.find(obj => {
                 switch (obj.type) {
@@ -361,69 +362,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 }
             }
         });
-        //canvas.addEventListener('dblclick', function (event: MouseEvent) {
-        //    const mouseX = event.clientX - canvas.offsetLeft;
-        //    const mouseY = event.clientY - canvas.offsetTop;
-        //    // Поиск объекта, по которому сделан двойной клик
-        //    const clickedObject = objects.find(obj => {
-        //        switch (obj.type) {
-        //            case 'rectangle':
-        //                const rect = obj as Rectangle;
-        //                return mouseX >= rect.x && mouseX <= rect.x + rect.width && mouseY >= rect.y && mouseY <= rect.y + rect.height;
-        //            case 'circle':
-        //                const circle = obj as Circle;
-        //                const dx = mouseX - circle.x;
-        //                const dy = mouseY - circle.y;
-        //                return dx * dx + dy * dy <= circle.radius * circle.radius;
-        //            // Добавьте другие типы объектов по аналогии
-        //            default:
-        //                return false;
-        //        }
-        //    });
-        //    if (clickedObject) {
-        //        // Создаем текстовое поле для ввода
-        //        const input = document.createElement('input');
-        //        input.type = 'text';
-        //        // Устанавливаем прозрачность и убираем границу
-        //        input.style.background = 'transparent';
-        //        input.style.border = 'none';
-        //        input.style.outline = 'none';
-        //        // Настраиваем позицию и размеры input в соответствии с объектом
-        //        input.style.position = 'absolute';
-        //        //input.style.left = `${event.clientX}px`;
-        //        //input.style.top = `${event.clientY}px`;
-        //        const [x, y] = getObjectCenter(clickedObject);
-        //        console.log(x, y, canvas);
-        //        input.style.left = `${x}px`;
-        //        input.style.top = `${y}px`;
-        //        if (clickedObject.type === 'rectangle') {
-        //            const rect = clickedObject as Rectangle;
-        //            input.style.width = `${rect.width}px`;
-        //            input.style.height = `${rect.height}px`;
-        //        } else if (clickedObject.type === 'circle') {
-        //            const circle = clickedObject as Circle;
-        //            input.style.width = `${circle.radius * 2}px`;
-        //            input.style.height = `${circle.radius * 2}px`;
-        //        }
-        //        // Текущий текст объекта (если есть) добавляется в input
-        //        input.value = clickedObject.info || '';
-        //        // Добавляем input в документ
-        //        document.body.appendChild(input);
-        //        input.focus();
-        //        // Обработчик для завершения ввода текста
-        //        input.addEventListener('blur', () => {
-        //            clickedObject.info = input.value;  // Сохраняем текст в объекте
-        //            document.body.removeChild(input);  // Удаляем input
-        //            drawObjects();  // Перерисовываем объекты на холсте
-        //        });
-        //        // Обработка нажатия Enter для завершения ввода
-        //        input.addEventListener('keydown', (e) => {
-        //            if (e.key === 'Enter') {
-        //                input.blur();  // Снимаем фокус с input, вызывая обработчик blur
-        //            }
-        //        });
-        //    }
-        //});
         //function insertionImageFromFile(shape: Shape) {
         //    const img = new Image();
         //    if (!shape) {
@@ -508,8 +446,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         }
         function hideContextMenu() {
             const menu = document.getElementById('contextMenu');
-            menu.style.display = 'none';
-            menu.hidden = true;
+            if (menu) {
+                menu.style.display = 'none';
+                menu.hidden = true;
+            }
         }
         function highlighting(obj_, ctx_) {
             if (highlight.includes(obj_)) {
@@ -659,7 +599,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 amount_points: 6,
                 m: 0.5,
                 color: getRandomColor(),
-                rotation: 0
+                rotation: 0,
+                borderPoints_X1: 0,
+                borderPoints_Y1: 0,
+                borderPoints_X2: 0,
+                borderPoints_Y2: 0
             };
             objects.push(newStar);
             logDebug(`Star added: ${JSON.stringify(newStar)}`);
@@ -674,7 +618,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 width: 200,
                 height: 120,
                 color: getRandomColor(),
-                rotation: 0
+                rotation: 0,
+                borderPoints_X1: 0,
+                borderPoints_Y1: 0,
+                borderPoints_X2: 0,
+                borderPoints_Y2: 0
             };
             objects.push(newStar);
             logDebug(`Cloud added: ${JSON.stringify(newStar)}`);
@@ -701,23 +649,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             ctx.fill();
             if (selectedObject_buf == obj) {
                 // Отрисовка голубой пунктирной рамки
-                ctx.save();
+                //ctx.save();
+                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                //ctx.lineWidth = 2;
+                //ctx.setLineDash([5, 3]);
+                //ctx.beginPath();
+                //points.forEach((point, index) => {
+                //    if (index === 0) {
+                //        ctx.moveTo(point.x, point.y);
+                //    } else {
+                //        ctx.lineTo(point.x, point.y);
+                //    }
+                //});
+                //ctx.closePath();
+                //ctx.stroke();
+                //ctx.setLineDash([]);  // Сбрасываем пунктир
+                //ctx.restore();
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);
-                ctx.beginPath();
-                points.forEach((point, index) => {
-                    if (index === 0) {
-                        ctx.moveTo(point.x, point.y);
-                    }
-                    else {
-                        ctx.lineTo(point.x, point.y);
-                    }
-                });
-                ctx.closePath();
-                ctx.stroke();
+                ctx.strokeRect(obj.x_C - obj.rad - 2, obj.y_C - obj.rad - 2, obj.rad * 2 + 4, obj.rad * 2 + 4);
                 ctx.setLineDash([]); // Сбрасываем пунктир
-                ctx.restore();
+                obj.borderPoints_X1 = obj.x_C - obj.rad - 2;
+                obj.borderPoints_Y1 = obj.y_C - obj.rad - 2;
+                obj.borderPoints_X2 = obj.x_C + obj.rad + 2;
+                obj.borderPoints_Y2 = obj.y_C + obj.rad + 2;
                 // Отрисовка квадратов на вершинах звезды
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
             }
@@ -762,7 +718,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 width: 50,
                 height: 50,
                 color: getRandomColor(),
-                rotation: 0
+                rotation: 0,
+                borderPoints_X1: 0,
+                borderPoints_Y1: 0,
+                borderPoints_X2: 0,
+                borderPoints_Y2: 0
             };
             objects.push(newRect);
             logDebug(`Rectangle added: ${JSON.stringify(newRect)}`);
@@ -776,7 +736,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 y_C: Math.random() * (canvas.height - 50) + 25,
                 radius: 25,
                 color: getRandomColor(),
-                rotation: 0
+                rotation: 0,
+                borderPoints_X1: 0,
+                borderPoints_Y1: 0,
+                borderPoints_X2: 0,
+                borderPoints_Y2: 0
             };
             objects.push(newCircle);
             logDebug(`Circle added: ${JSON.stringify(newCircle)}`);
@@ -797,7 +761,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 color: getRandomColor(),
                 rotation: 0,
                 x_C: (startX + endX) / 2, // Вычисляем центр по X
-                y_C: (startY + endY) / 2 // Вычисляем центр по Y
+                y_C: (startY + endY) / 2, // Вычисляем центр по Y
+                borderPoints_X1: startX + 2,
+                borderPoints_Y1: startY + 2,
+                borderPoints_X2: endX + 2,
+                borderPoints_Y2: endY + 2
             };
             objects.push(newLine);
             logDebug(`Line added: ${JSON.stringify(newLine)}`);
@@ -836,19 +804,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             else {
                 logDebug("No shape selected to delete");
             }
-        }
-        let isSelecting = false;
-        let selectionStartX = 0;
-        let selectionStartY = 0;
-        let selectionEndX = 0;
-        let selectionEndY = 0;
-        // Функция для отрисовки рамки выделения
-        function drawSelectionBox() {
-            ctx.setLineDash([5, 3]); // Делаем линию пунктирной
-            ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(Math.min(selectionStartX, selectionEndX), Math.min(selectionStartY, selectionEndY), Math.abs(selectionEndX - selectionStartX), Math.abs(selectionEndY - selectionStartY));
-            ctx.setLineDash([]); // Сбрасываем пунктир
         }
         function rotateSelectedObject(angle) {
             if (selectedObject_buf) {
@@ -947,16 +902,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 container === null || container === void 0 ? void 0 : container.appendChild(table);
             }
         }
+        function additionGrid(obj) {
+            const x_grid1 = Math.floor(obj.borderPoints_X1 / canvas.width);
+            const y_grid1 = Math.floor(obj.borderPoints_Y1 / canvas.height);
+            const x_grid2 = Math.floor(obj.borderPoints_X2 / canvas.width);
+            const y_grid2 = Math.floor(obj.borderPoints_Y2 / canvas.height);
+            if (x_grid1 < 0 || y_grid1 < 0) {
+                const newWidth = canvas.width * Math.abs(x_grid1);
+                const newHeight = canvas.height * Math.abs(y_grid1);
+                drawGrid(gridCtx, canvas.width + newWidth, canvas.height + newHeight, 20);
+                logDebug(`additionGrid ${(canvas.width + newWidth)}, ${(canvas.height + newHeight)}`);
+            }
+            if (x_grid2 > 0 || y_grid2 > 0) {
+                const newWidth = canvas.width * x_grid2;
+                const newHeight = canvas.height * y_grid2;
+                drawGrid(gridCtx, canvas.width + newWidth, canvas.height + newHeight, 20);
+            }
+        }
+        let isSelecting = false;
+        let selectionStartX = 0;
+        let selectionStartY = 0;
+        let selectionEndX = 0;
+        let selectionEndY = 0;
+        // Функция для отрисовки рамки выделения
+        function drawSelectionBox() {
+            ctx.setLineDash([5, 3]); // Делаем линию пунктирной
+            ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+            ctx.lineWidth = 2;
+            //logDebug(`drawSelectionBox - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
+            ctx.strokeRect(Math.min(selectionStartX, selectionEndX), Math.min(selectionStartY, selectionEndY), Math.abs(selectionEndX - selectionStartX), Math.abs(selectionEndY - selectionStartY));
+            ctx.setLineDash([]); // Сбрасываем пунктир
+        }
         function onMouseDown(e) {
-            logDebug(`(${objects})`);
-            const mouseX = e.clientX - canvas.offsetLeft;
-            const mouseY = e.clientY - canvas.offsetTop;
+            //logDebug(`(${objects})`);
+            const mouseX = e.clientX - canvas.offsetLeft - offsetX;
+            const mouseY = e.clientY - canvas.offsetTop - offsetY;
             const mouse_meaning = e.button;
             if (mouse_meaning === 1) {
                 mouse_meaning_check = 1;
             }
-            logDebug(`Mouse down at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
+            //logDebug(`Mouse down at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
             if (mouse_meaning === 0 && mouse_meaning_check != 1) {
+                hideContextMenu();
                 if (highlight.length != 0) {
                     //console.log("i am here");
                     logDebug(`highlight - (${highlight})`);
@@ -967,10 +954,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                     objects = processFileContent(savedSchema, objects);
                 }
                 isSelecting = true;
-                selectionStartX = mouseX;
-                selectionStartY = mouseY;
-                selectionEndX = mouseX;
-                selectionEndY = mouseY;
+                selectionStartX = e.clientX - canvas.offsetLeft;
+                selectionStartY = e.clientY - canvas.offsetTop;
+                selectionEndX = e.clientX - canvas.offsetLeft;
+                selectionEndY = e.clientY - canvas.offsetTop;
+                //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
                     if (obj.type === 'rectangle') {
@@ -1144,7 +1132,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                     }
                 }
             }
-            else if (mouse_meaning_check === 1) {
+            else if (mouse_meaning_check === 1) { /////////////////////////////////////////////////////////////////////////////////
+                hideContextMenu();
                 logDebug(`Button pressed id - 1 - (${mouse_meaning})`);
                 e.preventDefault();
                 startX = e.offsetX;
@@ -1200,8 +1189,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
         }
         function onMouseMove(e) {
-            const mouseX = e.clientX - canvas.offsetLeft;
-            const mouseY = e.clientY - canvas.offsetTop;
+            const mouseX = e.clientX - canvas.offsetLeft - offsetX;
+            const mouseY = e.clientY - canvas.offsetTop - offsetY;
             const mouse_meaning = e.button;
             //logDebug(`Mouse move at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
             if (isSelecting) {
@@ -1210,12 +1199,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 drawObjects(); // Перерисовываем объекты
                 drawSelectionBox(); // Рисуем текущую рамку выделения
             }
+            logDebug(`${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
             if (selectedObject && (mouse_meaning === 0) && mouse_meaning_check != 1) {
                 //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
                 if (selectedObject.type === 'rectangle') {
                     const rect = selectedObject;
                     rect.x_C = mouseX - startX;
                     rect.y_C = mouseY - startY;
+                    //additionGrid(rect);
                 }
                 else if (selectedObject.type === 'circle') {
                     const circle = selectedObject;
@@ -1272,16 +1263,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 }
                 else if (selectedObject.type === 'cloud') {
                     const cloud = selectedObject;
-                    logDebug(`(${mouseX})(${mouseY})`);
-                    logDebug(`(${startX})(${startY})`);
+                    //logDebug(`(${mouseX})(${mouseY})`);
+                    //logDebug(`(${startX})(${startY})`);
                     cloud.x_C = mouseX - startX;
                     cloud.y_C = mouseY - startY;
-                    logDebug(`(${mouseX - startX})(${mouseY - startY})`);
+                    //logDebug(`(${mouseX - startX})(${mouseY - startY})`);
                 }
                 drawObjects();
             }
             else if (mouse_meaning_check === 1) {
-                logDebug(`Button moved id - 1`);
+                //logDebug(`Button moved id - 1`);
                 e.preventDefault();
                 if (isPanning) {
                     const dx = e.clientX - panStartX;
@@ -1699,150 +1690,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 ctx.fillText(obj.info, textX, textY, 70);
             }
         }
-        //function drawObjects() {
-        //    if (ctx) {
-        //        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //        ctx.save();
-        //        ctx.translate(offsetX, offsetY);
-        //        ctx.drawImage(gridCanvas, 0, 0);
-        //        // Сначала отрисовываем связи между объектами
-        //        for (const obj of objects) {
-        //            if (obj.linkedObjects) {
-        //                obj.linkedObjects.forEach(linkedId => {
-        //                    const linkedObj = objects.find(o => o.id === linkedId);
-        //                    if (linkedObj) {
-        //                        ctx.beginPath();
-        //                        // Получаем центральные координаты текущего объекта
-        //                        const [startX, startY] = getObjectCenter(obj);
-        //                        // Получаем центральные координаты связанного объекта
-        //                        const [endX, endY] = getObjectCenter(linkedObj);
-        //                        // Рисуем линию от текущего объекта к связанному объекту
-        //                        ctx.moveTo(startX, startY);
-        //                        ctx.lineTo(endX, endY);
-        //                        ctx.strokeStyle = 'black';
-        //                        ctx.lineWidth = 2;
-        //                        ctx.stroke();
-        //                    }
-        //                });
-        //            }
-        //            if (obj.outgoingLinks) {
-        //                obj.outgoingLinks.forEach(linkedId => {
-        //                    const linkedObj = objects.find(o => o.id === linkedId);
-        //                    if (linkedObj) {
-        //                        const [startX, startY] = getObjectCenter(obj);
-        //                        const [endX, endY] = getObjectCenter(linkedObj);
-        //                        drawDirectedLine(ctx, startX, startY, endX, endY, 'blue');
-        //                    }
-        //                });
-        //            }
-        //        }
-        //        // Затем отрисовываем сами объекты
-        //        for (const obj of objects) {
-        //            logDebug(`Drawing object: ${JSON.stringify(obj)}`);
-        //            ctx.save();
-        //            let centerX = 0;
-        //            let centerY = 0;
-        //            if (obj.rotation) {
-        //                if (obj.type === 'rectangle') {
-        //                    centerX = (obj as Rectangle).x + (obj as Rectangle).width / 2;
-        //                    centerY = (obj as Rectangle).y + (obj as Rectangle).height / 2;
-        //                } else if (obj.type === 'circle') {
-        //                    centerX = (obj as Circle).x;
-        //                    centerY = (obj as Circle).y;
-        //                } else if (obj.type === 'line') {
-        //                    centerX = ((obj as Line).startX + (obj as Line).endX) / 2;
-        //                    centerY = ((obj as Line).startY + (obj as Line).endY) / 2;
-        //                } else if (obj.type === 'star') {
-        //                    centerX = (obj as Star).x_C;
-        //                    centerY = (obj as Star).y_C;
-        //                } else if (obj.type === 'cloud') {
-        //                    centerX = (obj as Cloud).x_C;
-        //                    centerY = (obj as Cloud).y_C;
-        //                }
-        //                ctx.translate(centerX, centerY);
-        //                ctx.rotate((obj.rotation * Math.PI) / 180);
-        //                ctx.translate(-centerX, -centerY);
-        //            }
-        //            switch (obj.type) {
-        //                case 'rectangle':
-        //                    const rect = obj as Rectangle;
-        //                    ctx.fillStyle = rect.color;
-        //                    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-        //                    if (rect.image) {
-        //                        ctx.drawImage(rect.image, rect.x, rect.y, rect.width!, rect.height!);//
-        //                    }
-        //                    if (selectedObject_buf == rect) {
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
-        //                        ctx.fillRect(rect.x + rect.width - 5, rect.y - 5, 10, 10);
-        //                        ctx.fillRect(rect.x - 5, rect.y + rect.height - 5, 10, 10);
-        //                        ctx.fillRect(rect.x + rect.width - 5, rect.y + rect.height - 5, 10, 10);
-        //                    }
-        //                    break;
-        //                case 'circle':
-        //                    const circle = obj as Circle;
-        //                    ctx.beginPath();
-        //                    ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
-        //                    ctx.fillStyle = circle.color;
-        //                    ctx.fill();
-        //                    if (selectedObject_buf == circle) {
-        //                        ctx.beginPath();
-        //                        ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fill();
-        //                        ctx.beginPath();
-        //                        ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fill();
-        //                        ctx.beginPath();
-        //                        ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fill();
-        //                        ctx.beginPath();
-        //                        ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fill();
-        //                    }
-        //                    break;
-        //                case 'line':
-        //                    const line = obj as Line;
-        //                    ctx.beginPath();
-        //                    ctx.moveTo(line.startX, line.startY);
-        //                    ctx.lineTo(line.endX, line.endY);
-        //                    ctx.strokeStyle = line.color;
-        //                    ctx.lineWidth = 5;
-        //                    ctx.stroke();
-        //                    if (selectedObject_buf == line) {
-        //                        ctx.beginPath();
-        //                        ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fill();
-        //                        ctx.beginPath();
-        //                        ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
-        //                        ctx.fillStyle = 'black';
-        //                        ctx.fill();
-        //                    }
-        //                    break;
-        //                case 'star':
-        //                    const star = obj as Star;
-        //                    drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
-        //                    break;
-        //                case 'cloud':
-        //                    const cloud = obj as Cloud;
-        //                    drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
-        //                    break;
-        //                default:
-        //                    logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
-        //            }
-        //            // Выделяем объект, если он входит в цикл
-        //            highlighting(obj, ctx);
-        //            ctx.restore();
-        //        }
-        //        ctx.restore();
-        //    } else {
-        //        logDebug("Canvas context is not available");
-        //    }
-        //}
         function drawObjects() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1927,6 +1774,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                                 ctx.setLineDash([5, 3]); // Длина штриха и промежутка
                                 ctx.strokeRect(rect.x_C - 2, rect.y_C - 2, rect.width + 4, rect.height + 4);
                                 ctx.setLineDash([]); // Сбрасываем пунктир
+                                rect.borderPoints_X1 = rect.x_C - 2;
+                                rect.borderPoints_Y1 = rect.y_C - 2;
+                                rect.borderPoints_X2 = rect.x_C + rect.width + 2;
+                                rect.borderPoints_Y2 = rect.y_C + rect.height + 2;
                             }
                             enteringText(obj);
                             break;
@@ -1962,13 +1813,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                                 //ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
                                 //ctx.fillStyle = 'black';
                                 //ctx.fill();
+                                //
+                                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                                //ctx.lineWidth = 2;
+                                //ctx.setLineDash([5, 3]);
+                                //ctx.beginPath();
+                                //ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
+                                //ctx.stroke();
+                                //ctx.setLineDash([]);  // Сбрасываем пунктир
+                                //
                                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                                 ctx.lineWidth = 2;
-                                ctx.setLineDash([5, 3]);
-                                ctx.beginPath();
-                                ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
-                                ctx.stroke();
+                                ctx.setLineDash([5, 3]); // Длина штриха и промежутка
+                                ctx.strokeRect(circle.x_C - circle.radius - 2, circle.y_C - circle.radius - 2, circle.radius * 2 + 4, circle.radius * 2 + 4);
                                 ctx.setLineDash([]); // Сбрасываем пунктир
+                                circle.borderPoints_X1 = circle.x_C - circle.radius - 2;
+                                circle.borderPoints_Y1 = circle.y_C - circle.radius - 2;
+                                circle.borderPoints_X2 = circle.x_C + circle.radius + 2;
+                                circle.borderPoints_Y2 = circle.y_C + circle.radius + 2;
                             }
                             enteringText(obj);
                             break;
@@ -1981,23 +1843,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                             ctx.lineWidth = 5;
                             ctx.stroke();
                             // Линии не поддерживают изображение, но можно добавить, если требуется
-                            if (selectedObject_buf == line) {
-                                //ctx.beginPath();
-                                //ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
-                                //ctx.fillStyle = 'black';
-                                //ctx.fill();
-                                //ctx.beginPath();
-                                //ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
-                                //ctx.fillStyle = 'black';
-                                //ctx.fill();
+                            //if (selectedObject_buf == line) {
+                            //    //ctx.beginPath();
+                            //    //ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
+                            //    //ctx.fillStyle = 'black';
+                            //    //ctx.fill();
+                            //    //ctx.beginPath();
+                            //    //ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
+                            //    //ctx.fillStyle = 'black';
+                            //    //ctx.fill();
+                            //    ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                            //    ctx.lineWidth = 2;
+                            //    ctx.setLineDash([5, 3]);
+                            //    ctx.strokeRect(line.startX + 1, line.startY + 1, Math.abs(line.startX - line.endX - 1), Math.abs(line.startY - line.endY - 1));
+                            //    ctx.setLineDash([]);
+                            //    line.borderPoints_X1 = line.startX + 1;
+                            //    line.borderPoints_Y1 = line.startY + 1;
+                            //    line.borderPoints_X2 = line.endX + 1;
+                            //    line.borderPoints_Y2 = line.endY + 1;
+                            //}
+                            if (selectedObject_buf === line) {
                                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                                 ctx.lineWidth = 2;
                                 ctx.setLineDash([5, 3]);
-                                ctx.beginPath();
-                                ctx.moveTo(line.startX, line.startY);
-                                ctx.lineTo(line.endX, line.endY);
-                                ctx.stroke();
-                                ctx.setLineDash([]); // Сбрасываем пунктир
+                                // Определяем верхний левый угол прямоугольника
+                                const rectX = Math.min(line.startX, line.endX);
+                                const rectY = Math.min(line.startY, line.endY);
+                                // Вычисляем ширину и высоту прямоугольника
+                                const rectWidth = Math.abs(line.endX - line.startX);
+                                const rectHeight = Math.abs(line.endY - line.startY);
+                                // Рисуем пунктирный прямоугольник вокруг линии
+                                ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+                                ctx.setLineDash([]);
+                                // Обновляем координаты крайних точек прямоугольника
+                                line.borderPoints_X1 = rectX;
+                                line.borderPoints_Y1 = rectY;
+                                line.borderPoints_X2 = rectX + rectWidth;
+                                line.borderPoints_Y2 = rectY + rectHeight;
                             }
                             enteringText(obj);
                             break;

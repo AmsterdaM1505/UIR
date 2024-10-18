@@ -11,19 +11,19 @@
     imageSrc?: string;
     x_C: number;
     y_C: number;
+    borderPoints_X1: number;
+    borderPoints_Y1: number;
+    borderPoints_X2: number;
+    borderPoints_Y2: number;
     connectors?: number[];
 }
 
 interface Rectangle extends Shape {
-    //x: number;
-    //y: number;
     width: number;
     height: number;
 }
 
 interface Circle extends Shape {
-    //x: number;
-    //y: number;
     radius: number;
 }
 
@@ -35,16 +35,12 @@ interface Line extends Shape {
 }
 
 interface Star extends Shape {
-    //x_C: number;
-    //y_C: number;
     rad: number;
     amount_points: number;
     m: number;
 }
 
 interface Cloud extends Shape {
-    //x_C: number;
-    //y_C: number;
     width: number;
     height: number;
 
@@ -58,14 +54,6 @@ function logDebug(message: string) {
         debugOutput.scrollTop = debugOutput.scrollHeight;
     }
 }
-
-//function logProperties(message: string) {
-//    const propertiesOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;
-//    if (propertiesOutput) {
-//        propertiesOutput.value += message + '\n';
-//        propertiesOutput.scrollTop = propertiesOutput.scrollHeight;
-//    }
-//}
 
 function generateUniqueId(): string {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

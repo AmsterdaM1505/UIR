@@ -665,6 +665,70 @@
                 logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
+        function addRect() {
+            const newRect: Rectangle = {
+                id: generateRandomId(16),
+                type: 'rectangle',
+                x_C: Math.random() * (canvas.width - 50),
+                y_C: Math.random() * (canvas.height - 50),
+                width: 50,
+                height: 50,
+                color: getRandomColor(),
+                rotation: 0,
+                borderPoints_X1: 0,
+                borderPoints_Y1: 0,
+                borderPoints_X2: 0,
+                borderPoints_Y2: 0
+            };
+            objects.push(newRect);
+            logDebug(`Rectangle added: ${JSON.stringify(newRect)}`);
+            drawObjects();
+        }
+        function addCircle() {
+            const newCircle: Circle = {
+                id: generateRandomId(16),
+                type: 'circle',
+                x_C: Math.random() * (canvas.width - 50) + 25,
+                y_C: Math.random() * (canvas.height - 50) + 25,
+                radius: 25,
+                color: getRandomColor(),
+                rotation: 0,
+                borderPoints_X1: 0,
+                borderPoints_Y1: 0,
+                borderPoints_X2: 0,
+                borderPoints_Y2: 0
+            };
+            objects.push(newCircle);
+            logDebug(`Circle added: ${JSON.stringify(newCircle)}`);
+            drawObjects();
+        }
+        function addLine() {
+            const startX = Math.random() * canvas.width;
+            const startY = Math.random() * canvas.height;
+            const endX = Math.random() * canvas.width;
+            const endY = Math.random() * canvas.height;
+
+            const newLine: Line = {
+                id: generateRandomId(16),
+                type: 'line',
+                startX: startX,
+                startY: startY,
+                endX: endX,
+                endY: endY,
+                color: getRandomColor(),
+                rotation: 0,
+                x_C: (startX + endX) / 2,  // Вычисляем центр по X
+                y_C: (startY + endY) / 2,   // Вычисляем центр по Y
+                borderPoints_X1: startX + 2,
+                borderPoints_Y1: startY + 2,
+                borderPoints_X2: endX + 2,
+                borderPoints_Y2: endY + 2
+            };
+
+            objects.push(newLine);
+            logDebug(`Line added: ${JSON.stringify(newLine)}`);
+            drawObjects();
+        }
         function addStar() {
             const newStar: Star = {
                 id: generateRandomId(16),
@@ -707,6 +771,132 @@
         function drawSquare(ctx, x, y, size) {
             ctx.fillStyle = 'black';
             ctx.fillRect(x - size / 2, y - size / 2, size, size);
+        }
+        function drawRect(rect: Rectangle, ctx: CanvasRenderingContext2D) {
+            ctx.fillStyle = rect.color;
+            ctx.fillRect(rect.x_C, rect.y_C, rect.width, rect.height);
+            if (rect.image) {
+                ctx.drawImage(rect.image, rect.x_C, rect.y_C, rect.width!, rect.height!);
+            }
+            if (selectedObject_buf == rect) {
+                //ctx.fillStyle = 'black';
+                //ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
+                //ctx.fillRect(rect.x + rect.width - 5, rect.y - 5, 10, 10);
+                //ctx.fillRect(rect.x - 5, rect.y + rect.height - 5, 10, 10);
+                //ctx.fillRect(rect.x + rect.width - 5, rect.y + rect.height - 5, 10, 10);
+                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);  // Длина штриха и промежутка
+                ctx.strokeRect(rect.x_C - 2, rect.y_C - 2, rect.width + 4, rect.height + 4);
+                ctx.setLineDash([]);  // Сбрасываем пунктир
+                rect.borderPoints_X1 = rect.x_C - 2;
+                rect.borderPoints_Y1 = rect.y_C - 2;
+                rect.borderPoints_X2 = rect.x_C + rect.width + 2;
+                rect.borderPoints_Y2 = rect.y_C + rect.height + 2;
+            }
+        }
+        function drawLine(line: Line, ctx: CanvasRenderingContext2D) {
+            ctx.beginPath();
+            ctx.moveTo(line.startX, line.startY);
+            ctx.lineTo(line.endX, line.endY);
+            ctx.strokeStyle = line.color;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            // Линии не поддерживают изображение, но можно добавить, если требуется
+            //if (selectedObject_buf == line) {
+            //    //ctx.beginPath();
+            //    //ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
+            //    //ctx.fillStyle = 'black';
+            //    //ctx.fill();
+            //    //ctx.beginPath();
+            //    //ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
+            //    //ctx.fillStyle = 'black';
+            //    //ctx.fill();
+            //    ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+            //    ctx.lineWidth = 2;
+            //    ctx.setLineDash([5, 3]);
+            //    ctx.strokeRect(line.startX + 1, line.startY + 1, Math.abs(line.startX - line.endX - 1), Math.abs(line.startY - line.endY - 1));
+            //    ctx.setLineDash([]);
+            //    line.borderPoints_X1 = line.startX + 1;
+            //    line.borderPoints_Y1 = line.startY + 1;
+            //    line.borderPoints_X2 = line.endX + 1;
+            //    line.borderPoints_Y2 = line.endY + 1;
+            //}
+            if (selectedObject_buf === line) {
+                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+
+                // Определяем верхний левый угол прямоугольника
+                const rectX = Math.min(line.startX, line.endX);
+                const rectY = Math.min(line.startY, line.endY);
+
+                // Вычисляем ширину и высоту прямоугольника
+                const rectWidth = Math.abs(line.endX - line.startX);
+                const rectHeight = Math.abs(line.endY - line.startY);
+
+                // Рисуем пунктирный прямоугольник вокруг линии
+                ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
+                ctx.setLineDash([]);
+
+                // Обновляем координаты крайних точек прямоугольника
+                line.borderPoints_X1 = rectX;
+                line.borderPoints_Y1 = rectY;
+                line.borderPoints_X2 = rectX + rectWidth;
+                line.borderPoints_Y2 = rectY + rectHeight;
+            }
+        }
+        function drawCircle(circle: Circle, ctx: CanvasRenderingContext2D) {
+            ctx.beginPath();
+            ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
+            ctx.fillStyle = circle.color;
+            ctx.fill();
+            if (circle.image) {
+                // Клипируем область круга, чтобы ограничить изображение
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
+                ctx.clip();
+                ctx.drawImage(circle.image, circle.x_C - circle.radius, circle.y_C - circle.radius, circle.radius * 2, circle.radius * 2);
+                ctx.restore();
+            }
+            if (selectedObject_buf == circle) {
+                //ctx.beginPath();
+                //ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
+                //ctx.fillStyle = 'black';
+                //ctx.fill();
+                //ctx.beginPath();
+                //ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
+                //ctx.fillStyle = 'black';
+                //ctx.fill();
+                //ctx.beginPath();
+                //ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
+                //ctx.fillStyle = 'black';
+                //ctx.fill();
+                //ctx.beginPath();
+                //ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
+                //ctx.fillStyle = 'black';
+                //ctx.fill();
+                //
+                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                //ctx.lineWidth = 2;
+                //ctx.setLineDash([5, 3]);
+                //ctx.beginPath();
+                //ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
+                //ctx.stroke();
+                //ctx.setLineDash([]);  // Сбрасываем пунктир
+                //
+                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);  // Длина штриха и промежутка
+                ctx.strokeRect(circle.x_C - circle.radius - 2, circle.y_C - circle.radius - 2, circle.radius * 2 + 4, circle.radius * 2 + 4);
+                ctx.setLineDash([]);  // Сбрасываем пунктир
+                circle.borderPoints_X1 = circle.x_C - circle.radius - 2;
+                circle.borderPoints_Y1 = circle.y_C - circle.radius - 2;
+                circle.borderPoints_X2 = circle.x_C + circle.radius + 2;
+                circle.borderPoints_Y2 = circle.y_C + circle.radius + 2;
+
+            }
         }
         function drawStar(ctx, x_C, y_C, rad, amount_points, m, obj) {
             ctx.beginPath();
@@ -812,70 +1002,6 @@
                 // Отрисовка квадратов на контрольных точках
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
             }
-        }
-        function addRect() {
-            const newRect: Rectangle = {
-                id: generateRandomId(16),
-                type: 'rectangle',
-                x_C: Math.random() * (canvas.width - 50),
-                y_C: Math.random() * (canvas.height - 50),
-                width: 50,
-                height: 50,
-                color: getRandomColor(),
-                rotation: 0,
-                borderPoints_X1: 0,
-                borderPoints_Y1: 0,
-                borderPoints_X2: 0,
-                borderPoints_Y2: 0
-            };
-            objects.push(newRect);
-            logDebug(`Rectangle added: ${JSON.stringify(newRect)}`);
-            drawObjects();
-        }
-        function addCircle() {
-            const newCircle: Circle = {
-                id: generateRandomId(16),
-                type: 'circle',
-                x_C: Math.random() * (canvas.width - 50) + 25,
-                y_C: Math.random() * (canvas.height - 50) + 25,
-                radius: 25,
-                color: getRandomColor(),
-                rotation: 0,
-                borderPoints_X1: 0,
-                borderPoints_Y1: 0,
-                borderPoints_X2: 0,
-                borderPoints_Y2: 0
-            };
-            objects.push(newCircle);
-            logDebug(`Circle added: ${JSON.stringify(newCircle)}`);
-            drawObjects();
-        }
-        function addLine() {
-            const startX = Math.random() * canvas.width;
-            const startY = Math.random() * canvas.height;
-            const endX = Math.random() * canvas.width;
-            const endY = Math.random() * canvas.height;
-
-            const newLine: Line = {
-                id: generateRandomId(16),
-                type: 'line',
-                startX: startX,
-                startY: startY,
-                endX: endX,
-                endY: endY,
-                color: getRandomColor(),
-                rotation: 0,
-                x_C: (startX + endX) / 2,  // Вычисляем центр по X
-                y_C: (startY + endY) / 2,   // Вычисляем центр по Y
-                borderPoints_X1: startX + 2,
-                borderPoints_Y1: startY + 2,
-                borderPoints_X2: endX + 2,
-                borderPoints_Y2: endY + 2
-            };
-
-            objects.push(newLine);
-            logDebug(`Line added: ${JSON.stringify(newLine)}`);
-            drawObjects();
         }
         function deleteShape() {
             if (selectedObject_buf) {
@@ -1011,7 +1137,6 @@
                 container?.appendChild(table);
             }
         }
-
         function additionGrid(obj: Shape) {
             const x_grid1 = Math.floor(obj.borderPoints_X1 / canvas.width);
             const y_grid1 = Math.floor(obj.borderPoints_Y1 / canvas.height);
@@ -1449,15 +1574,13 @@
             }
         }
         function onMouseUp(e) {
-            let mouse_meaning = e.button
-
+            let mouse_meaning = e.button;
 
             if (isSelecting) {
                 isSelecting = false;
                 //selectedObjects = getObjectsInSelectionBox();  // Получаем выделенные объекты
                 //drawObjects();  // Перерисовываем объекты с учетом выделения
             }
-
 
             if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
                 logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
@@ -1574,7 +1697,6 @@
                 reader.readAsText(file);
             }
         });
-
         function processOWLFileContent(content: string) {
             try {
                 const parser = new DOMParser();
@@ -1872,223 +1994,99 @@
                 ctx.fillText(obj.info, textX, textY, 70);
             }
         }
-
+        function drawingConnection(obj_s: Shape[], ctx: CanvasRenderingContext2D) {
+            // Сначала отрисовываем связи между объектами
+            for (const obj of obj_s) {
+                if (obj.linkedObjects) {
+                    obj.linkedObjects.forEach(linkedId => {
+                        const linkedObj = objects.find(o => o.id === linkedId);
+                        if (linkedObj) {
+                            ctx.beginPath();
+                            const [startX, startY] = getObjectCenter(obj);
+                            const [endX, endY] = getObjectCenter(linkedObj);
+                            ctx.moveTo(startX, startY);
+                            ctx.lineTo(endX, endY);
+                            ctx.strokeStyle = 'black';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        }
+                    });
+                }
+                if (obj.outgoingLinks) {
+                    obj.outgoingLinks.forEach(linkedId => {
+                        const linkedObj = objects.find(o => o.id === linkedId);
+                        if (linkedObj) {
+                            const [startX, startY] = getObjectCenter(obj);
+                            const [endX, endY] = getObjectCenter(linkedObj);
+                            drawDirectedLine(ctx, startX, startY, endX, endY, 'blue');
+                        }
+                    });
+                }
+            }
+        }
+        
+        function rotationCheck(obj: Shape, ctx: CanvasRenderingContext2D) {
+            ctx.save();
+            let centerX = 0;
+            let centerY = 0;
+            if (obj.rotation) {
+                if (obj.type === 'rectangle') {
+                    centerX = (obj as Rectangle).x_C /*+ (obj as Rectangle).width / 2*/;
+                    centerY = (obj as Rectangle).y_C /*+ (obj as Rectangle).height / 2*/;
+                } else if (obj.type === 'circle') {
+                    centerX = (obj as Circle).x_C;
+                    centerY = (obj as Circle).y_C;
+                } else if (obj.type === 'line') {
+                    centerX = ((obj as Line).startX + (obj as Line).endX) / 2;
+                    centerY = ((obj as Line).startY + (obj as Line).endY) / 2;
+                } else if (obj.type === 'star') {
+                    centerX = (obj as Star).x_C;
+                    centerY = (obj as Star).y_C;
+                } else if (obj.type === 'cloud') {
+                    centerX = (obj as Cloud).x_C;
+                    centerY = (obj as Cloud).y_C;
+                }
+                ctx.translate(centerX, centerY);
+                ctx.rotate((obj.rotation * Math.PI) / 180);
+                ctx.translate(-centerX, -centerY);
+            }
+        }
         function drawObjects() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
                 ctx.drawImage(gridCanvas, 0, 0);
-
-                // Сначала отрисовываем связи между объектами
-                for (const obj of objects) {
-                    if (obj.linkedObjects) {
-                        obj.linkedObjects.forEach(linkedId => {
-                            const linkedObj = objects.find(o => o.id === linkedId);
-                            if (linkedObj) {
-                                ctx.beginPath();
-                                const [startX, startY] = getObjectCenter(obj);
-                                const [endX, endY] = getObjectCenter(linkedObj);
-                                ctx.moveTo(startX, startY);
-                                ctx.lineTo(endX, endY);
-                                ctx.strokeStyle = 'black';
-                                ctx.lineWidth = 2;
-                                ctx.stroke();
-                            }
-                        });
-                    }
-                    if (obj.outgoingLinks) {
-                        obj.outgoingLinks.forEach(linkedId => {
-                            const linkedObj = objects.find(o => o.id === linkedId);
-                            if (linkedObj) {
-                                const [startX, startY] = getObjectCenter(obj);
-                                const [endX, endY] = getObjectCenter(linkedObj);
-                                drawDirectedLine(ctx, startX, startY, endX, endY, 'blue');
-                            }
-                        });
-                    }
-                }
+                drawingConnection(objects, ctx);
 
                 // Затем отрисовываем сами объекты
                 for (const obj of objects) {
                     //logDebug(`Drawing object: ${JSON.stringify(obj)}`);
-
-                    ctx.save();
-                    let centerX = 0;
-                    let centerY = 0;
-                    if (obj.rotation) {
-                        if (obj.type === 'rectangle') {
-                            centerX = (obj as Rectangle).x_C /*+ (obj as Rectangle).width / 2*/;
-                            centerY = (obj as Rectangle).y_C /*+ (obj as Rectangle).height / 2*/;
-                        } else if (obj.type === 'circle') {
-                            centerX = (obj as Circle).x_C;
-                            centerY = (obj as Circle).y_C;
-                        } else if (obj.type === 'line') {
-                            centerX = ((obj as Line).startX + (obj as Line).endX) / 2;
-                            centerY = ((obj as Line).startY + (obj as Line).endY) / 2;
-                        } else if (obj.type === 'star') {
-                            centerX = (obj as Star).x_C;
-                            centerY = (obj as Star).y_C;
-                        } else if (obj.type === 'cloud') {
-                            centerX = (obj as Cloud).x_C;
-                            centerY = (obj as Cloud).y_C;
-                        }
-                        ctx.translate(centerX, centerY);
-                        ctx.rotate((obj.rotation * Math.PI) / 180);
-                        ctx.translate(-centerX, -centerY);
-                    }
-
-                    
-
+                    rotationCheck(obj, ctx);
                     switch (obj.type) {
                         case 'rectangle':
                             const rect = obj as Rectangle;
-                            ctx.fillStyle = rect.color;
-                            ctx.fillRect(rect.x_C, rect.y_C, rect.width, rect.height);
-                            if (rect.image) {
-                                ctx.drawImage(rect.image, rect.x_C, rect.y_C, rect.width!, rect.height!);
-                            }
-                            if (selectedObject_buf == rect) {
-                                //ctx.fillStyle = 'black';
-                                //ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
-                                //ctx.fillRect(rect.x + rect.width - 5, rect.y - 5, 10, 10);
-                                //ctx.fillRect(rect.x - 5, rect.y + rect.height - 5, 10, 10);
-                                //ctx.fillRect(rect.x + rect.width - 5, rect.y + rect.height - 5, 10, 10);
-                                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                                ctx.lineWidth = 2;
-                                ctx.setLineDash([5, 3]);  // Длина штриха и промежутка
-                                ctx.strokeRect(rect.x_C - 2, rect.y_C - 2, rect.width + 4, rect.height + 4);
-                                ctx.setLineDash([]);  // Сбрасываем пунктир
-                                rect.borderPoints_X1 = rect.x_C - 2;
-                                rect.borderPoints_Y1 = rect.y_C - 2;
-                                rect.borderPoints_X2 = rect.x_C + rect.width + 2;
-                                rect.borderPoints_Y2 = rect.y_C + rect.height + 2;
-
-                            }
+                            drawRect(rect, ctx);
                             enteringText(obj);
                             break;
                         case 'circle':
                             const circle = obj as Circle;
-                            ctx.beginPath();
-                            ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
-                            ctx.fillStyle = circle.color;
-                            ctx.fill();
-                            if (circle.image) {
-                                // Клипируем область круга, чтобы ограничить изображение
-                                ctx.save();
-                                ctx.beginPath();
-                                ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
-                                ctx.clip();
-                                ctx.drawImage(circle.image, circle.x_C - circle.radius, circle.y_C - circle.radius, circle.radius * 2, circle.radius * 2);
-                                ctx.restore();
-                            }
-                            if (selectedObject_buf == circle) {
-                                //ctx.beginPath();
-                                //ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
-                                //ctx.fillStyle = 'black';
-                                //ctx.fill();
-                                //ctx.beginPath();
-                                //ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
-                                //ctx.fillStyle = 'black';
-                                //ctx.fill();
-                                //ctx.beginPath();
-                                //ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
-                                //ctx.fillStyle = 'black';
-                                //ctx.fill();
-                                //ctx.beginPath();
-                                //ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
-                                //ctx.fillStyle = 'black';
-                                //ctx.fill();
-                                //
-                                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                                //ctx.lineWidth = 2;
-                                //ctx.setLineDash([5, 3]);
-                                //ctx.beginPath();
-                                //ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
-                                //ctx.stroke();
-                                //ctx.setLineDash([]);  // Сбрасываем пунктир
-                                //
-                                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                                ctx.lineWidth = 2;
-                                ctx.setLineDash([5, 3]);  // Длина штриха и промежутка
-                                ctx.strokeRect(circle.x_C - circle.radius - 2, circle.y_C - circle.radius - 2, circle.radius*2 + 4, circle.radius*2 + 4);
-                                ctx.setLineDash([]);  // Сбрасываем пунктир
-                                circle.borderPoints_X1 = circle.x_C - circle.radius - 2;
-                                circle.borderPoints_Y1 = circle.y_C - circle.radius - 2;
-                                circle.borderPoints_X2 = circle.x_C + circle.radius + 2;
-                                circle.borderPoints_Y2 = circle.y_C + circle.radius + 2;
-
-                            }
+                            drawCircle(circle, ctx);
                             enteringText(obj);
                             break;
                         case 'line':
                             const line = obj as Line;
-                            ctx.beginPath();
-                            ctx.moveTo(line.startX, line.startY);
-                            ctx.lineTo(line.endX, line.endY);
-                            ctx.strokeStyle = line.color;
-                            ctx.lineWidth = 5;
-                            ctx.stroke();
-                            // Линии не поддерживают изображение, но можно добавить, если требуется
-                            //if (selectedObject_buf == line) {
-                            //    //ctx.beginPath();
-                            //    //ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
-                            //    //ctx.fillStyle = 'black';
-                            //    //ctx.fill();
-                            //    //ctx.beginPath();
-                            //    //ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
-                            //    //ctx.fillStyle = 'black';
-                            //    //ctx.fill();
-                            //    ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                            //    ctx.lineWidth = 2;
-                            //    ctx.setLineDash([5, 3]);
-                            //    ctx.strokeRect(line.startX + 1, line.startY + 1, Math.abs(line.startX - line.endX - 1), Math.abs(line.startY - line.endY - 1));
-                            //    ctx.setLineDash([]);
-                            //    line.borderPoints_X1 = line.startX + 1;
-                            //    line.borderPoints_Y1 = line.startY + 1;
-                            //    line.borderPoints_X2 = line.endX + 1;
-                            //    line.borderPoints_Y2 = line.endY + 1;
-                            //}
-                            if (selectedObject_buf === line) {
-                                ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                                ctx.lineWidth = 2;
-                                ctx.setLineDash([5, 3]);
-
-                                // Определяем верхний левый угол прямоугольника
-                                const rectX = Math.min(line.startX, line.endX);
-                                const rectY = Math.min(line.startY, line.endY);
-
-                                // Вычисляем ширину и высоту прямоугольника
-                                const rectWidth = Math.abs(line.endX - line.startX);
-                                const rectHeight = Math.abs(line.endY - line.startY);
-
-                                // Рисуем пунктирный прямоугольник вокруг линии
-                                ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
-                                ctx.setLineDash([]);
-
-                                // Обновляем координаты крайних точек прямоугольника
-                                line.borderPoints_X1 = rectX;
-                                line.borderPoints_Y1 = rectY;
-                                line.borderPoints_X2 = rectX + rectWidth;
-                                line.borderPoints_Y2 = rectY + rectHeight;
-                            }
-
+                            drawLine(line, ctx);
                             enteringText(obj);
                             break;
                         case 'star':
                             const star = obj as Star;
                             drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
-                            
                             enteringText(obj);
-                            // Звезды тоже могут поддерживать изображение при необходимости
                             break;
                         case 'cloud':
                             const cloud = obj as Cloud;
                             drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
-                            // Обработка изображения для облаков
-                            //if (cloud.image) {
-                            //    ctx.drawImage(cloud.image, cloud.x_C - cloud.width / 2, cloud.y_C - cloud.height / 2, cloud.width, cloud.height);
-                            //}
                             enteringText(obj);
                             break;
                         default:

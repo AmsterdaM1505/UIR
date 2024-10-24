@@ -54,11 +54,42 @@
         background-color: #666;
     }
 
+    .button-style {
+        width: 80px;
+        height: 40px;
+        font-size: 12px;
+    }
+
+    .div-style1 {
+        flex: 1;
+        flex-direction: column;
+        height: 600px;
+        overflow-y: auto;
+        align-items: center;
+        width: 80px;
+        border: 1px solid grey;
+        padding: 15px;
+        margin-right: 10px;
+        resize: both;
+        overflow: auto;
+    }
+
+    .div-style2 {
+        flex: 1;
+        flex-direction: column;
+        height: 600px;
+        overflow-y: auto;
+        align-items: center;
+        width: 80px;
+        border: 1px solid grey;
+        padding: 15px;
+        margin-right: 10px;
+    }
+
 </style>
 
-
 <div style="display: flex;">
-    <div style="flex: 1; flex-direction: column; height: 600px; overflow-y: auto; align-items: center; width: 80px; border: 1px solid grey; padding: 15px; margin-right:10px">
+    <div style="flex: 1; flex-direction: column; height: 600px; overflow-y: auto; align-items: center; width: 80px; border: 1px solid grey; padding: 15px; margin-right:10px; resize: both; overflow: auto;">
         <MudButton id="addRectBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
         <MudButton id="addCircleBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Secondary">Добавить круг</MudButton><br>
         <MudButton id="addLineBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Добавить линию</MudButton><br>

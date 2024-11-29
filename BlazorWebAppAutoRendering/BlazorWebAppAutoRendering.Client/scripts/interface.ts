@@ -15,7 +15,8 @@
     borderPoints_Y1: number;
     borderPoints_X2: number;
     borderPoints_Y2: number;
-    connectors?: number[];
+    connectors?: { x: number, y: number, type: string }[];
+    selectionMarker?: boolean;
 }
 
 interface Rectangle extends Shape {
@@ -43,7 +44,6 @@ interface Star extends Shape {
 interface Cloud extends Shape {
     width: number;
     height: number;
-
 }
 type GraphObject = Rectangle | Circle | Line | Star | Cloud;
 

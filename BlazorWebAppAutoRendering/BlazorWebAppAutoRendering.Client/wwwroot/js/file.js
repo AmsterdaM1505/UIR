@@ -31,6 +31,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     const container = document.getElementById('table-container');
     let cyclePath = null;
     let savedSchema = null;
+    let selectedObjectMass = [];
     function generateRandomId(length) {
         let result = '';
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -341,7 +342,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 switch (obj.type) {
                     case 'rectangle':
                         const rect = obj;
-                        return mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height;
+                        return /*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/ isPointInRotatedRect(mouseX, mouseY, rect);
                     case 'circle':
                         const circle = obj;
                         const dx = mouseX - circle.x_C;
@@ -589,6 +590,76 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
+        function updateConnectors(rect) {
+            const { x_C, y_C, width, height } = rect;
+            rect.connectors = [
+                { x: x_C, y: y_C + height / 2, type: 'left' }, // Левый коннектор
+                { x: x_C + width, y: y_C + height / 2, type: 'right' }, // Правый коннектор
+                { x: x_C + width / 2, y: y_C, type: 'top' }, // Верхний коннектор
+                { x: x_C + width / 2, y: y_C + height, type: 'bottom' }, // Нижний коннектор
+            ];
+        }
+        //function updateConnectors(rect: Rectangle) {
+        //    const { x_C, y_C, width, height, rotation } = rect;
+        //    // Центр прямоугольника
+        //    const centerX = x_C + width / 2;
+        //    const centerY = y_C + height / 2;
+        //    const angle = (rotation || 0) * Math.PI / 180; // Угол поворота в радианах
+        //    // Вращение точки вокруг центра
+        //    function rotatePoint(px: number, py: number, angle: number, centerX: number, centerY: number) {
+        //        let a = width / 2;
+        //        let b = height / 2;
+        //        let dx = 0;
+        //        let dy = 0;
+        //        if (a === b) {
+        //            dx = a * Math.cos(angle);
+        //            dy = a * Math.sin(angle);
+        //        } else {
+        //            dx = a * Math.cos(angle);
+        //            dy = b * Math.sin(angle);
+        //        }
+        //        return {
+        //            x: dx + centerX,
+        //            y: dy + centerY
+        //        };
+        //    }
+        //    // Вычисление позиций коннекторов до поворота
+        //    const connectors = [
+        //        { x: x_C, y: y_C + height / 2, type: 'left' },            // Левый коннектор
+        //        { x: x_C + width, y: y_C + height / 2, type: 'right' },   // Правый коннектор
+        //        { x: x_C + width / 2, y: y_C, type: 'top' },              // Верхний коннектор
+        //        { x: x_C + width / 2, y: y_C + height, type: 'bottom' }   // Нижний коннектор
+        //    ];
+        //    // Применяем поворот к каждому коннектору и сохраняем их позиции
+        //    rect.connectors = connectors.map(connector => {
+        //        const rotated = rotatePoint(connector.x, connector.y, angle, centerX, centerY);
+        //        return { ...rotated, type: connector.type };
+        //    });
+        //}
+        //function updateConnectors(rect: Rectangle) {
+        //    const { x_C, y_C, width, height, rotation } = rect;
+        //    // Центр прямоугольника
+        //    const centerX = x_C + width / 2;
+        //    const centerY = y_C + height / 2;
+        //    const angle = (rotation || 0) * Math.PI / 180; // Угол поворота в радианах
+        //    // Расстояние от центра до каждого коннектора и их исходный угол (в радианах)
+        //    const connectors = [
+        //        { r: width / 2, initialAngle: Math.PI, type: 'left' },              // Левый коннектор
+        //        { r: width / 2, initialAngle: 0, type: 'right' },                   // Правый коннектор
+        //        { r: height / 2, initialAngle: -Math.PI / 2, type: 'top' },         // Верхний коннектор
+        //        { r: height / 2, initialAngle: Math.PI / 2, type: 'bottom' }        // Нижний коннектор
+        //    ];
+        //    // Вычисление новых координат коннекторов
+        //    rect.connectors = connectors.map(connector => {
+        //        const totalAngle = connector.initialAngle + angle;
+        //        const x = centerX + connector.r * Math.cos(totalAngle);
+        //        const y = centerY + connector.r * Math.sin(totalAngle);
+        //        return { x, y, type: connector.type };
+        //    });
+        //}
+        //ctx.translate(centerX, centerY);
+        //ctx.rotate((obj.rotation * Math.PI) / 180);
+        //ctx.translate(-centerX, -centerY);
         function addRect() {
             const newRect = {
                 id: generateRandomId(16),
@@ -602,10 +673,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 borderPoints_X1: 0,
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
-                borderPoints_Y2: 0
+                borderPoints_Y2: 0,
+                selectionMarker: false
             };
-            objects.push(newRect);
-            logDebug(`Rectangle added: ${JSON.stringify(newRect)}`);
+            updateConnectors(newRect);
+            selectedObject_buf = newRect;
+            selectedObject_buf.selectionMarker = true;
+            drawRect(selectedObject_buf, ctx);
+            selectedObject_buf.selectionMarker = false;
+            objects.push(selectedObject_buf);
+            selectedObject_buf = null;
             drawObjects();
         }
         function addCircle() {
@@ -620,10 +697,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 borderPoints_X1: 0,
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
-                borderPoints_Y2: 0
+                borderPoints_Y2: 0,
+                selectionMarker: false
             };
-            objects.push(newCircle);
-            logDebug(`Circle added: ${JSON.stringify(newCircle)}`);
+            selectedObject_buf = newCircle;
+            selectedObject_buf.selectionMarker = true;
+            drawCircle(selectedObject_buf, ctx);
+            selectedObject_buf.selectionMarker = false;
+            objects.push(selectedObject_buf);
+            selectedObject_buf = null;
             drawObjects();
         }
         function addLine() {
@@ -645,10 +727,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 borderPoints_X1: startX + 2,
                 borderPoints_Y1: startY + 2,
                 borderPoints_X2: endX + 2,
-                borderPoints_Y2: endY + 2
+                borderPoints_Y2: endY + 2,
+                selectionMarker: false
             };
-            objects.push(newLine);
-            logDebug(`Line added: ${JSON.stringify(newLine)}`);
+            selectedObject_buf = newLine;
+            selectedObject_buf.selectionMarker = true;
+            drawLine(selectedObject_buf, ctx);
+            selectedObject_buf.selectionMarker = false;
+            objects.push(selectedObject_buf);
+            selectedObject_buf = null;
             drawObjects();
         }
         function addStar() {
@@ -665,14 +752,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 borderPoints_X1: 0,
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
-                borderPoints_Y2: 0
+                borderPoints_Y2: 0,
+                selectionMarker: false
             };
-            objects.push(newStar);
-            logDebug(`Star added: ${JSON.stringify(newStar)}`);
+            selectedObject_buf = newStar;
+            selectedObject_buf.selectionMarker = true;
+            drawStar(ctx, selectedObject_buf.x_C, selectedObject_buf.y_C, selectedObject_buf.rad, selectedObject_buf.amount_points, selectedObject_buf.m, selectedObject_buf);
+            selectedObject_buf.selectionMarker = false;
+            objects.push(selectedObject_buf);
+            selectedObject_buf = null;
             drawObjects();
+            logDebug(`Star added: ${JSON.stringify(newStar)}`);
         }
         function addCloud() {
-            const newStar = {
+            const newCloud = {
                 id: generateRandomId(16),
                 type: 'cloud',
                 x_C: Math.random() * (canvas.width - 200),
@@ -684,11 +777,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 borderPoints_X1: 0,
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
-                borderPoints_Y2: 0
+                borderPoints_Y2: 0,
+                selectionMarker: false
             };
-            objects.push(newStar);
-            logDebug(`Cloud added: ${JSON.stringify(newStar)}`);
+            selectedObject_buf = newCloud;
+            selectedObject_buf.selectionMarker = true;
+            drawCloud(ctx, selectedObject_buf.x_C, selectedObject_buf.y_C, selectedObject_buf.width, selectedObject_buf.height, selectedObject_buf);
+            selectedObject_buf.selectionMarker = false;
+            objects.push(selectedObject_buf);
+            selectedObject_buf = null;
             drawObjects();
+            logDebug(`Cloud added: ${JSON.stringify(newCloud)}`);
         }
         function drawSquare(ctx, x, y, size) {
             ctx.fillStyle = 'black';
@@ -700,7 +799,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             if (rect.image) {
                 ctx.drawImage(rect.image, rect.x_C, rect.y_C, rect.width, rect.height);
             }
-            if (selectedObject_buf == rect) {
+            //console.log(rect.selectionMarker, (rect.selectionMarker && selectedObject_buf === rect));
+            if (rect.selectionMarker || selectedObject_buf === rect) {
                 //ctx.fillStyle = 'black';
                 //ctx.fillRect(rect.x - 5, rect.y - 5, 10, 10);
                 //ctx.fillRect(rect.x + rect.width - 5, rect.y - 5, 10, 10);
@@ -715,6 +815,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 rect.borderPoints_Y1 = rect.y_C - 2;
                 rect.borderPoints_X2 = rect.x_C + rect.width + 2;
                 rect.borderPoints_Y2 = rect.y_C + rect.height + 2;
+                updateConnectors(rect);
+                rect.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
         function drawLine(line, ctx) {
@@ -744,7 +850,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             //    line.borderPoints_X2 = line.endX + 1;
             //    line.borderPoints_Y2 = line.endY + 1;
             //}
-            if (selectedObject_buf === line) {
+            if (line.selectionMarker || selectedObject_buf === line) {
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);
@@ -778,7 +884,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 ctx.drawImage(circle.image, circle.x_C - circle.radius, circle.y_C - circle.radius, circle.radius * 2, circle.radius * 2);
                 ctx.restore();
             }
-            if (selectedObject_buf == circle) {
+            if (circle.selectionMarker || selectedObject_buf === circle) {
                 //ctx.beginPath();
                 //ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
                 //ctx.fillStyle = 'black';
@@ -830,7 +936,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             ctx.closePath();
             ctx.fillStyle = obj.color;
             ctx.fill();
-            if (selectedObject_buf == obj) {
+            if (obj.selectionMarker || selectedObject_buf === obj) {
                 // Отрисовка голубой пунктирной рамки
                 //ctx.save();
                 //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
@@ -879,7 +985,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             ctx.closePath();
             ctx.fillStyle = obj.color;
             ctx.fill();
-            if (selectedObject_buf == obj) {
+            if (obj.selectionMarker || selectedObject_buf === obj) {
                 // Отрисовка голубой пунктирной рамки
                 ctx.save();
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
@@ -893,12 +999,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
         }
         function deleteShape() {
-            if (selectedObject_buf) {
-                const indexToRemove = objects.indexOf(selectedObject_buf);
-                if (indexToRemove !== -1) {
-                    const shapeToRemove = objects[indexToRemove];
-                    logDebug(`Deleting shape: ${JSON.stringify(shapeToRemove)}`);
-                    // Удаляем ссылки на удаляемую фигуру из других объектов
+            if (selectedObjectMass.length > 0) {
+                logDebug(`Deleting multiple shapes: ${JSON.stringify(selectedObjectMass)}`);
+                // Удаляем ссылки на удаляемые фигуры из других объектов
+                for (const shapeToRemove of selectedObjectMass) {
                     for (const obj of objects) {
                         // Удаление из linkedObjects
                         if (obj.linkedObjects) {
@@ -913,23 +1017,54 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                             obj.incomingLinks = obj.incomingLinks.filter(id => id !== shapeToRemove.id);
                         }
                     }
-                    // Удаляем сам объект из массива objects
+                    // Удаляем объект из массива objects
+                    const indexToRemove = objects.indexOf(shapeToRemove);
+                    if (indexToRemove !== -1) {
+                        objects.splice(indexToRemove, 1);
+                    }
+                }
+                // Очищаем массив выделенных объектов
+                selectedObjectMass = [];
+                drawObjects();
+                logDebug("All selected shapes deleted.");
+            }
+            else if (selectedObject_buf) {
+                // Удаление одного объекта, если selectedObjectMass пустой
+                const indexToRemove = objects.indexOf(selectedObject_buf);
+                if (indexToRemove !== -1) {
+                    const shapeToRemove = objects[indexToRemove];
+                    logDebug(`Deleting shape: ${JSON.stringify(shapeToRemove)}`);
+                    // Удаляем ссылки на удаляемую фигуру из других объектов
+                    for (const obj of objects) {
+                        if (obj.linkedObjects) {
+                            obj.linkedObjects = obj.linkedObjects.filter(id => id !== shapeToRemove.id);
+                        }
+                        if (obj.outgoingLinks) {
+                            obj.outgoingLinks = obj.outgoingLinks.filter(id => id !== shapeToRemove.id);
+                        }
+                        if (obj.incomingLinks) {
+                            obj.incomingLinks = obj.incomingLinks.filter(id => id !== shapeToRemove.id);
+                        }
+                    }
+                    // Удаляем сам объект
                     objects.splice(indexToRemove, 1);
                     drawObjects();
                     selectedObject_buf = null;
-                    while (container.firstChild) {
-                        container.removeChild(container.firstChild);
-                    }
                 }
             }
             else {
                 logDebug("No shape selected to delete");
+            }
+            // Очищаем контейнер для описания
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
             }
         }
         function rotateSelectedObject(angle) {
             if (selectedObject_buf) {
                 selectedObject_buf.rotation = (selectedObject_buf.rotation || 0) + angle;
                 logDebug(`Rotated object: ${JSON.stringify(selectedObject_buf)}`);
+                updateConnectors(selectedObject_buf);
                 drawObjects();
             }
         }
@@ -1045,14 +1180,358 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         let selectionStartY = 0;
         let selectionEndX = 0;
         let selectionEndY = 0;
+        let activeConnector = null;
+        function isPointInRotatedRect(mouseX, mouseY, rect) {
+            // Центр вращения
+            const centerX = rect.x_C + rect.width / 2;
+            const centerY = rect.y_C + rect.height / 2;
+            // Преобразуем координаты мыши обратно, чтобы исключить поворот фигуры
+            const angle = -(rect.rotation || 0) * Math.PI / 180; // Отрицательный угол для обратного вращения
+            const rotatedX = Math.cos(angle) * (mouseX - centerX) - Math.sin(angle) * (mouseY - centerY) + centerX;
+            const rotatedY = Math.sin(angle) * (mouseX - centerX) + Math.cos(angle) * (mouseY - centerY) + centerY;
+            // Теперь проверяем, находится ли преобразованная точка внутри исходного прямоугольника без поворота
+            return (rotatedX >= rect.x_C &&
+                rotatedX <= rect.x_C + rect.width &&
+                rotatedY >= rect.y_C &&
+                rotatedY <= rect.y_C + rect.height);
+        }
+        function leftButtonDown(e, mouseX, mouseY) {
+            logDebug("mouse_down");
+            let foundObject = false;
+            hideContextMenu();
+            if (highlight.length != 0) {
+                //console.log("i am here");
+                logDebug(`highlight - (${highlight})`);
+                highlight = [];
+            }
+            if (objects.length === 0) {
+                const savedSchema = localStorage.getItem('savedSchema');
+                objects = processFileContent(savedSchema, objects);
+            }
+            //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                if (obj.type === 'rectangle') {
+                    const rect = obj;
+                    if ( /*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect)) {
+                        console.log("i am here");
+                        for (let i = objects.length - 1; i >= 0; i--) {
+                            objects[i].selectionMarker = false;
+                        }
+                        foundObject = true;
+                        rect.selectionMarker = true;
+                        selectedObject = rect;
+                        selectedObject_buf = rect;
+                        startX = mouseX - rect.x_C;
+                        startY = mouseY - rect.y_C;
+                        //logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        connectionServ == 2;
+                        tableObjectCheck(selectedObject_buf);
+                        break;
+                    }
+                }
+                else if (obj.type === 'circle') {
+                    const circle = obj;
+                    const dx = mouseX - circle.x_C;
+                    const dy = mouseY - circle.y_C;
+                    if (dx * dx + dy * dy <= circle.radius * circle.radius) {
+                        for (let i = objects.length - 1; i >= 0; i--) {
+                            objects[i].selectionMarker = false;
+                        }
+                        foundObject = true;
+                        circle.selectionMarker = true;
+                        selectedObject = circle;
+                        selectedObject_buf = circle;
+                        startX = dx;
+                        startY = dy;
+                        logDebug(`Selected circle: ${JSON.stringify(circle)}`);
+                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        connectionServ == 2;
+                        tableObjectCheck(selectedObject_buf);
+                        break;
+                    }
+                }
+                else if (obj.type === 'line') {
+                    const line = obj;
+                    const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
+                    const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
+                    const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                        Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
+                    if (distStart < 5 || distEnd < 5 || distToLine < 10) {
+                        for (let i = objects.length - 1; i >= 0; i--) {
+                            objects[i].selectionMarker = false;
+                        }
+                        foundObject = true;
+                        line.selectionMarker = true;
+                        selectedObject = line;
+                        selectedObject_buf = line;
+                        startX = mouseX;
+                        startY = mouseY;
+                        logDebug(`Selected line: ${JSON.stringify(line)}`);
+                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        connectionServ == 2;
+                        tableObjectCheck(selectedObject_buf);
+                        break;
+                    }
+                }
+                else if (obj.type === 'star') {
+                    const star = obj;
+                    const points = [];
+                    for (let i = 0; i < 2 * star.amount_points; i++) {
+                        let angle = Math.PI * i / star.amount_points;
+                        let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
+                        let x = star.x_C + radius * Math.sin(angle);
+                        let y = star.y_C + radius * Math.cos(angle);
+                        points.push({ x, y });
+                    }
+                    if (pointInPolygon(mouseX, mouseY, points)) {
+                        for (let i = objects.length - 1; i >= 0; i--) {
+                            objects[i].selectionMarker = false;
+                        }
+                        foundObject = true;
+                        star.selectionMarker = true;
+                        selectedObject = star;
+                        selectedObject_buf = star;
+                        startX = mouseX - star.x_C;
+                        startY = mouseY - star.y_C;
+                        logDebug(`Selected star: ${JSON.stringify(star)}`);
+                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        connectionServ == 2;
+                        tableObjectCheck(selectedObject_buf);
+                        break;
+                    }
+                }
+                else if (obj.type === 'cloud') {
+                    const cloud = obj;
+                    let startX_Cloud = cloud.x_C - cloud.width / 2;
+                    let startY_Cloud = cloud.y_C - cloud.height / 2;
+                    if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
+                        for (let i = objects.length - 1; i >= 0; i--) {
+                            objects[i].selectionMarker = false;
+                        }
+                        foundObject = true;
+                        cloud.selectionMarker = true;
+                        selectedObject = cloud;
+                        selectedObject_buf = cloud;
+                        startX = mouseX - cloud.x_C;
+                        startY = mouseY - cloud.y_C;
+                        logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        connectionServ == 2;
+                        tableObjectCheck(selectedObject_buf);
+                        break;
+                    }
+                }
+            }
+            if (foundObject === false) {
+                selectedObject = null;
+                selectedObject_buf = null;
+                for (let i = objects.length - 1; i >= 0; i--) {
+                    objects[i].selectionMarker = false;
+                }
+                isSelecting = true;
+                selectionStartX = e.clientX - canvas.offsetLeft;
+                selectionStartY = e.clientY - canvas.offsetTop;
+                selectionEndX = e.clientX - canvas.offsetLeft;
+                selectionEndY = e.clientY - canvas.offsetTop;
+                console.log("now is selecting");
+            }
+            drawObjects();
+            if (selectedObject_buf && selectedObject_buf.connectors) {
+                activeConnector = selectedObject_buf.connectors.find(connector => {
+                    return (mouseX >= connector.x - 5 &&
+                        mouseX <= connector.x + 5 &&
+                        mouseY >= connector.y - 5 &&
+                        mouseY <= connector.y + 5);
+                });
+            }
+        }
+        function rigtButtonDown(e, mouseX, mouseY) {
+            for (let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                if (obj.type === 'rectangle') {
+                    const rect = obj;
+                    if ( /*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect)) {
+                        selectedObject_buf = rect;
+                        startX = mouseX - rect.x_C;
+                        startY = mouseY - rect.y_C;
+                        drawObjects();
+                        showContextMenu(e.clientX, e.clientY);
+                        logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+                        break;
+                    }
+                }
+                else if (obj.type === 'circle') {
+                    const circle = obj;
+                    const dx = mouseX - circle.x_C;
+                    const dy = mouseY - circle.y_C;
+                    if (dx * dx + dy * dy <= circle.radius * circle.radius) {
+                        selectedObject_buf = circle;
+                        startX = dx;
+                        startY = dy;
+                        drawObjects();
+                        showContextMenu(e.clientX, e.clientY);
+                        logDebug(`Selected circle: ${JSON.stringify(circle)}`);
+                        break;
+                    }
+                }
+                else if (obj.type === 'line') {
+                    const line = obj;
+                    // Simplified line hit detection for example purposes
+                    const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
+                    const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
+                    const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                        Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
+                    if (distStart < 5 || distEnd < 5 || distToLine < 10) {
+                        selectedObject = line;
+                        selectedObject_buf = line;
+                        startX = mouseX;
+                        startY = mouseY;
+                        drawObjects();
+                        showContextMenu(e.clientX, e.clientY);
+                        logDebug(`Selected line: ${JSON.stringify(line)}`);
+                        break;
+                    }
+                }
+                else if (obj.type === 'star') {
+                    const star = obj;
+                    const points = [];
+                    for (let i = 0; i < 2 * star.amount_points; i++) {
+                        let angle = Math.PI * i / star.amount_points;
+                        let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
+                        let x = star.x_C + radius * Math.sin(angle);
+                        let y = star.y_C + radius * Math.cos(angle);
+                        points.push({ x, y });
+                    }
+                    if (pointInPolygon(mouseX, mouseY, points)) {
+                        selectedObject_buf = star;
+                        startX = mouseX - star.x_C;
+                        startY = mouseY - star.y_C;
+                        drawObjects();
+                        showContextMenu(e.clientX, e.clientY);
+                        logDebug(`Selected star: ${JSON.stringify(star)}`);
+                        break;
+                    }
+                }
+                else if (obj.type === 'cloud') {
+                    const cloud = obj;
+                    let startX_Cloud = cloud.x_C - cloud.width / 2;
+                    let startY_Cloud = cloud.y_C - cloud.height / 2;
+                    if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
+                        selectedObject_buf = cloud;
+                        startX_Cloud = mouseX - cloud.x_C;
+                        startY_Cloud = mouseY - cloud.y_C;
+                        drawObjects();
+                        showContextMenu(e.clientX, e.clientY);
+                        logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                        break;
+                    }
+                }
+            }
+        }
+        function scrollingButtonDown(e, mouseX, mouseY) {
+            hideContextMenu();
+            e.preventDefault();
+            startX = e.offsetX;
+            startY = e.offsetY;
+            if (e.button === 1) {
+                isPanning = true;
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+                canvas.style.cursor = 'move';
+                return;
+            }
+            selectedObject_canv = objects.find(obj => {
+                switch (obj.type) {
+                    case 'rectangle':
+                        const rect = obj;
+                        return startX >= rect.x_C && startX <= rect.x_C + rect.width && startY >= rect.y_C && startY <= rect.y_C + rect.height;
+                    case 'circle':
+                        const circle = obj;
+                        const dx = startX - circle.x_C;
+                        const dy = startY - circle.y_C;
+                        return dx * dx + dy * dy <= circle.radius * circle.radius;
+                    case 'line':
+                        const line = obj;
+                        const length = Math.sqrt(Math.pow((line.endX - line.startX), 2) + Math.pow((line.endY - line.startY), 2));
+                        const dotProduct = ((startX - line.startX) * (line.endX - line.startX) + (startY - line.startY) * (line.endY - line.startY)) / Math.pow(length, 2);
+                        const closestX = line.startX + dotProduct * (line.endX - line.startX);
+                        const closestY = line.startY + dotProduct * (line.endY - line.startY);
+                        const distX = startX - closestX;
+                        const distY = startY - closestY;
+                        const distance = Math.sqrt(distX * distX + distY * distY);
+                        return distance <= 10;
+                    case 'star':
+                        const star = obj;
+                        const points = [];
+                        for (let i = 0; i < 2 * star.amount_points; i++) {
+                            let angle = Math.PI * i / star.amount_points;
+                            let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
+                            let x = star.x_C + radius * Math.sin(angle);
+                            let y = star.y_C + radius * Math.cos(angle);
+                            points.push({ x, y });
+                        }
+                        return pointInPolygon(mouseX, mouseY, points);
+                    case 'cloud':
+                        const cloud = obj;
+                        let startX_Cloud = cloud.x_C - cloud.width / 2;
+                        let startY_Cloud = cloud.y_C - cloud.height / 2;
+                        return startX >= startX_Cloud && startX <= startX_Cloud + cloud.width && startY >= startY_Cloud && startY <= startY_Cloud + cloud.height;
+                    default:
+                        return false;
+                }
+            }) || null;
+            drawObjects();
+        }
+        function selectionBoxObjects(x_s, y_s, w_e, h_e) {
+            // Очищаем массив выбранных объектов перед каждой новой проверкой
+            selectedObject = null;
+            selectedObject_buf = null;
+            for (let i = objects.length - 1; i >= 0; i--) {
+                objects[i].selectionMarker = false;
+            }
+            selectedObjectMass = [];
+            // Координаты прямоугольника выделения
+            const selectionBoxX1 = Math.min(x_s, w_e);
+            const selectionBoxY1 = Math.min(y_s, h_e);
+            const selectionBoxX2 = Math.max(x_s, w_e);
+            const selectionBoxY2 = Math.max(y_s, h_e);
+            // Проходим по всем объектам и проверяем их на пересечение с полем выделения
+            for (const obj of objects) {
+                // Координаты объекта
+                const objX1 = obj.borderPoints_X1;
+                const objY1 = obj.borderPoints_Y1;
+                const objX2 = obj.borderPoints_X2;
+                const objY2 = obj.borderPoints_Y2;
+                // Проверяем, пересекаются ли прямоугольники (поле выделения и объект)
+                if (objX2 >= selectionBoxX1 &&
+                    objX1 <= selectionBoxX2 &&
+                    objY2 >= selectionBoxY1 &&
+                    objY1 <= selectionBoxY2) {
+                    // Если объект попадает в поле выделения, добавляем его в массив выбранных объектов
+                    obj.selectionMarker = true;
+                    selectedObjectMass.push(obj);
+                }
+            }
+        }
         // Функция для отрисовки рамки выделения
         function drawSelectionBox() {
+            logDebug("drawSelectionBox");
             ctx.setLineDash([5, 3]); // Делаем линию пунктирной
             ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
             ctx.lineWidth = 2;
             //logDebug(`drawSelectionBox - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
-            ctx.strokeRect(Math.min(selectionStartX, selectionEndX), Math.min(selectionStartY, selectionEndY), Math.abs(selectionEndX - selectionStartX), Math.abs(selectionEndY - selectionStartY));
+            let x = Math.min(selectionStartX, selectionEndX);
+            let y = Math.min(selectionStartY, selectionEndY);
+            let w = Math.abs(selectionEndX - selectionStartX);
+            let h = Math.abs(selectionEndY - selectionStartY);
+            ctx.strokeRect(x, y, w, h);
             ctx.setLineDash([]); // Сбрасываем пунктир
+            selectionBoxObjects(selectionStartX - offsetX, selectionStartY - offsetY, selectionEndX - offsetX, selectionEndY - offsetY);
+            //console.log("Выбранные объекты:", selectedObjectMass);
+            //console.log("Объекты на холсте:", objects);
+            console.log(x, y, w, h);
         }
         function onMouseDown(e) {
             //logDebug(`(${objects})`);
@@ -1064,248 +1543,227 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
             //logDebug(`Mouse down at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
             if (mouse_meaning === 0 && mouse_meaning_check != 1) {
-                hideContextMenu();
-                if (highlight.length != 0) {
-                    //console.log("i am here");
-                    logDebug(`highlight - (${highlight})`);
-                    highlight = [];
-                }
-                if (objects.length === 0) {
-                    const savedSchema = localStorage.getItem('savedSchema');
-                    objects = processFileContent(savedSchema, objects);
-                }
-                isSelecting = true;
-                selectionStartX = e.clientX - canvas.offsetLeft;
-                selectionStartY = e.clientY - canvas.offsetTop;
-                selectionEndX = e.clientX - canvas.offsetLeft;
-                selectionEndY = e.clientY - canvas.offsetTop;
-                //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
-                for (let i = objects.length - 1; i >= 0; i--) {
-                    const obj = objects[i];
-                    if (obj.type === 'rectangle') {
-                        const rect = obj;
-                        if (mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height) {
-                            selectedObject = rect;
-                            selectedObject_buf = rect;
-                            startX = mouseX - rect.x_C;
-                            startY = mouseY - rect.y_C;
-                            logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
-                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                            connectionServ == 2;
-                            tableObjectCheck(selectedObject_buf);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'circle') {
-                        const circle = obj;
-                        const dx = mouseX - circle.x_C;
-                        const dy = mouseY - circle.y_C;
-                        if (dx * dx + dy * dy <= circle.radius * circle.radius) {
-                            selectedObject = circle;
-                            selectedObject_buf = circle;
-                            startX = dx;
-                            startY = dy;
-                            logDebug(`Selected circle: ${JSON.stringify(circle)}`);
-                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                            connectionServ == 2;
-                            tableObjectCheck(selectedObject_buf);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'line') {
-                        const line = obj;
-                        const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
-                        const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
-                        const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
-                            Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
-                        if (distStart < 5 || distEnd < 5 || distToLine < 10) {
-                            selectedObject = line;
-                            selectedObject_buf = line;
-                            startX = mouseX;
-                            startY = mouseY;
-                            logDebug(`Selected line: ${JSON.stringify(line)}`);
-                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                            connectionServ == 2;
-                            tableObjectCheck(selectedObject_buf);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'star') {
-                        const star = obj;
-                        const points = [];
-                        for (let i = 0; i < 2 * star.amount_points; i++) {
-                            let angle = Math.PI * i / star.amount_points;
-                            let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
-                            let x = star.x_C + radius * Math.sin(angle);
-                            let y = star.y_C + radius * Math.cos(angle);
-                            points.push({ x, y });
-                        }
-                        if (pointInPolygon(mouseX, mouseY, points)) {
-                            selectedObject = star;
-                            selectedObject_buf = star;
-                            startX = mouseX - star.x_C;
-                            startY = mouseY - star.y_C;
-                            logDebug(`Selected star: ${JSON.stringify(star)}`);
-                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                            connectionServ == 2;
-                            tableObjectCheck(selectedObject_buf);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'cloud') {
-                        const cloud = obj;
-                        let startX_Cloud = cloud.x_C - cloud.width / 2;
-                        let startY_Cloud = cloud.y_C - cloud.height / 2;
-                        if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
-                            selectedObject = cloud;
-                            selectedObject_buf = cloud;
-                            startX = mouseX - cloud.x_C;
-                            startY = mouseY - cloud.y_C;
-                            logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
-                            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                            connectionServ == 2;
-                            tableObjectCheck(selectedObject_buf);
-                            break;
-                        }
-                    }
-                    else {
-                        selectedObject = null;
-                        selectedObject_buf = null;
-                    }
-                }
-                drawObjects();
+                leftButtonDown(e, mouseX, mouseY);
             }
-            else if (mouse_meaning == 2 && selectedObject_buf != null && mouse_meaning_check != 1) { // тут селект объект равен нулю
-                for (let i = objects.length - 1; i >= 0; i--) {
-                    const obj = objects[i];
-                    if (obj.type === 'rectangle') {
-                        const rect = obj;
-                        if (mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height) {
-                            selectedObject_buf = rect;
-                            startX = mouseX - rect.x_C;
-                            startY = mouseY - rect.y_C;
-                            showContextMenu(e.clientX, e.clientY);
-                            logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'circle') {
-                        const circle = obj;
-                        const dx = mouseX - circle.x_C;
-                        const dy = mouseY - circle.y_C;
-                        if (dx * dx + dy * dy <= circle.radius * circle.radius) {
-                            selectedObject_buf = circle;
-                            startX = dx;
-                            startY = dy;
-                            showContextMenu(e.clientX, e.clientY);
-                            logDebug(`Selected circle: ${JSON.stringify(circle)}`);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'line') {
-                        const line = obj;
-                        // Simplified line hit detection for example purposes
-                        const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
-                        const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
-                        const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
-                            Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
-                        if (distStart < 5 || distEnd < 5 || distToLine < 10) {
-                            selectedObject = line;
-                            selectedObject_buf = line;
-                            startX = mouseX;
-                            startY = mouseY;
-                            showContextMenu(e.clientX, e.clientY);
-                            logDebug(`Selected line: ${JSON.stringify(line)}`);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'star') {
-                        const star = obj;
-                        const points = [];
-                        for (let i = 0; i < 2 * star.amount_points; i++) {
-                            let angle = Math.PI * i / star.amount_points;
-                            let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
-                            let x = star.x_C + radius * Math.sin(angle);
-                            let y = star.y_C + radius * Math.cos(angle);
-                            points.push({ x, y });
-                        }
-                        if (pointInPolygon(mouseX, mouseY, points)) {
-                            selectedObject_buf = star;
-                            startX = mouseX - star.x_C;
-                            startY = mouseY - star.y_C;
-                            showContextMenu(e.clientX, e.clientY);
-                            logDebug(`Selected star: ${JSON.stringify(star)}`);
-                            break;
-                        }
-                    }
-                    else if (obj.type === 'cloud') {
-                        const cloud = obj;
-                        let startX_Cloud = cloud.x_C - cloud.width / 2;
-                        let startY_Cloud = cloud.y_C - cloud.height / 2;
-                        if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
-                            selectedObject_buf = cloud;
-                            startX_Cloud = mouseX - cloud.x_C;
-                            startY_Cloud = mouseY - cloud.y_C;
-                            showContextMenu(e.clientX, e.clientY);
-                            logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
-                            break;
-                        }
-                    }
-                }
+            else if (mouse_meaning == 2 /*&& selectedObject_buf != null*/ && mouse_meaning_check != 1) { // тут селект объект равен нулю
+                rigtButtonDown(e, mouseX, mouseY);
             }
             else if (mouse_meaning_check === 1) { /////////////////////////////////////////////////////////////////////////////////
-                hideContextMenu();
-                logDebug(`Button pressed id - 1 - (${mouse_meaning})`);
-                e.preventDefault();
-                startX = e.offsetX;
-                startY = e.offsetY;
-                if (e.button === 1) {
-                    isPanning = true;
-                    panStartX = e.clientX;
-                    panStartY = e.clientY;
-                    canvas.style.cursor = 'move';
-                    return;
-                }
-                selectedObject_canv = objects.find(obj => {
+                scrollingButtonDown(e, mouseX, mouseY);
+            }
+        }
+        function leftButtonMove(selectedObject, mouseX, mouseY) {
+            //console.log(mouseX, mouseY, startX, startY);
+            // Если есть несколько выделенных объектов
+            if (selectedObjectMass.length > 0) {
+                //const deltaX = mouseX - startX;
+                //const deltaY = mouseY - startY;
+                // Перемещаем все выделенные объекты
+                for (const obj of selectedObjectMass) {
                     switch (obj.type) {
                         case 'rectangle':
                             const rect = obj;
-                            return startX >= rect.x_C && startX <= rect.x_C + rect.width && startY >= rect.y_C && startY <= rect.y_C + rect.height;
+                            rect.x_C = mouseX - startX;
+                            rect.y_C = mouseY - startY;
+                            updateConnectors(rect);
+                            break;
                         case 'circle':
                             const circle = obj;
-                            const dx = startX - circle.x_C;
-                            const dy = startY - circle.y_C;
-                            return dx * dx + dy * dy <= circle.radius * circle.radius;
+                            circle.x_C += mouseX - startX;
+                            circle.y_C += mouseY - startY;
+                            break;
                         case 'line':
                             const line = obj;
-                            const length = Math.sqrt(Math.pow((line.endX - line.startX), 2) + Math.pow((line.endY - line.startY), 2));
-                            const dotProduct = ((startX - line.startX) * (line.endX - line.startX) + (startY - line.startY) * (line.endY - line.startY)) / Math.pow(length, 2);
-                            const closestX = line.startX + dotProduct * (line.endX - line.startX);
-                            const closestY = line.startY + dotProduct * (line.endY - line.startY);
-                            const distX = startX - closestX;
-                            const distY = startY - closestY;
-                            const distance = Math.sqrt(distX * distX + distY * distY);
-                            return distance <= 10;
+                            //line.startX += deltaX;
+                            //line.startY += deltaY;
+                            //line.endX += deltaX;
+                            //line.endY += deltaY;
+                            break;
                         case 'star':
                             const star = obj;
-                            const points = [];
-                            for (let i = 0; i < 2 * star.amount_points; i++) {
-                                let angle = Math.PI * i / star.amount_points;
-                                let radius = i % 2 === 0 ? star.rad : star.rad * star.m;
-                                let x = star.x_C + radius * Math.sin(angle);
-                                let y = star.y_C + radius * Math.cos(angle);
-                                points.push({ x, y });
-                            }
-                            return pointInPolygon(mouseX, mouseY, points);
+                            star.x_C += mouseX - startX;
+                            star.y_C += mouseY - startY;
+                            break;
                         case 'cloud':
                             const cloud = obj;
-                            let startX_Cloud = cloud.x_C - cloud.width / 2;
-                            let startY_Cloud = cloud.y_C - cloud.height / 2;
-                            return startX >= startX_Cloud && startX <= startX_Cloud + cloud.width && startY >= startY_Cloud && startY <= startY_Cloud + cloud.height;
+                            cloud.x_C += mouseX - startX;
+                            cloud.y_C += mouseY - startY;
+                            break;
                         default:
-                            return false;
+                            break;
                     }
-                }) || null;
+                }
+                // Обновляем стартовые координаты мыши
+                //startX = mouseX;
+                //startY = mouseY;
+                drawObjects(); // Перерисовываем все объекты
+                return;
+            }
+            //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
+            if (selectedObject.type === 'rectangle') {
+                const rect = selectedObject;
+                if (activeConnector) {
+                    //console.log(activeConnector);
+                    switch (activeConnector.type) {
+                        case 'left':
+                            // Изменяем ширину и смещаем объект, если двигаем левый коннектор
+                            const deltaXLeft = rect.x_C - mouseX;
+                            rect.width += deltaXLeft;
+                            rect.x_C = mouseX; // Двигаем левый край фигуры
+                            // Если ширина стала отрицательной, меняем направление (делаем фигуру перевёрнутой)
+                            if (rect.width <= 0) {
+                                rect.x_C += rect.width;
+                                rect.width = Math.abs(rect.width);
+                                activeConnector.type = 'right'; // Меняем тип активного коннектора
+                            }
+                            break;
+                        case 'right':
+                            const deltaXRight = mouseX - rect.x_C;
+                            rect.width = deltaXRight;
+                            if (rect.width <= 0) {
+                                rect.x_C += rect.width;
+                                rect.width = Math.abs(rect.width);
+                                activeConnector.type = 'left';
+                            }
+                            break;
+                        case 'top':
+                            const deltaYTop = rect.y_C - mouseY;
+                            rect.height += deltaYTop;
+                            rect.y_C = mouseY;
+                            if (rect.height <= 0) {
+                                rect.y_C += rect.height;
+                                rect.height = Math.abs(rect.height);
+                                activeConnector.type = 'bottom';
+                            }
+                            break;
+                        case 'bottom':
+                            const deltaYBottom = mouseY - rect.y_C;
+                            rect.height = deltaYBottom;
+                            if (rect.height <= 0) {
+                                rect.y_C += rect.height;
+                                rect.height = Math.abs(rect.height);
+                                activeConnector.type = 'top';
+                            }
+                            break;
+                    }
+                    updateConnectors(rect);
+                    drawObjects();
+                }
+                else {
+                    rect.x_C = mouseX - startX;
+                    rect.y_C = mouseY - startY;
+                }
+            }
+            else if (selectedObject.type === 'circle') {
+                const circle = selectedObject;
+                circle.x_C = mouseX - startX;
+                circle.y_C = mouseY - startY;
+            }
+            else if (selectedObject.type === 'line') {
+                const line = selectedObject;
+                const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
+                const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
+                // Расчет расстояния от точки до линии
+                const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                    Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
+                if (distStart < 20) {
+                    const dx = mouseX - startX;
+                    const dy = mouseY - startY;
+                    line.startX += dx;
+                    line.startY += dy;
+                    startX = mouseX;
+                    startY = mouseY;
+                    drawObjects();
+                    logDebug(`Line selected start`);
+                }
+                else if (distEnd < 20) {
+                    const dx = mouseX - startX;
+                    const dy = mouseY - startY;
+                    line.endX += dx;
+                    line.endY += dy;
+                    startX = mouseX;
+                    startY = mouseY;
+                    drawObjects();
+                    logDebug(`Line selected end`);
+                }
+                else if (distToLine < 10) {
+                    const dx = mouseX - startX;
+                    const dy = mouseY - startY;
+                    line.startX += dx;
+                    line.startY += dy;
+                    line.endX += dx;
+                    line.endY += dy;
+                    startX = mouseX;
+                    startY = mouseY;
+                    drawObjects();
+                    logDebug(`Line selected body`);
+                }
+                else {
+                    //logDebug(`GGWP1`);
+                }
+            }
+            else if (selectedObject.type === 'star') {
+                const star = selectedObject;
+                star.x_C = mouseX - startX;
+                star.y_C = mouseY - startY;
+            }
+            else if (selectedObject.type === 'cloud') {
+                const cloud = selectedObject;
+                //logDebug(`(${mouseX})(${mouseY})`);
+                //logDebug(`(${startX})(${startY})`);
+                cloud.x_C = mouseX - startX;
+                cloud.y_C = mouseY - startY;
+                //logDebug(`(${mouseX - startX})(${mouseY - startY})`);
+            }
+            drawObjects();
+        }
+        function scrollingButtonMove(e) {
+            //logDebug(`Button moved id - 1`);
+            e.preventDefault();
+            if (isPanning) {
+                const dx = e.clientX - panStartX;
+                const dy = e.clientY - panStartY;
+                offsetX += dx;
+                offsetY += dy;
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+                drawObjects();
+                return;
+            }
+            if (selectedObject_canv && (e.buttons & 1) === 1) {
+                const dx = e.offsetX - startX;
+                const dy = e.offsetY - startY;
+                switch (selectedObject_canv.type) {
+                    case 'rectangle':
+                        const rect = selectedObject_canv;
+                        rect.x_C += dx;
+                        rect.y_C += dy;
+                        break;
+                    case 'circle':
+                        const circle = selectedObject_canv;
+                        circle.x_C += dx;
+                        circle.y_C += dy;
+                        break;
+                    case 'line':
+                        const line = selectedObject_canv;
+                        line.startX += dx;
+                        line.startY += dy;
+                        line.endX += dx;
+                        line.endY += dy;
+                        break;
+                    case 'cloud':
+                        const cloud = selectedObject_canv;
+                        cloud.x_C += dx;
+                        cloud.y_C += dy;
+                        break;
+                    case 'star':
+                        const star = selectedObject_canv;
+                        star.x_C += dx;
+                        star.y_C += dy;
+                        break;
+                }
+                startX = e.offsetX;
+                startY = e.offsetY;
                 drawObjects();
             }
         }
@@ -1317,130 +1775,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             if (isSelecting) {
                 selectionEndX = e.clientX - canvas.offsetLeft;
                 selectionEndY = e.clientY - canvas.offsetTop;
-                drawObjects(); // Перерисовываем объекты
+                drawObjects();
                 drawSelectionBox(); // Рисуем текущую рамку выделения
             }
-            logDebug(`${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
+            //logDebug(`${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
             if (selectedObject && (mouse_meaning === 0) && mouse_meaning_check != 1) {
-                //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
-                if (selectedObject.type === 'rectangle') {
-                    const rect = selectedObject;
-                    rect.x_C = mouseX - startX;
-                    rect.y_C = mouseY - startY;
-                    //additionGrid(rect);
-                }
-                else if (selectedObject.type === 'circle') {
-                    const circle = selectedObject;
-                    circle.x_C = mouseX - startX;
-                    circle.y_C = mouseY - startY;
-                }
-                else if (selectedObject.type === 'line') {
-                    const line = selectedObject;
-                    const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
-                    const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
-                    // Расчет расстояния от точки до линии
-                    const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
-                        Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
-                    if (distStart < 20) {
-                        const dx = mouseX - startX;
-                        const dy = mouseY - startY;
-                        line.startX += dx;
-                        line.startY += dy;
-                        startX = mouseX;
-                        startY = mouseY;
-                        drawObjects();
-                        logDebug(`Line selected start`);
-                    }
-                    else if (distEnd < 20) {
-                        const dx = mouseX - startX;
-                        const dy = mouseY - startY;
-                        line.endX += dx;
-                        line.endY += dy;
-                        startX = mouseX;
-                        startY = mouseY;
-                        drawObjects();
-                        logDebug(`Line selected end`);
-                    }
-                    else if (distToLine < 10) { // Проверка на близость к линии
-                        const dx = mouseX - startX;
-                        const dy = mouseY - startY;
-                        line.startX += dx;
-                        line.startY += dy;
-                        line.endX += dx;
-                        line.endY += dy;
-                        startX = mouseX;
-                        startY = mouseY;
-                        drawObjects();
-                        logDebug(`Line selected body`);
-                    }
-                    else {
-                        //logDebug(`GGWP1`);
-                    }
-                }
-                else if (selectedObject.type === 'star') {
-                    const star = selectedObject;
-                    star.x_C = mouseX - startX;
-                    star.y_C = mouseY - startY;
-                }
-                else if (selectedObject.type === 'cloud') {
-                    const cloud = selectedObject;
-                    //logDebug(`(${mouseX})(${mouseY})`);
-                    //logDebug(`(${startX})(${startY})`);
-                    cloud.x_C = mouseX - startX;
-                    cloud.y_C = mouseY - startY;
-                    //logDebug(`(${mouseX - startX})(${mouseY - startY})`);
-                }
-                drawObjects();
+                leftButtonMove(selectedObject, mouseX, mouseY);
             }
             else if (mouse_meaning_check === 1) {
-                //logDebug(`Button moved id - 1`);
-                e.preventDefault();
-                if (isPanning) {
-                    const dx = e.clientX - panStartX;
-                    const dy = e.clientY - panStartY;
-                    offsetX += dx;
-                    offsetY += dy;
-                    panStartX = e.clientX;
-                    panStartY = e.clientY;
-                    drawObjects();
-                    return;
-                }
-                if (selectedObject_canv && (e.buttons & 1) === 1) {
-                    const dx = e.offsetX - startX;
-                    const dy = e.offsetY - startY;
-                    switch (selectedObject_canv.type) {
-                        case 'rectangle':
-                            const rect = selectedObject_canv;
-                            rect.x_C += dx;
-                            rect.y_C += dy;
-                            break;
-                        case 'circle':
-                            const circle = selectedObject_canv;
-                            circle.x_C += dx;
-                            circle.y_C += dy;
-                            break;
-                        case 'line':
-                            const line = selectedObject_canv;
-                            line.startX += dx;
-                            line.startY += dy;
-                            line.endX += dx;
-                            line.endY += dy;
-                            break;
-                        case 'cloud':
-                            const cloud = selectedObject_canv;
-                            cloud.x_C += dx;
-                            cloud.y_C += dy;
-                            break;
-                        case 'star':
-                            const star = selectedObject_canv;
-                            star.x_C += dx;
-                            star.y_C += dy;
-                            break;
-                    }
-                    startX = e.offsetX;
-                    startY = e.offsetY;
-                    drawObjects();
-                }
+                scrollingButtonMove(e);
             }
             else {
                 //logDebug(`GGWP2`);
@@ -1450,11 +1793,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             let mouse_meaning = e.button;
             if (isSelecting) {
                 isSelecting = false;
-                //selectedObjects = getObjectsInSelectionBox();  // Получаем выделенные объекты
-                //drawObjects();  // Перерисовываем объекты с учетом выделения
+                selectionStartX = 0;
+                selectionStartY = 0;
+                selectionEndX = 0;
+                selectionEndY = 0;
             }
             if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
-                logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
+                //logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
             }
             else if (mouse_meaning == 0 && mouse_meaning_check != 1) {
                 logDebug("Mouse up, no object selected");
@@ -1471,6 +1816,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 selectedObject_canv = null;
                 mouse_meaning_check = 0;
             }
+            activeConnector = null;
             selectedObject = null;
             selectedLineEnd = null;
         }
@@ -1847,8 +2193,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             let centerY = 0;
             if (obj.rotation) {
                 if (obj.type === 'rectangle') {
-                    centerX = obj.x_C /*+ (obj as Rectangle).width / 2*/;
-                    centerY = obj.y_C /*+ (obj as Rectangle).height / 2*/;
+                    centerX = obj.x_C + obj.width / 2;
+                    centerY = obj.y_C + obj.height / 2;
                 }
                 else if (obj.type === 'circle') {
                     centerX = obj.x_C;
@@ -1873,6 +2219,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         }
         function drawObjects() {
             if (ctx) {
+                logDebug("NOW I AM DRAWING OBJECTS");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
@@ -1886,6 +2233,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                         case 'rectangle':
                             const rect = obj;
                             drawRect(rect, ctx);
+                            updateConnectors(rect);
                             enteringText(obj);
                             break;
                         case 'circle':

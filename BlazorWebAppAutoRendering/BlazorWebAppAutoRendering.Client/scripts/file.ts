@@ -1,6 +1,7 @@
 ﻿(function () {
     let objects: Shape[] = [];
     let highlight: Shape[] = [];
+    let allConnectors: { id: string, x: number, y: number, type: string }[];
     let ctx: CanvasRenderingContext2D | null = null;
     // Переменные для хранения информации о текущем выбранном объекте и его начальной позиции
     let selectedObject: Shape | null = null;
@@ -461,6 +462,42 @@
 
             reader.readAsDataURL(file); // Преобразуем изображение в строку Base64
         }
+
+        function drawHeadArrow(ctx, x, y, angle, color) {
+            const headlen = 10; // Длина головы стрелки
+
+            // Координаты концов стрелки
+            const arrowX1 = x - headlen * Math.cos(angle - Math.PI / 6);
+            const arrowY1 = y - headlen * Math.sin(angle - Math.PI / 6);
+            const arrowX2 = x - headlen * Math.cos(angle + Math.PI / 6);
+            const arrowY2 = y - headlen * Math.sin(angle + Math.PI / 6);
+
+            // Рисуем треугольник стрелки
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(arrowX1, arrowY1);
+            ctx.lineTo(arrowX2, arrowY2);
+            ctx.lineTo(x, y);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        function drawArow(ctx: CanvasRenderingContext2D, line: Line) {
+            // Вычисляем угол наклона линии
+            const drawArrowAt = line.arrowDirection;
+            const angle = Math.atan2(line.endY - line.startY, line.endX - line.startX);
+
+            // Рисуем стрелки
+            if (drawArrowAt === "start" || drawArrowAt === "both") {
+                drawHeadArrow(ctx, line.startX, line.startY, angle + Math.PI, line.color);
+            }
+            if (drawArrowAt === "end" || drawArrowAt === "both") {
+                drawHeadArrow(ctx, line.endX, line.endY, angle, line.color);
+            }
+        }
+
         function drawDirectedLine(ctx, startX, startY, endX, endY, color) {
             // Рисуем линию
             ctx.beginPath();
@@ -665,15 +702,41 @@
                 logDebug(`removeObjects_buf - (${JSON.stringify(selectedObject_buf)})`);
             }
         }
+
+        let allConnectors: { id: string, x: number, y: number, type: string }[] = [];
+
         function updateConnectors(rect: Rectangle) {
             const { x_C, y_C, width, height } = rect;
+
+            // Если у объекта уже есть коннекторы, сохраняем их ID
+            const existingConnectors = rect.connectors || [];
+            const getConnectorId = (type: string): string => {
+                const existing = existingConnectors.find(connector => connector.type === type);
+                return existing ? existing.id : generateRandomId(16);
+            };
+
+            // Обновляем коннекторы объекта
             rect.connectors = [
-                { x: x_C, y: y_C + height / 2, type: 'left' }, // Левый коннектор
-                { x: x_C + width, y: y_C + height / 2, type: 'right' }, // Правый коннектор
-                { x: x_C + width / 2, y: y_C, type: 'top' }, // Верхний коннектор
-                { x: x_C + width / 2, y: y_C + height, type: 'bottom' }, // Нижний коннектор
+                { id: getConnectorId('left'), x: x_C, y: y_C + height / 2, type: 'left' },
+                { id: getConnectorId('right'), x: x_C + width, y: y_C + height / 2, type: 'right' },
+                { id: getConnectorId('top'), x: x_C + width / 2, y: y_C, type: 'top' },
+                { id: getConnectorId('bottom'), x: x_C + width / 2, y: y_C + height, type: 'bottom' }
             ];
+
+            // Синхронизируем данные с массивом allConnectors
+            rect.connectors.forEach(connector => {
+                const index = allConnectors.findIndex(existing => existing.id === connector.id);
+
+                if (index !== -1) {
+                    // Если коннектор уже существует в allConnectors, обновляем его координаты
+                    allConnectors[index] = { ...allConnectors[index], x: connector.x, y: connector.y };
+                } else {
+                    // Если коннектор отсутствует, добавляем его
+                    allConnectors.push({ id: connector.id, x: connector.x, y: connector.y, type: connector.type });
+                }
+            });
         }
+
         //function updateConnectors(rect: Rectangle) {
         //    const { x_C, y_C, width, height, rotation } = rect;
 
@@ -758,11 +821,12 @@
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
                 borderPoints_Y2: 0,
-                selectionMarker: false
+                selectionMarker: false,
+                colorAlpha: 1
             };
             updateConnectors(newRect);
-            
-            
+
+
             selectedObject_buf = newRect;
             selectedObject_buf.selectionMarker = true;
             drawRect(selectedObject_buf as Rectangle, ctx);
@@ -770,7 +834,7 @@
             objects.push(selectedObject_buf);
             selectedObject_buf = null;
             drawObjects();
-            
+            //console.log(newRect)
         }
         function addCircle() {
             const newCircle: Circle = {
@@ -785,7 +849,8 @@
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
                 borderPoints_Y2: 0,
-                selectionMarker: false
+                selectionMarker: false,
+                colorAlpha: 1
             };
             selectedObject_buf = newCircle;
             selectedObject_buf.selectionMarker = true;
@@ -816,7 +881,10 @@
                 borderPoints_Y1: startY + 2,
                 borderPoints_X2: endX + 2,
                 borderPoints_Y2: endY + 2,
-                selectionMarker: false
+                selectionMarker: false,
+                arrowDirection: "none",
+                colorAlpha: 1,
+                punctuation: "none"
             };
 
             selectedObject_buf = newLine;
@@ -842,7 +910,8 @@
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
                 borderPoints_Y2: 0,
-                selectionMarker: false
+                selectionMarker: false,
+                colorAlpha: 1
             }
 
             selectedObject_buf = newStar;
@@ -868,7 +937,8 @@
                 borderPoints_Y1: 0,
                 borderPoints_X2: 0,
                 borderPoints_Y2: 0,
-                selectionMarker: false
+                selectionMarker: false,
+                colorAlpha: 1
             }
             selectedObject_buf = newCloud;
             selectedObject_buf.selectionMarker = true;
@@ -879,12 +949,14 @@
             drawObjects();
             logDebug(`Cloud added: ${JSON.stringify(newCloud)}`); 
         }
+
         function drawSquare(ctx, x, y, size) {
             ctx.fillStyle = 'black';
             ctx.fillRect(x - size / 2, y - size / 2, size, size);
         }
         function drawRect(rect: Rectangle, ctx: CanvasRenderingContext2D) {
-            ctx.fillStyle = rect.color;
+            const colorWithAlpha = hexToRgba(rect.color, rect.colorAlpha);
+            ctx.fillStyle = colorWithAlpha;
             ctx.fillRect(rect.x_C, rect.y_C, rect.width, rect.height);
             if (rect.image) {
                 ctx.drawImage(rect.image, rect.x_C, rect.y_C, rect.width!, rect.height!);
@@ -914,32 +986,25 @@
             }
         }
         function drawLine(line: Line, ctx: CanvasRenderingContext2D) {
-            ctx.beginPath();
-            ctx.moveTo(line.startX, line.startY);
-            ctx.lineTo(line.endX, line.endY);
-            ctx.strokeStyle = line.color;
-            ctx.lineWidth = 5;
-            ctx.stroke();
-            // Линии не поддерживают изображение, но можно добавить, если требуется
-            //if (selectedObject_buf == line) {
-            //    //ctx.beginPath();
-            //    //ctx.arc(line.startX, line.startY, 5, 0, 2 * Math.PI);
-            //    //ctx.fillStyle = 'black';
-            //    //ctx.fill();
-            //    //ctx.beginPath();
-            //    //ctx.arc(line.endX, line.endY, 5, 0, 2 * Math.PI);
-            //    //ctx.fillStyle = 'black';
-            //    //ctx.fill();
-            //    ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-            //    ctx.lineWidth = 2;
-            //    ctx.setLineDash([5, 3]);
-            //    ctx.strokeRect(line.startX + 1, line.startY + 1, Math.abs(line.startX - line.endX - 1), Math.abs(line.startY - line.endY - 1));
-            //    ctx.setLineDash([]);
-            //    line.borderPoints_X1 = line.startX + 1;
-            //    line.borderPoints_Y1 = line.startY + 1;
-            //    line.borderPoints_X2 = line.endX + 1;
-            //    line.borderPoints_Y2 = line.endY + 1;
-            //}
+            const colorWithAlpha = hexToRgba(line.color, line.colorAlpha);
+            if (line.punctuation === "none" ) {
+                ctx.beginPath();
+                ctx.moveTo(line.startX, line.startY);
+                ctx.lineTo(line.endX, line.endY);
+                ctx.strokeStyle = colorWithAlpha;
+                ctx.lineWidth = 5;
+                ctx.stroke();
+            } else {
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath();
+                ctx.moveTo(line.startX, line.startY);
+                ctx.lineTo(line.endX, line.endY);
+                ctx.strokeStyle = colorWithAlpha;
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
             if (line.selectionMarker || selectedObject_buf === line) {
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
@@ -963,11 +1028,13 @@
                 line.borderPoints_X2 = rectX + rectWidth;
                 line.borderPoints_Y2 = rectY + rectHeight;
             }
+            drawArow(ctx, line);
         }
         function drawCircle(circle: Circle, ctx: CanvasRenderingContext2D) {
+            const colorWithAlpha = hexToRgba(circle.color, circle.colorAlpha);
             ctx.beginPath();
             ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
-            ctx.fillStyle = circle.color;
+            ctx.fillStyle = colorWithAlpha;
             ctx.fill();
             if (circle.image) {
                 // Клипируем область круга, чтобы ограничить изображение
@@ -1017,6 +1084,7 @@
             }
         }
         function drawStar(ctx, x_C, y_C, rad, amount_points, m, obj) {
+            const colorWithAlpha = hexToRgba(obj.color, obj.colorAlpha);
             ctx.beginPath();
             let points = [];
             ctx.moveTo(x_C, y_C + rad);
@@ -1029,7 +1097,7 @@
                 ctx.lineTo(x, y);
             }
             ctx.closePath();
-            ctx.fillStyle = obj.color;
+            ctx.fillStyle = colorWithAlpha;
             ctx.fill();
 
             if (obj.selectionMarker || selectedObject_buf === obj) {
@@ -1066,6 +1134,7 @@
             }
         }
         function drawCloud(ctx, x_C, y_C, width, height, obj) {
+            const colorWithAlpha = hexToRgba(obj.color, obj.colorAlpha);
             ctx.beginPath();
             let startX_Cloud = x_C - width / 2;
             let startY_Cloud = y_C - height / 2;
@@ -1104,7 +1173,7 @@
             );
 
             ctx.closePath();
-            ctx.fillStyle = obj.color;
+            ctx.fillStyle = colorWithAlpha;
             ctx.fill();
 
             if (obj.selectionMarker || selectedObject_buf === obj) {
@@ -1121,13 +1190,13 @@
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
             }
         }
-
         function deleteShape() {
             if (selectedObjectMass.length > 0) {
                 logDebug(`Deleting multiple shapes: ${JSON.stringify(selectedObjectMass)}`);
 
                 // Удаляем ссылки на удаляемые фигуры из других объектов
                 for (const shapeToRemove of selectedObjectMass) {
+                    // Удаляем ссылки на коннекторы и линии
                     for (const obj of objects) {
                         // Удаление из linkedObjects
                         if (obj.linkedObjects) {
@@ -1143,11 +1212,30 @@
                         if (obj.incomingLinks) {
                             obj.incomingLinks = obj.incomingLinks.filter(id => id !== shapeToRemove.id);
                         }
+
+                        // Удаление ссылок на линии в lineConnectionStart
+                        if (obj.lineConnectionStart) {
+                            obj.lineConnectionStart = obj.lineConnectionStart.filter(conn => conn.id_con !== shapeToRemove.id);
+                        }
+
+                        // Удаление ссылок на линии в lineConnectionEnd
+                        if (obj.lineConnectionEnd) {
+                            obj.lineConnectionEnd = obj.lineConnectionEnd.filter(conn => conn.id_con !== shapeToRemove.id);
+                        }
                     }
 
                     // Удаляем объект из массива objects
                     const indexToRemove = objects.indexOf(shapeToRemove);
                     if (indexToRemove !== -1) {
+                        // Если удаляемый объект — линия, удаляем ее id из lineConnectionStart и lineConnectionEnd
+                        if (shapeToRemove.type === 'line') {
+                            const lineToRemove = shapeToRemove as Line;
+                            for (const obj of objects) {
+                                obj.lineConnectionStart = obj.lineConnectionStart?.filter(conn => conn.id_line !== lineToRemove.id) || [];
+                                obj.lineConnectionEnd = obj.lineConnectionEnd?.filter(conn => conn.id_line !== lineToRemove.id) || [];
+                            }
+                        }
+
                         objects.splice(indexToRemove, 1);
                     }
                 }
@@ -1177,9 +1265,25 @@
                         if (obj.incomingLinks) {
                             obj.incomingLinks = obj.incomingLinks.filter(id => id !== shapeToRemove.id);
                         }
+
+                        if (obj.lineConnectionStart) {
+                            obj.lineConnectionStart = obj.lineConnectionStart.filter(conn => conn.id_con !== shapeToRemove.id);
+                        }
+
+                        if (obj.lineConnectionEnd) {
+                            obj.lineConnectionEnd = obj.lineConnectionEnd.filter(conn => conn.id_con !== shapeToRemove.id);
+                        }
                     }
 
                     // Удаляем сам объект
+                    if (shapeToRemove.type === 'line') {
+                        const lineToRemove = shapeToRemove as Line;
+                        for (const obj of objects) {
+                            obj.lineConnectionStart = obj.lineConnectionStart?.filter(conn => conn.id_line !== lineToRemove.id) || [];
+                            obj.lineConnectionEnd = obj.lineConnectionEnd?.filter(conn => conn.id_line !== lineToRemove.id) || [];
+                        }
+                    }
+
                     objects.splice(indexToRemove, 1);
                     drawObjects();
                     selectedObject_buf = null;
@@ -1361,7 +1465,7 @@
                 if (obj.type === 'rectangle') {
                     const rect = obj as Rectangle;
                     if (/*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect)) {
-                        console.log("i am here");
+                        //console.log("i am here");
                         for (let i = objects.length - 1; i >= 0; i--) {
                             objects[i].selectionMarker = false;
                         }
@@ -1482,7 +1586,7 @@
                 selectionStartY = e.clientY - canvas.offsetTop;
                 selectionEndX = e.clientX - canvas.offsetLeft;
                 selectionEndY = e.clientY - canvas.offsetTop;
-                console.log("now is selecting");
+                //console.log("now is selecting");
             }
             drawObjects();
             if (selectedObject_buf && selectedObject_buf.connectors) {
@@ -1706,14 +1810,47 @@
                 scrollingButtonDown(e, mouseX, mouseY);
             }
         }
+
+        function isLineEndpointNearConnector(line: Line, connectors: { id: string, x: number, y: number }[], threshold: number = 5) {
+            const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number =>
+                Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+
+            for (const connector of connectors) {
+                if (calculateDistance(line.startX, line.startY, connector.x, connector.y) <= threshold) {
+                    line.startX = connector.x;
+                    line.startY = connector.y;
+
+                    for (const obj of objects) {
+                        if (obj.connectors?.some(conn => conn.id === connector.id)) {
+                            obj.lineConnectionStart = obj.lineConnectionStart || [];
+                            if (!obj.lineConnectionStart.find(entry => entry.id_line === line.id)) {
+                                obj.lineConnectionStart.push({ id_con: connector.id, id_line: line.id });
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (calculateDistance(line.endX, line.endY, connector.x, connector.y) <= threshold) {
+                    line.endX = connector.x;
+                    line.endY = connector.y;
+
+                    for (const obj of objects) {
+                        if (obj.connectors?.some(conn => conn.id === connector.id)) {
+                            obj.lineConnectionEnd = obj.lineConnectionEnd || [];
+                            if (!obj.lineConnectionEnd.find(entry => entry.id_line === line.id)) {
+                                obj.lineConnectionEnd.push({ id_con: connector.id, id_line: line.id });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         function leftButtonMove(selectedObject: Shape, mouseX: number, mouseY: number) {
             //console.log(mouseX, mouseY, startX, startY);
 
             // Если есть несколько выделенных объектов
             if (selectedObjectMass.length > 0) {
-                //const deltaX = mouseX - startX;
-                //const deltaY = mouseY - startY;
-
                 // Перемещаем все выделенные объекты
                 for (const obj of selectedObjectMass) {
                     switch (obj.type) {
@@ -1762,8 +1899,6 @@
                 drawObjects(); // Перерисовываем все объекты
                 return;
             }
-
-
 
             //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
             if (selectedObject.type === 'rectangle') {
@@ -1826,6 +1961,20 @@
                 } else {
                     rect.x_C = mouseX - startX;
                     rect.y_C = mouseY - startY;
+                    ////isLineEndpointNearConnector(rect, allConnectors);
+                    for (const connector of rect.connectors) {
+                        // Перемещаем линии, связанные с коннектором
+                        for (const line of objects.filter(obj => obj.type === 'line') as Line[]) {
+                            if (rect.lineConnectionStart?.some(entry => entry.id_con === connector.id)) {
+                                line.startX = connector.x;
+                                line.startY = connector.y;
+                            }
+                            if (rect.lineConnectionEnd?.some(entry => entry.id_con === connector.id)) {
+                                line.endX = connector.x;
+                                line.endY = connector.y;
+                            }
+                        }
+                    }
                 }
 
             } else if (selectedObject.type === 'circle') {
@@ -1841,22 +1990,28 @@
                 const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
                     Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
 
-                if (distStart < 20) {
+                if (distStart < 10) {
                     const dx = mouseX - startX;
                     const dy = mouseY - startY;
                     line.startX += dx;
                     line.startY += dy;
                     startX = mouseX;
                     startY = mouseY;
+                    line.x_C = (line.startX + line.endX) / 2,
+                    line.y_C = (line.startY + line.endY) / 2,
+                    isLineEndpointNearConnector(line, allConnectors);
                     drawObjects();
                     logDebug(`Line selected start`);
-                } else if (distEnd < 20) {
+                } else if (distEnd < 10) {
                     const dx = mouseX - startX;
                     const dy = mouseY - startY;
                     line.endX += dx;
                     line.endY += dy;
                     startX = mouseX;
                     startY = mouseY;
+                    line.x_C = (line.startX + line.endX) / 2,
+                    line.y_C = (line.startY + line.endY) / 2,
+                    isLineEndpointNearConnector(line, allConnectors);
                     drawObjects();
                     logDebug(`Line selected end`);
                 } else if (distToLine < 10) {
@@ -1868,10 +2023,10 @@
                     line.endY += dy;
                     startX = mouseX;
                     startY = mouseY;
+                    line.x_C = (line.startX + line.endX) / 2,
+                    line.y_C = (line.startY + line.endY) / 2,
                     drawObjects();
                     logDebug(`Line selected body`);
-                } else {
-                    //logDebug(`GGWP1`);
                 }
             } else if (selectedObject.type === 'star') {
                 const star = selectedObject as Star;
@@ -1976,6 +2131,7 @@
 
             if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
                 //logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
+                tableObjectCheck(selectedObject_buf);
             } else if (mouse_meaning == 0 && mouse_meaning_check != 1) {
                 logDebug("Mouse up, no object selected");
                 selectedObject_buf = null;
@@ -2229,37 +2385,136 @@
             const owlContent = convertObjectsToOWL(objects);
             downloadFile('shapes.owl', owlContent);
         });
+
         function createVerticalTable(object: Shape): HTMLTableElement {
             const table = document.createElement('table');
             table.style.border = '1px solid black';
             table.style.borderCollapse = 'collapse';
-            table.style.width = '400px'; // Устанавливаем фиксированную ширину таблицы
-            table.style.tableLayout = 'fixed'; // Фиксируем ширину колонок
+            table.style.width = '400px'; // Фиксированная ширина таблицы
+            table.style.tableLayout = 'fixed';
 
-            // Перебираем свойства объекта
             for (const key in object) {
                 if (object.hasOwnProperty(key)) {
-                    if (key === "imageSrc" || (object as any)[key] === "") {
+                    // Пропускаем ненужные свойства
+                    if (key === "imageSrc" || (object as any)[key] === "" || key === "connectors" || key === "borderPoints_X1" || key === "borderPoints_Y1" || key === "borderPoints_X2" || key === "borderPoints_Y2") {
                         continue;
                     }
+
                     const row = table.insertRow();
 
+                    // Ячейка с названием свойства
                     const cellKey = row.insertCell();
                     cellKey.style.border = '1px solid black';
                     cellKey.style.padding = '5px';
-                    cellKey.style.width = '35%';
+                    cellKey.style.width = '30%';
                     cellKey.innerText = key;
 
+                    // Ячейка со значением свойства
                     const cellValue = row.insertCell();
                     cellValue.style.border = '1px solid black';
                     cellValue.style.padding = '5px';
-                    cellValue.style.width = '65%';
-                    cellValue.innerText = (object as any)[key];
+                    cellValue.style.width = '45%';
+
+                    const valueElement = document.createElement('span');
+                    valueElement.innerText = (object as any)[key];
+                    cellValue.appendChild(valueElement);
+
+                    // Если свойство число или цвет, добавляем кнопку "Изменить"
+                    if (typeof ((object as any)[key]) === "number" || key === "color" || key === "arrowDirection" || key === "punctuation") {
+                        const cellEdit = row.insertCell();
+                        cellEdit.style.border = '1px solid black';
+                        cellEdit.style.padding = '5px';
+                        cellEdit.style.width = '25%';
+
+                        const editButton = document.createElement('button');
+                        editButton.innerText = 'Изменить';
+                        editButton.style.margin = '0 auto';
+
+                        let inEditMode = false;
+                        let input: HTMLInputElement | HTMLSelectElement | null = null;
+
+                        editButton.addEventListener('click', () => {
+                            if (!inEditMode) {
+                                // Переход в режим редактирования
+                                inEditMode = true;
+                                editButton.innerText = 'Сохранить';
+
+                                cellValue.innerHTML = '';
+
+                                if (key === "color") {
+                                    input = document.createElement('input');
+                                    input.type = 'color';
+                                    input.value = (object as any)[key];
+                                } else if (key === "arrowDirection") {
+                                    // Создаем выпадающий список для направления стрелки
+                                    input = document.createElement('select');
+                                    const options = ["start", "end", "both", "none"];
+                                    options.forEach(option => {
+                                        const opt = document.createElement('option');
+                                        opt.value = option;
+                                        opt.textContent = option;
+                                        if ((object as any)[key] === option) {
+                                            opt.selected = true;
+                                        }
+                                        input.appendChild(opt);
+                                    });
+                                } else if (key === "punctuation") {
+                                    // Создаем выпадающий список для направления стрелки
+                                    input = document.createElement('select');
+                                    const options = ["yes", "none"];
+                                    options.forEach(option => {
+                                        const opt = document.createElement('option');
+                                        opt.value = option;
+                                        opt.textContent = option;
+                                        if ((object as any)[key] === option) {
+                                            opt.selected = true;
+                                        }
+                                        input.appendChild(opt);
+                                    });
+                                } else {
+                                    input = document.createElement('input');
+                                    input.type = 'text';
+                                    input.value = valueElement.innerText;
+                                }
+                                cellValue.appendChild(input);
+                            } else {
+                                // Сохранение изменений
+                                if (input) {
+                                    const newValue = input.value.trim();
+
+                                    if (typeof (object as any)[key] === 'number') {
+                                        const parsedValue = parseFloat(newValue);
+                                        if (isNaN(parsedValue)) {
+                                            alert("Некорректное числовое значение.");
+                                            return;
+                                        }
+                                        (object as any)[key] = parsedValue;
+                                        valueElement.innerText = parsedValue.toString();
+                                    } else {
+                                        (object as any)[key] = newValue;
+                                        valueElement.innerText = newValue;
+                                    }
+
+                                    cellValue.innerHTML = '';
+                                    cellValue.appendChild(valueElement);
+
+                                    editButton.innerText = 'Изменить';
+                                    inEditMode = false;
+
+                                    drawObjects(); // Перерисовываем объекты после изменения
+                                }
+                            }
+                        });
+
+                        cellEdit.appendChild(editButton);
+                    }
                 }
             }
 
+            drawObjects(); // Перерисовка объектов после создания таблицы
             return table;
         }
+
         function dfsCycleDetection(
             node: Shape,
             graph: Shape[],
@@ -2502,3 +2757,4 @@
         logDebug("Canvas context is not supported");
     }
 })();
+

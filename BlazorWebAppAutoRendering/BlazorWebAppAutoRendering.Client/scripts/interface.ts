@@ -15,8 +15,11 @@
     borderPoints_Y1: number;
     borderPoints_X2: number;
     borderPoints_Y2: number;
-    connectors?: { x: number, y: number, type: string }[];
+    connectors?: {id: string, x: number, y: number, type: string }[];
     selectionMarker?: boolean;
+    lineConnectionStart?: { id_con: string, id_line: string }[];
+    lineConnectionEnd?: { id_con: string, id_line: string }[];
+    colorAlpha?: number;
 }
 
 interface Rectangle extends Shape {
@@ -33,6 +36,8 @@ interface Line extends Shape {
     startY: number;
     endX: number;
     endY: number;
+    arrowDirection?: string; //start, end, both, none
+    punctuation?: string;
 }
 
 interface Star extends Shape {
@@ -63,4 +68,11 @@ function generateUniqueId(): string {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

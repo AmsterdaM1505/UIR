@@ -5,8 +5,10 @@
 <style>
     .custom-a {
         margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 </style>
+
 
 <div class="page">
 @*     <div class="sidebar">
@@ -15,23 +17,27 @@
 
 
     <main>
-        <div class="top-row px-4">
+        <div id="main-layout" class="top-row px-4">
             <a href="/" target="_blank" class="custom-a">App</a>
             <label>/</label>
             <a href="reg" target="_blank" class="custom-a">Sign up</a>
             <label>/</label>
-            <a href="auth" target="_blank" class="custom-a">Sign in</a>
+            <a href="Test.razor" target="_blank" class="custom-a">Sign in</a>
             <a href="https://mephi.ru/" target="_blank">About us</a>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
+        <MudThemeProvider/>
+            <MudDialogProvider/>
+                <MudSnackbarProvider/>
+                    <MudPopoverProvider/>
+                        <article class="content px-4">
+                            @Body
+                        </article>
+                    
     </main>
 </div>
 
-<div id="blazor-error-ui">
+@* <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
-</div>
+</div> *@

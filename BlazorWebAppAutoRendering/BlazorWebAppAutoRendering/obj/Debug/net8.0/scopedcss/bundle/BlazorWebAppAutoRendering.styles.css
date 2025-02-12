@@ -27,6 +27,7 @@ main[b-81hns9zntk] {
     .top-row[b-81hns9zntk]  a, .top-row[b-81hns9zntk]  .btn-link {
         white-space: nowrap;
         margin-left: 1.5rem;
+        margin-right: 1.5rem;
         text-decoration: none;
         color: #333; /* ��������� ����� ������ */
     }
@@ -75,8 +76,8 @@ main[b-81hns9zntk] {
     }
 
     .top-row[b-81hns9zntk], article[b-81hns9zntk] {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
+        padding-left: 0rem !important;
+        padding-right: 2rem !important;
     }
 }
 

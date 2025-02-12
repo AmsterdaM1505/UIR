@@ -3,26 +3,53 @@
     let highlight: Shape[] = [];
     let allConnectors: { id: string, x: number, y: number, type: string }[];
     let ctx: CanvasRenderingContext2D | null = null;
-    // Переменные для хранения информации о текущем выбранном объекте и его начальной позиции
     let selectedObject: Shape | null = null;
     let selectedObject_canv: Shape | null = null;
     let selectedObject_buf: Shape | null = null;
     let selectedObject_buf_connect: Shape | null = null;
-    let selectedLineEnd: 'start' | 'end' | null = null; // Новая переменная для хранения конца линии
     let startX: number, startY: number;
     let isPanning = false;
     let panStartX = 0;
     let panStartY = 0;
     let offsetX = 0;
     let offsetY = 0;
-    let canvas_offsetX = 0;
-    let canvas_offsetY = 0;
     let mouse_meaning_check = 0;
     let connectionServ = 2;
     const container = document.getElementById('table-container');
     let cyclePath = null;
     let savedSchema = null;
     let selectedObjectMass: Shape[] = [];
+    let selectedLineStart = null;
+    let selectedLineEnd = null;
+    let selectedLineMid = null;
+
+    //let complexObjects: ComplexShape[] = [];
+
+
+    function measureTextWidth(text: string, font: string): number {
+        // Создаём временный span
+        const span = document.createElement('span');
+
+        const help = document.getElementById("addRectBtn")
+        console.log("мой текст", help.style)
+        // Делаем его невидимым и не влияющим на layout
+        span.style.visibility = 'hidden';
+        span.style.whiteSpace = 'nowrap';
+        // Устанавливаем шрифт, который используется в кнопке (например, "16px Roboto")
+        span.style.font = font;
+        span.textContent = text;
+        // Добавляем элемент в body, чтобы он был отрендерен
+        document.body.appendChild(span);
+        // Измеряем его ширину
+        const width = span.getBoundingClientRect().width;
+        // Удаляем временный элемент
+        document.body.removeChild(span);
+        return width;
+    }
+
+    // Пример вызова:
+    const expectedWidth = measureTextWidth("Добавить прямоугольник", "16px Roboto");
+    console.log("Ожидаемая ширина текста:", expectedWidth);
 
     function generateRandomId(length: number): string {
         let result = '';
@@ -187,13 +214,101 @@
         logDebug("Canvas element found");
         
     }
-    
+
+    function resizeCanvas(canvas: HTMLCanvasElement) {
+        
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+        }
+    }
+
+    function updateOffsets(canvas: HTMLCanvasElement) {
+        
+        const mainLayout = document.getElementById("main-layout") as HTMLCanvasElement;
+        const debug = document.getElementById("debug-panel");
+
+        if (!canvas || !mainLayout) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const difference = mainLayout.getBoundingClientRect();
+
+
+        offsetX = rect.left;
+        offsetY = Math.max(0, rect.top - (difference.bottom - difference.top));
+
+        debug.style.bottom += `${difference.bottom - difference.top}px`;
+        //console.log(offsetX, offsetY, difference.top, difference.bottom)
+    }
+
+
+    function updateDebugPanelOffsets(): void {
+        const leftPanel = document.getElementById("button-panel");
+        const rightPanel = document.getElementById("table-container");
+        const debugPanel = document.getElementById("debug-panel");
+
+        if (!leftPanel || !rightPanel || !debugPanel) return;
+
+        // Вычисляем текущие ширины левой и правой панелей
+        const leftWidth = leftPanel.getBoundingClientRect().width;
+        const rightWidth = rightPanel.getBoundingClientRect().width;
+
+        // Задаем нижней панели отступы таким образом, чтобы она начиналась от края левой панели 
+        // и заканчивалась перед правой панелью.
+        debugPanel.style.left = leftWidth + "px";
+        debugPanel.style.right = rightWidth + "px";
+    }
+
+    function uniformizeButtons(selector: string): void {
+        const buttons = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
+        let maxWidth = 0;
+        let maxHeight = 0;
+        logDebug("button resize")
+        buttons.forEach(button => {
+            const rect = button.getBoundingClientRect();
+            if (rect.width > maxWidth) {
+                maxWidth = rect.width;
+            }
+            if (rect.height > maxHeight) {
+                maxHeight = rect.height;
+            }
+        });
+
+        buttons.forEach(button => {
+            button.style.width = `${maxWidth}px`;
+            button.style.height = `${maxHeight}px`;
+        });
+    }
+
+    window.addEventListener("resize", function () {
+        uniformizeButtons('._button');
+        logDebug("button resize")
+        console.log("button resize")
+        resizeCanvas(canvas);
+        updateOffsets(canvas);
+        updateDebugPanelOffsets();
+    });
+    updateDebugPanelOffsets();
+    resizeCanvas(canvas)
+    updateOffsets(canvas);
+
     const gridCanvas = document.createElement('canvas');
     const gridCtx = gridCanvas.getContext('2d')!;
     gridCanvas.width = canvas.width;
     gridCanvas.height = canvas.height;
-
-    //console.log(canvas.width, canvas.height);
 
     //Функция для рисования сетки
     function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, gridSize: number) {
@@ -242,6 +357,57 @@
         canvas.addEventListener('mouseup', function (e: MouseEvent) {
             onMouseUp(e);
         });
+
+        const leftPanel = document.getElementById("button-panel");
+        const rightPanel = document.getElementById("table-container");
+        const debugPanel = document.getElementById("debug-panel");
+
+        const resizeHandleLeft = document.getElementById("resize-handle-left");
+        const resizeHandleRight = document.getElementById("resize-handle-right");
+
+        let isResizingLeft = false;
+        let isResizingRight = false;
+
+        resizeHandleLeft.addEventListener("mousedown", function (e) {
+            isResizingLeft = true;
+            document.addEventListener("mousemove", resizeLeftPanel);
+            document.addEventListener("mouseup", stopResizing);
+        });
+
+        resizeHandleRight.addEventListener("mousedown", function (e) {
+            isResizingRight = true;
+            document.addEventListener("mousemove", resizeRightPanel);
+            document.addEventListener("mouseup", stopResizing);
+        });
+
+        function resizeLeftPanel(e) {
+            if (!isResizingLeft) return;
+            const newWidth = e.clientX;
+            if (newWidth > 50 && newWidth < window.innerWidth / 2) {
+                leftPanel.style.width = `${newWidth}px`;
+                debugPanel.style.left = `${newWidth}px`; // Корректируем отладочную панель
+                resizeHandleLeft.style.left = `${newWidth}px`;
+            }
+        }
+
+        function resizeRightPanel(e) {
+            if (!isResizingRight) return;
+            const newWidth = window.innerWidth - e.clientX;
+            if (newWidth > 50 && newWidth < window.innerWidth / 2) {
+                rightPanel.style.width = `${newWidth}px`;
+                debugPanel.style.right = `${newWidth}px`; // Корректируем отладочную панель
+                resizeHandleRight.style.right = `${newWidth}px`;
+            }
+        }
+
+        function stopResizing() {
+            isResizingLeft = false;
+            isResizingRight = false;
+            document.removeEventListener("mousemove", resizeLeftPanel);
+            document.removeEventListener("mousemove", resizeRightPanel);
+            document.removeEventListener("mouseup", stopResizing);
+        }
+
 
         document.getElementById('addRectBtn')?.addEventListener('click', function () {
             logDebug("Add rectangle button clicked");
@@ -362,7 +528,7 @@
         });
 
         document.getElementById('additionInfo')?.addEventListener('click', function () {
-            addInfoclick();
+            addInfo(selectedObject_buf);
         });
 
         document.addEventListener('contextmenu', function (e) {
@@ -376,6 +542,11 @@
             document.getElementById('imageInput')?.click(); // Открываем диалог выбора файлов
         });
 
+        document.getElementById('debugInfo')?.addEventListener('click', function () {
+            logDebug("debugInfo clicked");
+            debugHide();
+        });
+
         document.getElementById('imageInput')?.addEventListener('change', function (event) {
             const file = (event.target as HTMLInputElement)?.files?.[0];
             if (file && selectedObject_buf) {
@@ -386,41 +557,41 @@
             }
         });
 
-        canvas.addEventListener('dblclick', function (event: MouseEvent) {
-            // Получаем координаты клика относительно канваса
-            const canvasRect = canvas.getBoundingClientRect();
-            const mouseX = event.clientX - canvasRect.left - offsetX;
-            const mouseY = event.clientY - canvasRect.top - offsetY;
+        //canvas.addEventListener('dblclick', function (event: MouseEvent) {
+        //    // Получаем координаты клика относительно канваса
+        //    const canvasRect = canvas.getBoundingClientRect();
+        //    const mouseX = event.clientX - canvasRect.left - offsetX;
+        //    const mouseY = event.clientY - canvasRect.top - offsetY;
 
-            // Поиск объекта, по которому сделан двойной клик
-            const clickedObject = objects.find(obj => {
-                switch (obj.type) {
-                    case 'rectangle':
-                        const rect = obj as Rectangle;
-                        return /*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect);
-                    case 'circle':
-                        const circle = obj as Circle;
-                        const dx = mouseX - circle.x_C;
-                        const dy = mouseY - circle.y_C;
-                        return dx * dx + dy * dy <= circle.radius * circle.radius;
-                    // Добавьте другие типы объектов по аналогии
-                    default:
-                        return false;
-                }
-            });
+        //    // Поиск объекта, по которому сделан двойной клик
+        //    const clickedObject = objects.find(obj => {
+        //        switch (obj.type) {
+        //            case 'rectangle':
+        //                const rect = obj as Rectangle;
+        //                return /*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect);
+        //            case 'circle':
+        //                const circle = obj as Circle;
+        //                const dx = mouseX - circle.x_C;
+        //                const dy = mouseY - circle.y_C;
+        //                return dx * dx + dy * dy <= circle.radius * circle.radius;
+        //            // Добавьте другие типы объектов по аналогии
+        //            default:
+        //                return false;
+        //        }
+        //    });
 
-            if (clickedObject) {
-                // Запрашиваем текст у пользователя с помощью prompt
-                const text = prompt("Введите текст для объекта", clickedObject.info || "");
+        //    if (clickedObject) {
+        //        // Запрашиваем текст у пользователя с помощью prompt
+        //        const text = prompt("Введите текст для объекта", clickedObject.info || "");
 
-                if (text !== null) {
-                    // Сохраняем введенный текст в объекте
-                    clickedObject.info = text;
-                    drawObjects();  // Перерисовываем холст с новым текстом
-                }
-            }
-        });
-        
+        //        if (text !== null) {
+        //            // Сохраняем введенный текст в объекте
+        //            clickedObject.info = text;
+        //            drawObjects();  // Перерисовываем холст с новым текстом
+        //        }
+        //    }
+        //});
+
 
         //function insertionImageFromFile(shape: Shape) {
         //    const img = new Image();
@@ -433,6 +604,117 @@
         //        shape.image = img;
         //    };
         //}
+
+        canvas.addEventListener('dblclick', function (event: MouseEvent) {
+            // Получаем координаты клика относительно канваса
+            const canvasRect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - canvasRect.left - offsetX;
+            const mouseY = event.clientY - canvasRect.top - offsetY;
+
+            // Поиск объекта, по которому сделан двойной клик
+            const clickedObject = objects.find(obj => {
+                switch (obj.type) {
+                    case 'rectangle':
+                        const rect = obj as Rectangle;
+                        return isPointInRotatedRect(mouseX, mouseY, rect);
+                    case 'circle':
+                        const circle = obj as Circle;
+                        const dx = mouseX - circle.x_C;
+                        const dy = mouseY - circle.y_C;
+                        return dx * dx + dy * dy <= circle.radius * circle.radius;
+                    default:
+                        return false;
+                }
+            });
+
+            if (clickedObject) {
+                createTextInput(clickedObject, mouseX, mouseY);
+            }
+        });
+
+        function createTextInput(obj: Shape, x: number, y: number) {
+            // Создаем input-элемент
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = obj.info || "";
+            input.style.position = 'absolute';
+            input.style.fontSize = '14px';
+            input.style.outline = 'none';
+            input.style.border = 'none';
+            input.style.padding = '2px';
+            input.style.background = 'none';
+            input.style.zIndex = '1000';
+
+            switch (obj.type) {
+                case 'rectangle':
+                    const rect = obj as Rectangle;
+                    input.style.left = `${canvas.offsetLeft + rect.x_C}px`;
+                    input.style.top = `${canvas.offsetTop + rect.y_C}px`;
+                    input.style.width = `${rect.width}px`;
+                    input.style.height = `${rect.height / 3}px`;
+                    break;
+
+                case 'circle':
+                    const circle = obj as Circle;
+                    input.style.left = `${canvas.offsetLeft + circle.x_C - circle.radius / 2}px`;
+                    input.style.top = `${canvas.offsetTop + circle.y_C - circle.radius / 3}px`;
+                    input.style.width = `${circle.radius}px`;
+                    input.style.height = `${circle.radius / 3}px`;
+                    input.style.textAlign = 'center';
+                    break;
+
+                case 'line':
+                    const line = obj as Line;
+                    input.style.left = `${canvas.offsetLeft + (line.startX + line.endX) / 2 - 30}px`;
+                    input.style.top = `${canvas.offsetTop + (line.startY + line.endY) / 2 - 10}px`;
+                    input.style.width = `60px`;
+                    input.style.height = `20px`;
+                    input.style.textAlign = 'center';
+                    input.style.background = 'white';
+                    input.style.border = '1px solid black';
+                    break;
+
+                case 'star':
+                    const star = obj as Star;
+                    input.style.left = `${canvas.offsetLeft + star.x_C - star.rad / 2}px`;
+                    input.style.top = `${canvas.offsetTop + star.y_C - star.rad / 3}px`;
+                    input.style.width = `${star.rad}px`;
+                    input.style.height = `${star.rad / 3}px`;
+                    input.style.textAlign = 'center';
+                    break;
+
+                case 'cloud':
+                    const cloud = obj as Cloud;
+                    input.style.left = `${canvas.offsetLeft + cloud.x_C - cloud.width / 2}px`;
+                    input.style.top = `${canvas.offsetTop + cloud.y_C - cloud.height / 3}px`;
+                    input.style.width = `${cloud.width}px`;
+                    input.style.height = `${cloud.height / 3}px`;
+                    input.style.textAlign = 'center';
+                    break;
+
+                default:
+                    logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
+                    return;
+            }
+
+            // Добавляем input в body
+            document.body.appendChild(input);
+            input.focus();
+
+            // Функция сохранения текста и удаления input
+            function saveText() {
+                obj.info = input.value;
+                document.body.removeChild(input);
+                drawObjects(); // Перерисовываем холст с новым текстом
+            }
+
+            input.addEventListener('blur', saveText);  // Потеря фокуса
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') saveText();
+            });
+        }
+
+
 
         function insertionImage(selectedObject_buf: Shape, file: File) {
             const reader = new FileReader();
@@ -533,11 +815,21 @@
             hideContextMenu();
         });
         function showContextMenu(x, y) {
+            //const menu = document.getElementById('contextMenu');
+            //const menuWidth = menu.offsetWidth;
+            //const menuHeight = menu.offsetHeight;
+            //const windowWidth = window.innerWidth;
+            //const windowHeight = window.innerHeight;
             const menu = document.getElementById('contextMenu');
+            const canvasRect = canvas.getBoundingClientRect(); // Получаем координаты canvas
             const menuWidth = menu.offsetWidth;
             const menuHeight = menu.offsetHeight;
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
+
+            // Корректируем x и y с учетом `canvas.offsetLeft` и `canvas.offsetTop`
+            x = x - canvasRect.left;
+            y = y - canvasRect.top;
 
             // Adjust position if menu goes beyond window boundaries
             if (x + menuWidth > windowWidth) {
@@ -559,6 +851,17 @@
                 menu.hidden = true;
             }
         }
+
+        function debugHide() {
+            const debug_element = document.getElementById("debugOutput");
+            if (debug_element.style.display == 'none') {
+                debug_element.style.display = 'block';
+            } else {
+                debug_element.style.display = 'none';
+            }
+
+        }
+
         function highlighting(obj_: Shape, ctx_: CanvasRenderingContext2D) {
             if (highlight.includes(obj_)) {
                 ctx_.save();
@@ -808,11 +1111,13 @@
         //ctx.rotate((obj.rotation * Math.PI) / 180);
         //ctx.translate(-centerX, -centerY);
         function addRect() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
             const newRect: Rectangle = {
                 id: generateRandomId(16),
                 type: 'rectangle',
-                x_C: Math.random() * (canvas.width - 50),
-                y_C: Math.random() * (canvas.height - 50),
+                x_C: centerX,
+                y_C: centerY,
                 width: 50,
                 height: 50,
                 color: getRandomColor(),
@@ -824,6 +1129,7 @@
                 selectionMarker: false,
                 colorAlpha: 1
             };
+            console.log(newRect.x_C, newRect.y_C)
             updateConnectors(newRect);
 
 
@@ -837,11 +1143,13 @@
             //console.log(newRect)
         }
         function addCircle() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
             const newCircle: Circle = {
                 id: generateRandomId(16),
                 type: 'circle',
-                x_C: Math.random() * (canvas.width - 50) + 25,
-                y_C: Math.random() * (canvas.height - 50) + 25,
+                x_C: centerX,
+                y_C: centerY,
                 radius: 25,
                 color: getRandomColor(),
                 rotation: 0,
@@ -861,26 +1169,50 @@
             drawObjects();
         }
         function addLine() {
-            const startX = Math.random() * canvas.width;
-            const startY = Math.random() * canvas.height;
-            const endX = Math.random() * canvas.width;
-            const endY = Math.random() * canvas.height;
+            //const startX = Math.random() * canvas.width;
+            //const startY = Math.random() * canvas.height;
+            //const endX = Math.random() * canvas.width;
+            //const endY = Math.random() * canvas.height;
+
+            //const newLine: Line = {
+            //    id: generateRandomId(16),
+            //    type: 'line',
+            //    startX: startX,
+            //    startY: startY,
+            //    endX: endX,
+            //    endY: endY,
+            //    color: getRandomColor(),
+            //    rotation: 0,
+            //    x_C: (startX + endX) / 2,  // Вычисляем центр по X
+            //    y_C: (startY + endY) / 2,   // Вычисляем центр по Y
+            //    borderPoints_X1: startX + 2,
+            //    borderPoints_Y1: startY + 2,
+            //    borderPoints_X2: endX + 2,
+            //    borderPoints_Y2: endY + 2,
+            //    selectionMarker: false,
+            //    arrowDirection: "none",
+            //    colorAlpha: 1,
+            //    punctuation: "none"
+            //};
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const offset = 50;  // половина длины линии
 
             const newLine: Line = {
                 id: generateRandomId(16),
                 type: 'line',
-                startX: startX,
-                startY: startY,
-                endX: endX,
-                endY: endY,
+                startX: centerX - offset,
+                startY: centerY,
+                endX: centerX + offset,
+                endY: centerY,
                 color: getRandomColor(),
                 rotation: 0,
-                x_C: (startX + endX) / 2,  // Вычисляем центр по X
-                y_C: (startY + endY) / 2,   // Вычисляем центр по Y
-                borderPoints_X1: startX + 2,
-                borderPoints_Y1: startY + 2,
-                borderPoints_X2: endX + 2,
-                borderPoints_Y2: endY + 2,
+                x_C: centerX,  // Центр линии
+                y_C: centerY,
+                borderPoints_X1: centerX - offset + 2,
+                borderPoints_Y1: centerY + 2,
+                borderPoints_X2: centerX + offset + 2,
+                borderPoints_Y2: centerY + 2,
                 selectionMarker: false,
                 arrowDirection: "none",
                 colorAlpha: 1,
@@ -896,14 +1228,16 @@
             drawObjects();
         }
         function addStar() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
             const newStar: Star = {
                 id: generateRandomId(16),
                 type: 'star',
-                x_C: Math.random() * (canvas.width - 200),
-                y_C: Math.random() * (canvas.width - 200),
-                rad: 100,
-                amount_points: 6,
-                m: 0.5,
+                x_C: centerX,
+                y_C: centerY,
+                rad: 100,          // Радиус звезды
+                amount_points: 6,  // Количество точек звезды
+                m: 0.5,            // Коэффициент внутреннего радиуса
                 color: getRandomColor(),
                 rotation: 0,
                 borderPoints_X1: 0,
@@ -912,7 +1246,7 @@
                 borderPoints_Y2: 0,
                 selectionMarker: false,
                 colorAlpha: 1
-            }
+            };
 
             selectedObject_buf = newStar;
             selectedObject_buf.selectionMarker = true;
@@ -924,11 +1258,13 @@
             logDebug(`Star added: ${JSON.stringify(newStar)}`);
         }
         function addCloud() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
             const newCloud: Cloud = {
                 id: generateRandomId(16),
                 type: 'cloud',
-                x_C: Math.random() * (canvas.width - 200),
-                y_C: Math.random() * (canvas.width - 200),
+                x_C: centerX,
+                y_C: centerY,
                 width: 200,
                 height: 120,
                 color: getRandomColor(),
@@ -939,7 +1275,7 @@
                 borderPoints_Y2: 0,
                 selectionMarker: false,
                 colorAlpha: 1
-            }
+            };
             selectedObject_buf = newCloud;
             selectedObject_buf.selectionMarker = true;
             drawCloud(ctx, (selectedObject_buf as Cloud).x_C, (selectedObject_buf as Cloud).y_C, (selectedObject_buf as Cloud).width, (selectedObject_buf as Cloud).height, (selectedObject_buf as Cloud));
@@ -1101,23 +1437,6 @@
             ctx.fill();
 
             if (obj.selectionMarker || selectedObject_buf === obj) {
-                // Отрисовка голубой пунктирной рамки
-                //ctx.save();
-                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                //ctx.lineWidth = 2;
-                //ctx.setLineDash([5, 3]);
-                //ctx.beginPath();
-                //points.forEach((point, index) => {
-                //    if (index === 0) {
-                //        ctx.moveTo(point.x, point.y);
-                //    } else {
-                //        ctx.lineTo(point.x, point.y);
-                //    }
-                //});
-                //ctx.closePath();
-                //ctx.stroke();
-                //ctx.setLineDash([]);  // Сбрасываем пунктир
-                //ctx.restore();
 
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
@@ -1306,9 +1625,6 @@
                 drawObjects();
             }
         }
-        function addInfoclick() {
-            addInfo(selectedObject_buf);
-        }
         function addInfo(selectedObject_buf_: Shape) {
             showPrompt("Введите текст:");
             selectedObject_buf_.info = userInput;
@@ -1383,9 +1699,6 @@
         function tableObjectCheck(selectedObject_buf_: Shape) {
             if (selectedObject_buf_) {
                 const table = createVerticalTable(selectedObject_buf_);
-                //if (table && table.parentElement) {
-                //    table.parentElement.removeChild(table);
-                //}
                 if (container) {
                     while (container.firstChild) {
                         container.removeChild(container.firstChild);
@@ -1454,8 +1767,14 @@
             }
 
             if (objects.length === 0) {
-                const savedSchema = localStorage.getItem('savedSchema');
-                objects = processFileContent(savedSchema, objects);
+                try {
+                    const savedSchema = localStorage.getItem('savedSchema');
+                    if (savedSchema) {
+                        objects = processFileContent(savedSchema, objects);
+                    }
+                } catch (error) {
+                    console.error("Ошибка загрузки схемы:", error);
+                }
             }
 
             //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
@@ -1508,6 +1827,7 @@
 
                     const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
                         Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
+                    //const distToLine = pointToSegmentDistance(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
 
                     if (distStart < 5 || distEnd < 5 || distToLine < 10) {
                         for (let i = objects.length - 1; i >= 0; i--) {
@@ -1523,8 +1843,38 @@
                         selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
                         connectionServ == 2;
                         tableObjectCheck(selectedObject_buf);
+                        if (distStart < 10) {
+                            selectedLineStart = true;
+                            selectedObject = line;
+                            selectedObject_buf = line;
+                            startX = mouseX;
+                            startY = mouseY;
+                            logDebug(`Line start point selected`);
+                            break;
+                        } else if (distEnd < 10) {
+                            selectedLineEnd = true;
+                            selectedObject = line;
+                            selectedObject_buf = line;
+                            startX = mouseX;
+                            startY = mouseY;
+                            logDebug(`Line end point selected`);
+                            break;
+                        } else if (distToLine < 10) {
+                            selectedLineMid = true;
+                            selectedObject = line;
+                            selectedObject_buf = line;
+                            startX = mouseX;
+                            startY = mouseY;
+                            logDebug(`Line body selected`);
+                            break;
+                        }
                         break;
                     }
+
+
+                    
+
+                    
 
                 } else if (obj.type === 'star') {
                     const star = obj as Star;
@@ -1647,6 +1997,7 @@
                         logDebug(`Selected line: ${JSON.stringify(line)}`);
                         break;
                     }
+                    
                 } else if (obj.type === 'star') {
                     const star = obj as Star;
                     const points = [];
@@ -1687,8 +2038,15 @@
         function scrollingButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
             hideContextMenu();
             e.preventDefault();
-            startX = e.offsetX;
-            startY = e.offsetY;
+            //startX = e.offsetX;
+            //startY = e.offsetY;
+
+
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+
+
             if (e.button === 1) {
                 isPanning = true;
                 panStartX = e.clientX;
@@ -1777,26 +2135,49 @@
 
         // Функция для отрисовки рамки выделения
         function drawSelectionBox() {/////////////////////////////
+            const rect = canvas.getBoundingClientRect();
             logDebug("drawSelectionBox");
             ctx.setLineDash([5, 3]);  // Делаем линию пунктирной
             ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
             ctx.lineWidth = 2;
             //logDebug(`drawSelectionBox - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
-            let x = Math.min(selectionStartX, selectionEndX);
-            let y = Math.min(selectionStartY, selectionEndY);
+            //let x = Math.min(selectionStartX, selectionEndX);
+            //let y = Math.min(selectionStartY, selectionEndY);
+            //let w = Math.abs(selectionEndX - selectionStartX);
+            //let h = Math.abs(selectionEndY - selectionStartY);
+            //ctx.strokeRect(x, y, w, h);
+            //ctx.setLineDash([]);  // Сбрасываем пунктир
+            //selectionBoxObjects(selectionStartX - offsetX, selectionStartY - offsetY, selectionEndX - offsetX, selectionEndY - offsetY);
+            let x = Math.min(selectionStartX, selectionEndX) - rect.left;
+            let y = Math.min(selectionStartY, selectionEndY) - rect.top;
             let w = Math.abs(selectionEndX - selectionStartX);
             let h = Math.abs(selectionEndY - selectionStartY);
+
             ctx.strokeRect(x, y, w, h);
-            ctx.setLineDash([]);  // Сбрасываем пунктир
-            selectionBoxObjects(selectionStartX - offsetX, selectionStartY - offsetY, selectionEndX - offsetX, selectionEndY - offsetY);
+            ctx.setLineDash([]);
+
+            // Пересчет выделенных объектов
+            selectionBoxObjects(
+                selectionStartX - rect.left,
+                selectionStartY - rect.top,
+                selectionEndX - rect.left,
+                selectionEndY - rect.top
+            );
             //console.log("Выбранные объекты:", selectedObjectMass);
             //console.log("Объекты на холсте:", objects);
             console.log(x, y, w, h);
         }
         function onMouseDown(e: MouseEvent) {
             //logDebug(`(${objects})`);
-            const mouseX = e.clientX - canvas.offsetLeft - offsetX;
-            const mouseY = e.clientY - canvas.offsetTop - offsetY;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left - offsetX;
+            const mouseY = e.clientY - rect.top - offsetY;
+
+            //const mouseX = e.clientX - canvas.offsetLeft - offsetX;
+            //const mouseY = e.clientY - canvas.offsetTop - offsetY;
+
+            console.log(mouseX, mouseY);
+
             const mouse_meaning = e.button;
             if (mouse_meaning === 1) {
                 mouse_meaning_check = 1;
@@ -1806,11 +2187,10 @@
                 leftButtonDown(e, mouseX, mouseY);
             } else if (mouse_meaning == 2 /*&& selectedObject_buf != null*/ && mouse_meaning_check != 1) { // тут селект объект равен нулю
                 rigtButtonDown(e, mouseX, mouseY);
-            } else if (mouse_meaning_check === 1) {/////////////////////////////////////////////////////////////////////////////////
+            } else if (mouse_meaning_check === 1) {
                 scrollingButtonDown(e, mouseX, mouseY);
             }
         }
-
         function isLineEndpointNearConnector(line: Line, connectors: { id: string, x: number, y: number }[], threshold: number = 5) {
             const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number =>
                 Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
@@ -1846,6 +2226,37 @@
                 }
             }
         }
+
+
+        function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            let param = lenSq !== 0 ? dot / lenSq : -1;
+
+            let xx, yy;
+            if (param < 0) {
+                xx = x1;
+                yy = y1;
+            } else if (param > 1) {
+                xx = x2;
+                yy = y2;
+            } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+            }
+
+            const dx = px - xx;
+            const dy = py - yy;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+
+
         function leftButtonMove(selectedObject: Shape, mouseX: number, mouseY: number) {
             //console.log(mouseX, mouseY, startX, startY);
 
@@ -1982,52 +2393,69 @@
                 circle.x_C = mouseX - startX;
                 circle.y_C = mouseY - startY;
             } else if (selectedObject.type === 'line') {
+                //const line = selectedObject as Line;
+                //const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
+                //const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
+
+                //// Расчет расстояния от точки до линии
+                //const distToLine = pointToSegmentDistance(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
+                //const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                //    Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
+                //const dx = mouseX - startX;
+                //const dy = mouseY - startY;
+                //startX = mouseX;
+                //startY = mouseY;
+
+                //if (distStart < 10 && !selectedLineStart) {
+                //    selectedLineStart = true;
+                //    line.startX += dx;
+                //    line.startY += dy;
+                //    isLineEndpointNearConnector(line, allConnectors);
+                //    logDebug(`Line selected start`);
+                //} else if (distEnd < 10 && !selectedLineEnd) {
+                //    selectedLineEnd = true;
+                //    line.endX += dx;
+                //    line.endY += dy;
+                //    isLineEndpointNearConnector(line, allConnectors);
+                //    logDebug(`Line selected end`);
+                //} else if (distToLine < 10) {
+                //    line.startX += dx;
+                //    line.startY += dy;
+                //    line.endX += dx;
+                //    line.endY += dy;
+                //    logDebug(`Line selected body`);
+                //}
+                //line.x_C = (line.startX + line.endX) / 2,
+                //line.y_C = (line.startY + line.endY) / 2,
+                //drawObjects();
+                //2 вариант
                 const line = selectedObject as Line;
-                const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
-                const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
+                const dx = mouseX - startX;
+                const dy = mouseY - startY;
 
-                // Расчет расстояния от точки до линии
-                const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
-                    Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
-
-                if (distStart < 10) {
-                    const dx = mouseX - startX;
-                    const dy = mouseY - startY;
+                if (selectedLineStart) {
                     line.startX += dx;
                     line.startY += dy;
-                    startX = mouseX;
-                    startY = mouseY;
-                    line.x_C = (line.startX + line.endX) / 2,
-                    line.y_C = (line.startY + line.endY) / 2,
                     isLineEndpointNearConnector(line, allConnectors);
-                    drawObjects();
-                    logDebug(`Line selected start`);
-                } else if (distEnd < 10) {
-                    const dx = mouseX - startX;
-                    const dy = mouseY - startY;
+                } else if (selectedLineEnd) {
                     line.endX += dx;
                     line.endY += dy;
-                    startX = mouseX;
-                    startY = mouseY;
-                    line.x_C = (line.startX + line.endX) / 2,
-                    line.y_C = (line.startY + line.endY) / 2,
                     isLineEndpointNearConnector(line, allConnectors);
-                    drawObjects();
-                    logDebug(`Line selected end`);
-                } else if (distToLine < 10) {
-                    const dx = mouseX - startX;
-                    const dy = mouseY - startY;
+                } else if (selectedLineMid) {
                     line.startX += dx;
                     line.startY += dy;
                     line.endX += dx;
                     line.endY += dy;
-                    startX = mouseX;
-                    startY = mouseY;
-                    line.x_C = (line.startX + line.endX) / 2,
-                    line.y_C = (line.startY + line.endY) / 2,
-                    drawObjects();
-                    logDebug(`Line selected body`);
                 }
+
+                startX = mouseX;
+                startY = mouseY;
+
+                // Обновление центра линии
+                line.x_C = (line.startX + line.endX) / 2;
+                line.y_C = (line.startY + line.endY) / 2;
+
+                drawObjects();
             } else if (selectedObject.type === 'star') {
                 const star = selectedObject as Star;
 
@@ -2096,8 +2524,13 @@
             }
         }
         function onMouseMove(e: MouseEvent) {
-            const mouseX = e.clientX - canvas.offsetLeft - offsetX;
-            const mouseY = e.clientY - canvas.offsetTop - offsetY;
+            //const mouseX = e.clientX - canvas.offsetLeft - offsetX;
+            //const mouseY = e.clientY - canvas.offsetTop - offsetY;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left - offsetX;
+            const mouseY = e.clientY - rect.top - offsetY;
+
+
             const mouse_meaning = e.button;
             //logDebug(`Mouse move at (${mouseX}, ${mouseY}, ${mouse_meaning})`);
 
@@ -2118,8 +2551,9 @@
                 //logDebug(`GGWP2`);
             }
         }
-        function onMouseUp(e) {
+        function onMouseUp(e: MouseEvent) {
             let mouse_meaning = e.button;
+
 
             if (isSelecting) {
                 isSelecting = false;
@@ -2128,6 +2562,10 @@
                 selectionEndX = 0;
                 selectionEndY = 0;
             }
+
+            selectedLineStart = false;
+            selectedLineEnd = false;
+            selectedLineMid = false;
 
             if (selectedObject && (mouse_meaning == 0) && mouse_meaning_check != 1) {
                 //logDebug(`Mouse up, deselecting object: ${JSON.stringify(selectedObject)}`);
@@ -2190,7 +2628,6 @@
                 .then(response => response.json())
                 .then(data => {
                     logDebug(`File uploaded successfully: ${JSON.stringify(data)}`);
-                    // Optionally, you can apply the CSS dynamically if needed
                     applyCssFile(data.filePath);
                 })
                 .catch(error => {
@@ -2386,17 +2823,155 @@
             downloadFile('shapes.owl', owlContent);
         });
 
+        //function createVerticalTable(object: Shape): HTMLTableElement {
+        //    const table = document.createElement('table');
+        //    table.style.border = '1px solid black';
+        //    table.style.borderCollapse = 'collapse';
+        //    table.style.width = '400px'; // Фиксированная ширина таблицы
+        //    table.style.tableLayout = 'fixed';
+
+        //    for (const key in object) {
+        //        if (object.hasOwnProperty(key)) {
+        //            // Пропускаем ненужные свойства
+        //            if (key === "imageSrc" || (object as any)[key] === "" || key === "connectors" || key === "borderPoints_X1" || key === "borderPoints_Y1" || key === "borderPoints_X2" || key === "borderPoints_Y2" || key === "lineConnectionStart" || key === "lineConnectionEnd") {
+        //                continue;
+        //            }
+
+        //            const row = table.insertRow();
+
+        //            // Ячейка с названием свойства
+        //            const cellKey = row.insertCell();
+        //            cellKey.style.border = '1px solid black';
+        //            cellKey.style.padding = '5px';
+        //            cellKey.style.width = '30%';
+        //            cellKey.innerText = key;
+
+        //            // Ячейка со значением свойства
+        //            const cellValue = row.insertCell();
+        //            cellValue.style.border = '1px solid black';
+        //            cellValue.style.padding = '5px';
+        //            cellValue.style.width = '45%';
+
+        //            const valueElement = document.createElement('span');
+        //            valueElement.innerText = (object as any)[key];
+        //            cellValue.appendChild(valueElement);
+
+        //            // Если свойство число или цвет, добавляем кнопку "Изменить"
+        //            if (typeof ((object as any)[key]) === "number" || key === "color" || key === "arrowDirection" || key === "punctuation") {
+        //                const cellEdit = row.insertCell();
+        //                cellEdit.style.border = '1px solid black';
+        //                cellEdit.style.padding = '5px';
+        //                cellEdit.style.width = '25%';
+
+        //                const editButton = document.createElement('button');
+        //                editButton.innerText = 'Изменить';
+        //                editButton.style.margin = '0 auto';
+
+        //                let inEditMode = false;
+        //                let input: HTMLInputElement | HTMLSelectElement | null = null;
+
+        //                editButton.addEventListener('click', () => {
+        //                    if (!inEditMode) {
+        //                        // Переход в режим редактирования
+        //                        inEditMode = true;
+        //                        editButton.innerText = 'Сохранить';
+
+        //                        cellValue.innerHTML = '';
+
+        //                        if (key === "color") {
+        //                            input = document.createElement('input');
+        //                            input.type = 'color';
+        //                            input.value = (object as any)[key];
+        //                        } else if (key === "arrowDirection") {
+        //                            // Создаем выпадающий список для направления стрелки
+        //                            input = document.createElement('select');
+        //                            const options = ["start", "end", "both", "none"];
+        //                            options.forEach(option => {
+        //                                const opt = document.createElement('option');
+        //                                opt.value = option;
+        //                                opt.textContent = option;
+        //                                if ((object as any)[key] === option) {
+        //                                    opt.selected = true;
+        //                                }
+        //                                input.appendChild(opt);
+        //                            });
+        //                        } else if (key === "punctuation") {
+        //                            // Создаем выпадающий список для направления стрелки
+        //                            input = document.createElement('select');
+        //                            const options = ["yes", "none"];
+        //                            options.forEach(option => {
+        //                                const opt = document.createElement('option');
+        //                                opt.value = option;
+        //                                opt.textContent = option;
+        //                                if ((object as any)[key] === option) {
+        //                                    opt.selected = true;
+        //                                }
+        //                                input.appendChild(opt);
+        //                            });
+        //                        } else {
+        //                            input = document.createElement('input');
+        //                            input.type = 'text';
+        //                            input.value = valueElement.innerText;
+        //                        }
+        //                        cellValue.appendChild(input);
+        //                    } else {
+        //                        // Сохранение изменений
+        //                        if (input) {
+        //                            const newValue = input.value.trim();
+
+        //                            if (typeof (object as any)[key] === 'number') {
+        //                                const parsedValue = parseFloat(newValue);
+        //                                if (isNaN(parsedValue)) {
+        //                                    alert("Некорректное числовое значение.");
+        //                                    return;
+        //                                }
+        //                                (object as any)[key] = parsedValue;
+        //                                valueElement.innerText = parsedValue.toString();
+        //                            } else {
+        //                                (object as any)[key] = newValue;
+        //                                valueElement.innerText = newValue;
+        //                            }
+
+        //                            cellValue.innerHTML = '';
+        //                            cellValue.appendChild(valueElement);
+
+        //                            editButton.innerText = 'Изменить';
+        //                            inEditMode = false;
+
+        //                            drawObjects(); // Перерисовываем объекты после изменения
+        //                        }
+        //                    }
+        //                });
+
+        //                cellEdit.appendChild(editButton);
+        //            }
+        //        }
+        //    }
+
+        //    drawObjects(); // Перерисовка объектов после создания таблицы
+        //    return table;
+        //}
+
         function createVerticalTable(object: Shape): HTMLTableElement {
             const table = document.createElement('table');
             table.style.border = '1px solid black';
             table.style.borderCollapse = 'collapse';
-            table.style.width = '400px'; // Фиксированная ширина таблицы
+            table.style.width = '340px';
             table.style.tableLayout = 'fixed';
 
             for (const key in object) {
                 if (object.hasOwnProperty(key)) {
-                    // Пропускаем ненужные свойства
-                    if (key === "imageSrc" || (object as any)[key] === "" || key === "connectors" || key === "borderPoints_X1" || key === "borderPoints_Y1" || key === "borderPoints_X2" || key === "borderPoints_Y2") {
+                    if (
+                        key === "imageSrc" ||
+                        (object as any)[key] === "" ||
+                        key === "connectors" ||
+                        key === "borderPoints_X1" ||
+                        key === "borderPoints_Y1" ||
+                        key === "borderPoints_X2" ||
+                        key === "borderPoints_Y2" ||
+                        key === "lineConnectionStart" ||
+                        key === "lineConnectionEnd"
+                    ) {
                         continue;
                     }
 
@@ -2406,80 +2981,74 @@
                     const cellKey = row.insertCell();
                     cellKey.style.border = '1px solid black';
                     cellKey.style.padding = '5px';
-                    cellKey.style.width = '30%';
+                    cellKey.style.width = '40%';
                     cellKey.innerText = key;
 
                     // Ячейка со значением свойства
                     const cellValue = row.insertCell();
                     cellValue.style.border = '1px solid black';
                     cellValue.style.padding = '5px';
-                    cellValue.style.width = '45%';
+                    cellValue.style.width = '60%';
 
                     const valueElement = document.createElement('span');
                     valueElement.innerText = (object as any)[key];
                     cellValue.appendChild(valueElement);
 
-                    // Если свойство число или цвет, добавляем кнопку "Изменить"
-                    if (typeof ((object as any)[key]) === "number" || key === "color" || key === "arrowDirection" || key === "punctuation") {
-                        const cellEdit = row.insertCell();
-                        cellEdit.style.border = '1px solid black';
-                        cellEdit.style.padding = '5px';
-                        cellEdit.style.width = '25%';
+                    // Если свойство подлежит редактированию (число, цвет, arrowDirection или punctuation)
+                    if (
+                        typeof ((object as any)[key]) === "number" ||
+                        key === "color" ||
+                        key === "arrowDirection" ||
+                        key === "punctuation"
+                    ) {
+                        cellValue.style.cursor = "pointer";
 
-                        const editButton = document.createElement('button');
-                        editButton.innerText = 'Изменить';
-                        editButton.style.margin = '0 auto';
+                        cellValue.addEventListener('click', () => {
+                            if (cellValue.querySelector('input, select')) return;
 
-                        let inEditMode = false;
-                        let input: HTMLInputElement | HTMLSelectElement | null = null;
+                            // Очистим содержимое ячейки
+                            cellValue.innerHTML = '';
 
-                        editButton.addEventListener('click', () => {
-                            if (!inEditMode) {
-                                // Переход в режим редактирования
-                                inEditMode = true;
-                                editButton.innerText = 'Сохранить';
+                            let input: HTMLInputElement | HTMLSelectElement;
 
-                                cellValue.innerHTML = '';
-
-                                if (key === "color") {
-                                    input = document.createElement('input');
-                                    input.type = 'color';
-                                    input.value = (object as any)[key];
-                                } else if (key === "arrowDirection") {
-                                    // Создаем выпадающий список для направления стрелки
-                                    input = document.createElement('select');
-                                    const options = ["start", "end", "both", "none"];
-                                    options.forEach(option => {
-                                        const opt = document.createElement('option');
-                                        opt.value = option;
-                                        opt.textContent = option;
-                                        if ((object as any)[key] === option) {
-                                            opt.selected = true;
-                                        }
-                                        input.appendChild(opt);
-                                    });
-                                } else if (key === "punctuation") {
-                                    // Создаем выпадающий список для направления стрелки
-                                    input = document.createElement('select');
-                                    const options = ["yes", "none"];
-                                    options.forEach(option => {
-                                        const opt = document.createElement('option');
-                                        opt.value = option;
-                                        opt.textContent = option;
-                                        if ((object as any)[key] === option) {
-                                            opt.selected = true;
-                                        }
-                                        input.appendChild(opt);
-                                    });
-                                } else {
-                                    input = document.createElement('input');
-                                    input.type = 'text';
-                                    input.value = valueElement.innerText;
-                                }
-                                cellValue.appendChild(input);
+                            if (key === "color") {
+                                input = document.createElement('input');
+                                input.type = 'color';
+                                input.value = (object as any)[key];
+                            } else if (key === "arrowDirection") {
+                                input = document.createElement('select');
+                                const options = ["start", "end", "both", "none"];
+                                options.forEach(option => {
+                                    const opt = document.createElement('option');
+                                    opt.value = option;
+                                    opt.textContent = option;
+                                    if ((object as any)[key] === option) {
+                                        opt.selected = true;
+                                    }
+                                    input.appendChild(opt);
+                                });
+                            } else if (key === "punctuation") {
+                                input = document.createElement('select');
+                                const options = ["yes", "none"];
+                                options.forEach(option => {
+                                    const opt = document.createElement('option');
+                                    opt.value = option;
+                                    opt.textContent = option;
+                                    if ((object as any)[key] === option) {
+                                        opt.selected = true;
+                                    }
+                                    input.appendChild(opt);
+                                });
                             } else {
-                                // Сохранение изменений
-                                if (input) {
+                                input = document.createElement('input');
+                                input.type = 'text';
+                                input.value = valueElement.innerText;
+                            }
+
+                            input.focus();
+
+                            input.addEventListener('keydown', (e: KeyboardEvent) => {
+                                if (e.key === 'Enter') {
                                     const newValue = input.value.trim();
 
                                     if (typeof (object as any)[key] === 'number') {
@@ -2497,16 +3066,17 @@
 
                                     cellValue.innerHTML = '';
                                     cellValue.appendChild(valueElement);
-
-                                    editButton.innerText = 'Изменить';
-                                    inEditMode = false;
-
-                                    drawObjects(); // Перерисовываем объекты после изменения
+                                    drawObjects();
                                 }
-                            }
-                        });
+                            });
 
-                        cellEdit.appendChild(editButton);
+                            input.addEventListener('blur', () => {
+                                cellValue.innerHTML = '';
+                                cellValue.appendChild(valueElement);
+                            });
+
+                            cellValue.appendChild(input);
+                        });
                     }
                 }
             }
@@ -2752,9 +3322,14 @@
             }
         }
 
+
+        
+
+
+
+
     } else {
         console.error("Canvas context is not supported");
         logDebug("Canvas context is not supported");
     }
 })();
-

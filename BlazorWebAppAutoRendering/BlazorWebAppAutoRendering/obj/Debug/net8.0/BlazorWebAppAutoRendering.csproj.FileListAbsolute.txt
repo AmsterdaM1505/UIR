@@ -27,6 +27,7 @@ C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\B
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.AspNetCore.Components.WebAssembly.Server.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.AspNetCore.Metadata.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Localization.dll
 C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\bin\Debug\net8.0\Microsoft.Extensions.Localization.Abstractions.dll

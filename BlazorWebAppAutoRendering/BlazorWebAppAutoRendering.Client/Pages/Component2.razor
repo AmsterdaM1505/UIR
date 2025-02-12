@@ -7,29 +7,112 @@
 @using System;
 @using System.Text;
 @inject IDialogService DialogService
+@inherits LayoutComponentBase
 
 <PageTitle>pageee</PageTitle>
 <style>
-    .custom-border {
-        flex: 1 !important;
-        display: flex;
-        border: 1px solid black;
-        border-radius: 4px;
+
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
     }
 
+    .pl-4, .px-4 {
+        padding-left: 0px !important
+    }
+
+    #container {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+    }
+
+    /* Canvas занимает всю доступную область */
+    #canvas {
+        flex-grow: 1;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px solid grey;
+        z-index: 1;
+    }
+
+    /* Контейнер страницы. Абсолютные дочерние элементы будут позиционироваться относительно него */
+    /* #container {
+        position: relative;
+        width: 90vw;
+        height: 85vh;
+    }
+
+    
+    #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        border: 1px solid grey;
+    } */
+
+    /* Левая панель с кнопками для добавления фигур */
+    .left-div-style {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        background: rgba(200,200,200,0.8);
+        z-index: 2;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    /* Правая панель — таблица характеристик выбранных фигур */
+    #table-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 360px;
+        height: 100%;
+        background: rgba(200,200,200,0.8);
+        z-index: 2;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    /* Нижняя панель — отладочная информация */
+    #debug-panel {
+        position: absolute;
+        left: 200px; /* отступ слева, чтобы не перекрывать левую панель */
+        right: 250px; /* отступ справа, чтобы не перекрывать правую панель */
+        /* bottom: 10%; */
+        bottom: 0;
+        height: 20vh; /* задаём высоту отладочной панели */
+        background: rgba(200,200,200,0.8);
+        z-index: 2;
+        padding: 10px;
+    }
+
+    /* Контекстное меню (оставляем без изменений) */
     .context-menu {
         position: absolute;
-        background-color: #333; /* Темный фон */
-        color: #fff; /* Белый текст */
-        border: 1px solid #555; /* Темная граница */
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #555;
         border-radius: 4px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        font-size: 14px; /* Размер шрифта */
-        z-index: 1000; /* Размещаем поверх других элементов */
-        display: none; /* Скрыто по умолчанию */
+        font-size: 14px;
+        z-index: 1000;
+        display: none;
     }
 
-    /* Стиль для каждого элемента контекстного меню */
     .context-menu-item {
         display: block;
         padding: 10px 20px;
@@ -37,117 +120,516 @@
         text-align: center;
     }
 
-    /* Изменяем фон и текст при наведении */
     .context-menu-item:hover {
         background-color: #555;
     }
 
-    /* Стили для кнопок */
-    .context-menu-item.MudButton {
-        margin: 0;
-        border: none;
-        color: #fff;
-        background-color: #444;
+    .custom-file-upload {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
     }
 
-    .context-menu-item.MudButton:hover {
-        background-color: #666;
+    .custom-button {
+        width: 100%;
+        height: 60px;
     }
 
-    .button-style {
-        width: 80px;
-        height: 40px;
-        font-size: 12px;
+    .custom-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
     }
 
-    .div-style1 {
-        flex: 1;
-        flex-direction: column;
-        height: 600px;
-        overflow-y: auto;
-        align-items: center;
-        width: 80px;
-        border: 1px solid grey;
-        padding: 15px;
-        margin-right: 10px;
-        resize: both;
-        overflow: auto;
+    #resize-handle-left, #resize-handle-right {
+        position: absolute;
+        width: 2px;
+        height: 100%;
+        background: #555;
+        cursor: ew-resize;
+        z-index: 2;
     }
 
-    .div-style2 {
-        flex: 1;
-        flex-direction: column;
-        height: 600px;
-        overflow-y: auto;
-        align-items: center;
-        width: 80px;
-        border: 1px solid grey;
-        padding: 15px;
-        margin-right: 10px;
+    #resize-handle-left {
+        left: 200px; /* Должно совпадать с шириной левого блока */
     }
+
+    #resize-handle-right {
+        right: 360px; /* Должно совпадать с шириной правого блока */
+    }
+
 
 </style>
 
-<div style="display: flex;">
-    <div style="flex: 1; flex-direction: column; height: 600px; overflow-y: auto; align-items: center; width: 80px; border: 1px solid grey; padding: 15px; margin-right:10px; resize: both; overflow: auto;">
-        <MudButton id="addRectBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">Добавить прямоугольник</MudButton><br>
-        <MudButton id="addCircleBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Secondary">Добавить круг</MudButton><br>
-        <MudButton id="addLineBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Добавить линию</MudButton><br>
-        <MudButton id="addStarBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Добавить звезду</MudButton><br>
-        <MudButton id="addCloudBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Добавить облако</MudButton><br>
-        <MudButton id="delShapeBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Error">Удалить фигуру</MudButton><br>
-        <MudButton id="rotateLeftBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Повернуть влево</MudButton><br>
-        <MudButton id="rotateRightBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Error">Повернуть вправо</MudButton><br>
-        <MudButton id="connect_objects" Variant="Variant.Filled" Style="width: 50%; height: 60px;" Color="Color.Info">Неориентированная связь</MudButton>
-        <MudButton id="remove_connection" Variant="Variant.Filled" Style="width: 49%; height: 60px;" Color="Color.Info">Удалить неор. соединение</MudButton><br>
-        <MudButton id="outgoing_connect" Variant="Variant.Filled" Style="width: 50%; height: 60px;" Color="Color.Info">Ориентированная связь</MudButton>
-        <MudButton id="remove_outgoing_connection" Variant="Variant.Filled" Style="width: 49%; height: 60px;" Color="Color.Info">Удалить ор. соединение</MudButton><br>
-        <MudButton OnClick="ShowDialog" id="additionInfo" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Добавить описание</MudButton><br>
-        <MudButton id="cycleCheck" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Проверить на циклы</MudButton><br>
-        <MudButton id="longWayCheck" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Info">Найти кратчайший путь</MudButton><br>
+<div id="container">
+    <!-- Первый слой: canvas -->
+    @* <canvas id="canvas" width="698" height="598"></canvas> *@
+    <canvas id="canvas" position: "absolute";></canvas>
+    <!-- Второй слой: левая панель с элементами управления -->
+
+    <div id="button-panel" class="left-div-style">
+        <MudButton id="addComplex" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Добавить сложную фигуру
+        </MudButton>
+        <br>
+        @* <MudExpansionPanels>
+            <MudExpansionPanel Text="Фигуры">
+                <MudButton id="addRectBtn" title="Добавить прямоугольник" Class="button" data-action="addRectBtn" StartIcon="@Icons.Material.Filled.Square" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Добавить прямоугольник
+                </MudButton>
+                <br>
+                <MudButton id="addCircleBtn" Class="button" data-action="addCircleBtn" StartIcon="@Icons.Material.Filled.Circle" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Добавить круг
+                </MudButton>
+                <br>
+                <MudButton id="addLineBtn" Class="button" data-action="addLineBtn" StartIcon="@Icons.Material.Filled.LinearScale" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Добавить линию
+                </MudButton>
+                <br>
+                <MudButton id="addStarBtn" Class="button" data-action="addStarBtn" StartIcon="@Icons.Material.Filled.Star" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Добавить звезду
+                </MudButton>
+                <br>
+                <MudButton id="addCloudBtn" Class="button" data-action="addCloudBtn" StartIcon="@Icons.Material.Filled.Cloud" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Добавить облако
+                </MudButton>
+                <br>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Управление">
+                <MudButton OnClick="ShowDialog" id="additionInfo" Class="button" data-action="additionInfo" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Добавить описание
+                </MudButton>
+                <br>
+                <MudButton id="delShapeBtn" Class="button" data-action="delShapeBtn" StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Удалить фигуру
+                </MudButton>
+                <br>
+                <MudButton id="rotateLeftBtn" Class="button" data-action="rotateLeftBtn" StartIcon="@Icons.Material.Filled.RotateLeft" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Повернуть влево
+                </MudButton>
+                <br>
+                <MudButton id="rotateRightBtn" Class="button" data-action="rotateRightBtn" StartIcon="@Icons.Material.Filled.RotateRight" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Повернуть вправо
+                </MudButton>
+                <br>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Построение связей">
+                <MudButton id="connect_objects" Class="button" data-action="connect_objects" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Неориентированная связь
+                </MudButton>
+                <MudButton id="remove_connection" Class="button" data-action="remove_connection" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Удалить неор. соединение
+                </MudButton>
+                <br>
+                <MudButton id="outgoing_connect" Class="button" data-action="outgoing_connect" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Ориентированная связь
+                </MudButton>
+                <MudButton id="remove_outgoing_connection" Class="button" data-action="remove_outgoing_connection" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Удалить ор. соединение
+                </MudButton>
+                <br>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Анализ схемы">
+                <MudButton id="cycleCheck" Class="button" data-action="cycleCheck" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Проверить на циклы
+                </MudButton>
+                <br>
+                <MudButton id="longWayCheck" Class="button" data-action="longWayCheck" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                    Найти кратчайший путь
+                </MudButton>
+                <br>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Управление файлами">
+                <MudButton id="downloadBtn3" Class="button" data-action="downloadBtn3" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Error">
+                    OWL скачивание
+                </MudButton>
+                <br>
+                <label for="fileInput3" class="custom-file-upload">
+                    Загрузить диаграмму в виде OWL
+                </label>
+                <input type="file" id="fileInput3" name="fileInput3" style="width: 100%; margin-bottom: 10px;">
+                <br>
+                <MudButton id="downloadBtn" Class="button" data-action="downloadBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Error">
+                    Скачать диаграмму
+                </MudButton>
+                <br>
+                <label for="fileInput" class="custom-file-upload">
+                    Загрузить диаграмму в обычном виде
+                </label>
+                <input type="file" id="fileInput" name="fileInput" style="width: 100%; margin-bottom: 10px;">
+                <br>
+                <MudButton id="uploadCssBtn2" Class="button" data-action="uploadCssBtn2" Variant="Variant.Filled" Color="Color.Primary" Style="width: 100%; height: 60px;">
+                    Загрузить еще CSS(лх)
+                </MudButton>
+                <br>
+                <label for="cssFileInput2" class="custom-file-upload">
+                    Загрузить файл css с (ЛХ)
+                </label>
+                <input type="file" id="cssFileInput2" accept=".css" style="width: 100%; margin-bottom: 10px;">
+                <br>
+                <MudButton id="uploadCssBtn" Class="button" data-action="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 100%; height: 60px;">
+                    Загрузить CSS
+                </MudButton>
+                <br>
+                <label for="cssFileInput2" class="custom-file-upload">
+                    Загрузить файл css
+                </label>
+                <input type="file" id="cssFileInput" accept=".css" style="width: 100%;">
+                <br>
+            </MudExpansionPanel>
+        </MudExpansionPanels> *@
         
+        <MudExpansionPanels>
+            <MudExpansionPanel Text="Фигуры">
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="addRectBtn" Class="_button" data-action="addRectBtn" StartIcon="@Icons.Material.Filled.Square" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                            <MudText Typo="Typo.body2">Добавить прямоугольник</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Добавить прямоугольник</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы добавить прямоугольник</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Square" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="addCircleBtn" Class="_button" data-action="addCircleBtn" StartIcon="@Icons.Material.Filled.Circle" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                            <MudText Typo="Typo.body2">Добавить круг</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Добавить круг</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы добавить круг</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Circle" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="addLineBtn" Class="_button" data-action="addLineBtn" StartIcon="@Icons.Material.Filled.LinearScale" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Добавить линию</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Добавить линию</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы добавить линию</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.LinearScale" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="addStarBtn" Class="_button" data-action="addStarBtn" StartIcon="@Icons.Material.Filled.Star" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Добавить звезду</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Добавить звезду</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы добавить звезду</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Star" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="addCloudBtn" Class="_button" data-action="addCloudBtn" StartIcon="@Icons.Material.Filled.Cloud" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Добавить облако</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Добавить облако</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы добавить облако</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Cloud" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+            </MudExpansionPanel>
 
-        @* Пробую загрузить диаграмму в виде OWL *@
-        <MudButton id="downloadBtn3" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Error">OWL скачивание</MudButton><br>
-        <label for="fileInput3" class="custom-file-upload" style="display: block; width: 100%; margin-bottom: 10px;">
-            Загрузить диаграмму в виде OWL
-        </label>
-        <input type="file" id="fileInput3" name="fileInput3" style="width: 100%; margin-bottom: 10px;"><br>
+            <MudExpansionPanel Text="Управление">
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton OnClick="ShowDialog" id="additionInfo" Class="_button" data-action="additionInfo" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Добавить описание</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Добавить описание</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы добавить описание</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Edit" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="delShapeBtn" Class="_button" data-action="delShapeBtn" StartIcon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Удалить фигуру</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Удалить фигуру</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы удалить выбранную фигуру</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="rotateLeftBtn" Class="_button" data-action="rotateLeftBtn" StartIcon="@Icons.Material.Filled.RotateLeft" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Повернуть влево</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Повернуть влево</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы повернуть выбранную фигуру влево</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.RotateLeft" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="rotateRightBtn" Class="_button" data-action="rotateRightBtn" StartIcon="@Icons.Material.Filled.RotateRight" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Повернуть вправо</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Повернуть вправо</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы повернуть выбранную фигуру вправо</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.RotateRight" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+            </MudExpansionPanel>
 
-        @* Загрузка диаграммы в обычном виде *@
-        <MudButton id="downloadBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Error">Скачать диаграмму</MudButton><br>
-        <label for="fileInput" class="custom-file-upload" style="display: block; width: 100%; margin-bottom: 10px;">
-            Загрузить диаграмму в обычном виде
-        </label>
-        <input type="file" id="fileInput" name="fileInput" style="width: 100%; margin-bottom: 10px;"><br>
+            <MudExpansionPanel Text="Построение связей">
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="connect_objects" Class="_button" data-action="connect_objects" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Неориентированная связь</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Неориентированная связь</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы создать связь между фигурами</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Link" />
+                    </TooltipContent>
+                </MudTooltip>
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="remove_connection" Class="_button" data-action="remove_connection" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Удалить неор. соединение</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Удалить связь</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы удалить неориентированное соединение</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.LinkOff" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="outgoing_connect" Class="_button" data-action="outgoing_connect" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Ориентированная связь</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Ориентированная связь</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы создать ориентированную связь</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.CallMade" />
+                    </TooltipContent>
+                </MudTooltip>
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="remove_outgoing_connection" Class="_button" data-action="remove_outgoing_connection" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Удалить ор. соединение</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Удалить связь</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы удалить ориентированное соединение</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.CallReceived" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+            </MudExpansionPanel>
 
-        @* Пробую загрузить css через локальное хранилище *@
-        <MudButton id="uploadCssBtn2" Variant="Variant.Filled" Color="Color.Primary" Style="width: 100%; height: 60px;">Загрузить еще CSS(лх)</MudButton><br>
-        <label for="cssFileInput2" class="custom-file-upload" style="display: block; width: 100%; margin-bottom: 10px;">
-            Загрузить файл css с (ЛХ)
-        </label>
-        <input type="file" id="cssFileInput2" accept=".css" style="width: 100%; margin-bottom: 10px;"><br>
+            <MudExpansionPanel Text="Анализ схемы">
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="cycleCheck" Class="_button" data-action="cycleCheck" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Проверить на циклы</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Проверить на циклы</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы проверить схему на циклические связи</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Cyclone" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="longWayCheck" Class="_button" data-action="longWayCheck" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Найти кратчайший путь</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Найти кратчайший путь</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы найти кратчайший путь между фигурами</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Timeline" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+            </MudExpansionPanel>
 
-        @* Пробую загрузить css через сервер *@
-        <MudButton id="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 100%; height: 60px;">Загрузить CSS</MudButton><br>
-        <label for="cssFileInput2" class="custom-file-upload" style="display: block; width: 100%; margin-bottom: 10px;">
-            Загрузить файл css
-        </label>
-        <input type="file" id="cssFileInput" accept=".css" style="width: 100%;"><br>
+            <MudExpansionPanel Text="Управление файлами">
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="downloadBtn3" Class="_button" data-action="downloadBtn3" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
+                            <MudText Typo="Typo.body2">OWL скачивание</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">OWL скачивание</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы скачать диаграмму в формате OWL</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Download" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <label for="fileInput3" class="custom-file-upload">
+                            Загрузить диаграмму в виде OWL
+                        </label>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить OWL</MudText>
+                        <MudText Typo="Typo.body2">Выберите файл для загрузки диаграммы в формате OWL</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="downloadBtn" Class="_button" data-action="downloadBtn" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
+                            <MudText Typo="Typo.body2">Скачать диаграмму</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Скачать диаграмму</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы скачать диаграмму</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Download" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <label for="fileInput" class="custom-file-upload">
+                            Загрузить диаграмму в обычном виде
+                        </label>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить диаграмму</MudText>
+                        <MudText Typo="Typo.body2">Выберите файл для загрузки диаграммы</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="uploadCssBtn2" Class="_button" data-action="uploadCssBtn2" Variant="Variant.Filled" Color="Color.Primary" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Загрузить CSS (лх)</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить CSS (лх)</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы загрузить дополнительный CSS</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <label for="cssFileInput2" class="custom-file-upload">
+                            Загрузить файл css с (ЛХ)
+                        </label>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить CSS (ЛХ)</MudText>
+                        <MudText Typo="Typo.body2">Выберите файл для загрузки дополнительного CSS</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="uploadCssBtn" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Загрузить CSS</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить CSS</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы загрузить CSS</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <label for="cssFileInput" class="custom-file-upload">
+                            Загрузить файл css
+                        </label>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
+                        <MudText Typo="Typo.body2">Выберите файл CSS для загрузки</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+            </MudExpansionPanel>
+        </MudExpansionPanels>
     </div>
-    <div style="display: flex; flex: 2; flex-direction: row;">
-        <canvas id="canvas" width="698" height="598" style="border:1px solid grey"></canvas>
-        <div id="contextMenu" class="context-menu" hidden>
-            <MudButton id="deleteItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Primary">Удалить</MudButton>
-            <MudButton id="rotateLeftItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Secondary">Поверн. влево</MudButton>
-            <MudButton id="rotateRightItem" class="context-menu-item" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Info">Поверн. вправо</MudButton>
-            <MudButton id="connect_objects" class="context-menu-item" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Info">Соед. фигуры</MudButton>
-            <MudButton id="insert_img" class="context-menu-item" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Info">Вставить изображение</MudButton>
-            <input type="file" id="imageInput" style="display: none;">
-        </div>
-        <div style="margin-left:1px" id="table-container"></div>
+    <div id="resize-handle-left"></div>
+    <!-- Контекстное меню (оставляем без изменений) -->
+    <div id="contextMenu" class="context-menu" hidden>
+        <MudButton id="deleteItem" class="context-menu-item" data-action="deleteItem" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Primary">
+            Удалить
+        </MudButton>
+        <MudButton id="rotateLeftItem" class="context-menu-item" data-action="rotateLeftItem" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Secondary">
+            Поверн. влево
+        </MudButton>
+        <MudButton id="rotateRightItem" class="context-menu-item" data-action="rotateRightItem" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Info">
+            Поверн. вправо
+        </MudButton>
+        <MudButton id="connect_objects" class="context-menu-item" data-action="connect_objects" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Info">
+            Соед. фигуры
+        </MudButton>
+        <MudButton id="insert_img" class="context-menu-item" data-action="insert_img" Variant="Variant.Filled" Style="width: 200px; height: 35px;" Color="Color.Info">
+            Вставить изображение
+        </MudButton>
+        <input type="file" id="imageInput" style="display: none;">
     </div>
-    
+
+    <!-- Правая панель: таблица характеристик с кнопкой для скрытия/показа -->
+    <div id="table-container">
+        <h4>Характеристики</h4>
+        <table style="width:100%;">
+            <tr>
+                <td>Фигура:</td>
+                <td>Не выбрана</td>
+            </tr>
+        </table>
+    </div>
+    <div id="resize-handle-right"></div>
+    <!-- Нижняя панель: отладочная информация -->
+    <div id="debug-panel">
+        <h3 id="debugInfo" style="cursor: pointer">Debug Information</h3>
+        <textarea id="debugOutput" rows="10" cols="150" style="width:100%;" readonly></textarea>
+    </div>
 </div>
 
 @code {
@@ -157,70 +639,16 @@
         {
             // Вызов функции showPrompt из TypeScript
             var userInput_ = await JS.InvokeAsync<string>("addInfoclick", "Введите текст:");
-
-            // Обработка пользовательского ввода
             Console.WriteLine($"User input: {userInput_}");
         }
         catch (Exception ex)
         {
-            // Обработка случая, когда пользователь отменил диалог
             Console.WriteLine("Prompt was cancelled or an error occurred: " + ex.Message);
         }
     }
 }
 
-<h3>Debug Information</h3>
-<textarea id="debugOutput" rows="10" cols="150" class="custom-border" readonly></textarea>
-
-@* <h3>Cookies Management</h3>
-
-<div>
-    <label>Cookie Name: </label><br>
-    <input @bind="cookieName" class="custom-border" />
-</div>
-<div>
-    <label>Cookie Value: </label><br>
-    <input @bind="cookieValue" class="custom-border" />
-</div>
-<div>
-    <label>Days (optional): </label><br>
-    <input type="number" @bind="days" class="custom-border" />
-</div>
-<div>
-    <MudButton @onclick="SetCookie" Variant="Variant.Filled" Style="width: 100px; height: 60px;" Color="Color.Info">Set Cookie</MudButton>
-    <MudButton @onclick="GetCookie" Variant="Variant.Filled" Style="width: 100px; height: 60px;" Color="Color.Error">Get Cookie</MudButton>
-    <MudButton @onclick="EraseCookie" Variant="Variant.Filled" Style="width: 100px; height: 60px;" Color="Color.Error">Erase Cookie</MudButton><br>
-</div>
-
-<div>
-    <p>Cookie Result: @cookieResult</p>
-</div>
-
-@code {
-    private string cookieName = string.Empty;
-    private string cookieValue = string.Empty;
-    private int? days;
-    private string cookieResult = string.Empty;
-
-    private async Task SetCookie()
-    {
-        await JS.InvokeVoidAsync("cookiesInterop.setCookie", cookieName, cookieValue, days);
-        cookieResult = $"Cookie {cookieName} set.";
-    }
-
-    private async Task GetCookie()
-    {
-        cookieResult = await JS.InvokeAsync<string>("cookiesInterop.getCookie", cookieName);
-    }
-
-    private async Task EraseCookie()
-    {
-        await JS.InvokeVoidAsync("cookiesInterop.eraseCookie", cookieName);
-        cookieResult = $"Cookie {cookieName} erased.";
-    }
-} *@
-
 <script src="js/CookiesServ.js"></script>
 <script src="js/interface.js"></script>
 <script src="js/file.js"></script>
-<script src="js/file1.js"></script>
+<script src="js/file1.js"></script> 

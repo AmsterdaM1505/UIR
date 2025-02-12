@@ -70,11 +70,11 @@
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[5.5.3, )"
+              "version": "[5.7.1, )"
             },
             "MudBlazor": {
               "target": "Package",
-              "version": "[7.6.0, )"
+              "version": "[8.2.0, )"
             }
           },
           "imports": [
@@ -164,7 +164,7 @@
             },
             "MudBlazor": {
               "target": "Package",
-              "version": "[7.6.0, )"
+              "version": "[8.2.0, )"
             }
           },
           "imports": [

@@ -13,6 +13,18 @@
     {
       "AbsoluteMoniker": "D:0:0:{794B25CE-51B0-403E-9158-5C671CC37B40}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\BlazorWebAppAutoRendering.Client.csproj|c:\\users\\user\\source\\repos\\blazorwebappautorendering\\blazorwebappautorendering\\blazorwebappautorendering.client\\pages\\component2.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{794B25CE-51B0-403E-9158-5C671CC37B40}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\BlazorWebAppAutoRendering.Client.csproj|solutionrelative:blazorwebappautorendering\\blazorwebappautorendering.client\\pages\\component2.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{940955A3-7DE6-4591-A61D-7A3F5F0873BE}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.csproj|c:\\users\\user\\source\\repos\\blazorwebappautorendering\\blazorwebappautorendering\\blazorwebappautorendering\\components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{940955A3-7DE6-4591-A61D-7A3F5F0873BE}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.csproj|solutionrelative:blazorwebappautorendering\\blazorwebappautorendering\\components\\layout\\mainlayout.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{794B25CE-51B0-403E-9158-5C671CC37B40}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\BlazorWebAppAutoRendering.Client.csproj|c:\\users\\user\\source\\repos\\blazorwebappautorendering\\blazorwebappautorendering\\blazorwebappautorendering.client\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{794B25CE-51B0-403E-9158-5C671CC37B40}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\BlazorWebAppAutoRendering.Client.csproj|solutionrelative:blazorwebappautorendering\\blazorwebappautorendering.client\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{940955A3-7DE6-4591-A61D-7A3F5F0873BE}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.csproj|c:\\users\\user\\source\\repos\\blazorwebappautorendering\\blazorwebappautorendering\\blazorwebappautorendering\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{940955A3-7DE6-4591-A61D-7A3F5F0873BE}|BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.csproj|solutionrelative:blazorwebappautorendering\\blazorwebappautorendering\\components\\app.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
   "DocumentGroupContainers": [
@@ -52,22 +64,46 @@
               "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\scripts\\file.ts",
               "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\scripts\\file.ts",
               "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\scripts\\file.ts",
-              "ViewState": "AQIAAG8JAAAAAAAAAAAgwHYJAACJAAAA",
+              "ViewState": "AQIAACUAAAAAAAAAAAAgwLgAAAATAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
               "WhenOpened": "2024-07-19T13:23:16.975Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Component2.razor",
-              "DocumentMoniker": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
-              "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
-              "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
-              "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAJMAAABAAAAA",
+              "DocumentIndex": 5,
+              "Title": "App.razor",
+              "DocumentMoniker": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\App.razor",
+              "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\App.razor",
+              "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\App.razor",
+              "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\App.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-07-17T21:08:32.384Z"
+              "WhenOpened": "2025-02-04T22:04:11.954Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\_Imports.razor",
+              "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\_Imports.razor",
+              "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\_Imports.razor",
+              "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\_Imports.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAA5AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-02-04T20:36:21.406Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MainLayout.razor",
+              "DocumentMoniker": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\Layout\\MainLayout.razor",
+              "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\Layout\\MainLayout.razor",
+              "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\Layout\\MainLayout.razor",
+              "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\Components\\Layout\\MainLayout.razor",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAACIAAAAUAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-02-04T16:34:17.869Z"
             },
             {
               "$type": "Document",
@@ -77,10 +113,21 @@
               "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\scripts\\interface.ts",
               "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\scripts\\interface.ts",
               "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\scripts\\interface.ts",
-              "ViewState": "AQIAACEAAAAAAAAAAAAowC4AAAABAAAA",
+              "ViewState": "AQIAABEAAAAAAAAAAAAQwFgAAAABAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2024-08-19T18:51:26.838Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-19T18:51:26.838Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Component2.razor",
+              "DocumentMoniker": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
+              "RelativeDocumentMoniker": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
+              "ToolTip": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
+              "RelativeToolTip": "BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\Pages\\Component2.razor",
+              "ViewState": "AQIAAEUAAAAAAAAAAAAAAFEAAAAVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-07-17T21:08:32.384Z"
             }
           ]
         }

@@ -50,7 +50,25 @@ interface Cloud extends Shape {
     width: number;
     height: number;
 }
-type GraphObject = Rectangle | Circle | Line | Star | Cloud;
+
+//interface ComplexShape {
+//    id: number;
+//    elements: Shape[];
+//    type: string;
+
+
+//}
+interface ComplexShape extends Shape, Rectangle {
+    children: Shape[];
+    text: string[];
+    type: string;
+    layout?: "vertical" | "horizontal"; // Описание размещения
+    //startSize?: number; // Размер заголовка
+    //width: number;
+    //height: number;
+}
+
+//type GraphObject = Rectangle | Circle | Line | Star | Cloud;
 
 function logDebug(message: string) {
     const debugOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;

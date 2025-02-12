@@ -1,3 +1,4 @@
+//type GraphObject = Rectangle | Circle | Line | Star | Cloud;
 function logDebug(message) {
     const debugOutput = document.getElementById('debugOutput');
     if (debugOutput) {

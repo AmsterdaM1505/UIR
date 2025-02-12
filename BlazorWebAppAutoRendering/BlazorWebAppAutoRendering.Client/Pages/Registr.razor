@@ -5,7 +5,80 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 
-<style>
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Демонстрация z-index</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border: 2px solid #333;
+        }
+
+        .box {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            text-align: center;
+            line-height: 150px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            border-radius: 10px;
+        }
+
+        .box1 {
+            background-color: red;
+            top: 50px;
+            left: 50px;
+            z-index: 1;
+        }
+
+        .box2 {
+            background-color: blue;
+            top: 80px;
+            left: 80px;
+            z-index: 2;
+        }
+
+        .box3 {
+            background-color: green;
+            top: 110px;
+            left: 110px;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="box box1">z-index: 1</div>
+        <div class="box box2">z-index: 2</div>
+        <div class="box box3">z-index: 3</div>
+    </div>
+
+</body>
+</html>
+
+
+
+@* <style>
     .custom-border {
         border: 1px solid black;
         border-radius: 4px;
@@ -61,7 +134,7 @@
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" DropShadow="false" OnClick="@(()=>form.ResetAsync())" Class="custom-border">Reset</MudButton>
             <MudButton Variant="Variant.Filled" DropShadow="false" OnClick="@(()=>form.ResetValidation())" Class="custom-border">Reset Validation</MudButton>
         </MudPaper>
-    </MudItem>
+    </MudItem> *@
    @*  <MudItem xs="12" sm="5">
         <MudPaper Class="pa-4 mud-height-full">
             <MudText Typo="Typo.subtitle2">@($"Errors ({errors.Length})")</MudText>
@@ -71,8 +144,8 @@
             }
         </MudPaper>
     </MudItem> *@
-</MudGrid>
-@code {
+@* </MudGrid> *@
+@* @code {
     bool success;
     string[] errors = { };
     MudTextField<string> pwField1 = new MudTextField<string>();
@@ -102,4 +175,4 @@
         return string.Empty;
     }
 
-}
+} *@

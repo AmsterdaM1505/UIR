@@ -62,87 +62,138 @@
 
         return result;
     }
+    //function processFileContent(content: string, objects: Shape[]) {
+    //    try {
+    //        const sizeMatch = content.match(/Size:({[^}]+})/);
+    //        const objectsMatch = content.match(/Objects:\(([^)]+)\)/);
+
+    //        if (sizeMatch && objectsMatch) {
+    //            const size = JSON.parse(sizeMatch[1]);
+    //            const shapes = JSON.parse(`[${objectsMatch[1]}]`);
+
+    //            objects = shapes.map((obj: any) => {
+    //                //if (obj.imageSrc) {
+    //                //    insertionImageFromFile(obj);
+    //                //}
+    //                const baseProps = {
+    //                    id: obj.id || generateUniqueId(),
+    //                    type: obj.type,
+    //                    color: obj.color || '#000',
+    //                    rotation: obj.rotation || 0,
+    //                    info: obj.info || '',
+    //                    linkedObjects: obj.linkedObjects || [],
+    //                    outgoingLinks: obj.outgoingLinks || [],
+    //                    incomingLinks: obj.incomingLinks || [],
+    //                    //imageSrc: obj.imageScr || []
+    //                };
+
+    //                if (obj.type === 'rectangle') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x,
+    //                        y_C: obj.y,
+    //                        width: obj.width,
+    //                        height: obj.height
+    //                    } as Rectangle;
+    //                } else if (obj.type === 'circle') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x,
+    //                        y_C: obj.y,
+    //                        radius: obj.radius
+    //                    } as Circle;
+    //                } else if (obj.type === 'line') {
+    //                    return {
+    //                        ...baseProps,
+    //                        startX: obj.startX,
+    //                        startY: obj.startY,
+    //                        endX: obj.endX,
+    //                        endY: obj.endY
+    //                    } as Line;
+    //                } else if (obj.type === 'star') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x_C,
+    //                        y_C: obj.y_C,
+    //                        rad: obj.rad,
+    //                        amount_points: obj.amount_points,
+    //                        m: obj.m
+    //                    } as Star;
+    //                } else if (obj.type === 'cloud') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x_C,
+    //                        y_C: obj.y_C,
+    //                        width: obj.width,
+    //                        height: obj.height
+    //                    } as Cloud;
+    //                } else {
+    //                    throw new Error('Unknown shape type');
+    //                }
+    //            });
+    //            return objects;
+    //        } else if (sizeMatch && !objectsMatch) {
+    //            const size = JSON.parse(sizeMatch[1]);
+    //            objects = [];
+    //            return objects;
+    //        } else {
+    //            throw new Error('Invalid file format');
+    //        }
+    //    } catch (error) {
+    //        console.error('Error processing file content:', error);
+    //    }
+    //}
+
+
     function processFileContent(content: string, objects: Shape[]) {
         try {
-            const sizeMatch = content.match(/Size:({[^}]+})/);
-            const objectsMatch = content.match(/Objects:\(([^)]+)\)/);
+            if (!content) return objects;  // Проверяем, есть ли данные
 
-            if (sizeMatch && objectsMatch) {
-                const size = JSON.parse(sizeMatch[1]);
-                const shapes = JSON.parse(`[${objectsMatch[1]}]`);
-
-                objects = shapes.map((obj: any) => {
-                    //if (obj.imageSrc) {
-                    //    insertionImageFromFile(obj);
-                    //}
-                    const baseProps = {
-                        id: obj.id || generateUniqueId(),
-                        type: obj.type,
-                        color: obj.color || '#000',
-                        rotation: obj.rotation || 0,
-                        info: obj.info || '',
-                        linkedObjects: obj.linkedObjects || [],
-                        outgoingLinks: obj.outgoingLinks || [],
-                        incomingLinks: obj.incomingLinks || [],
-                        //imageSrc: obj.imageScr || []
-                    };
-
-                    if (obj.type === 'rectangle') {
-                        return {
-                            ...baseProps,
-                            x_C: obj.x,
-                            y_C: obj.y,
-                            width: obj.width,
-                            height: obj.height
-                        } as Rectangle;
-                    } else if (obj.type === 'circle') {
-                        return {
-                            ...baseProps,
-                            x_C: obj.x,
-                            y_C: obj.y,
-                            radius: obj.radius
-                        } as Circle;
-                    } else if (obj.type === 'line') {
-                        return {
-                            ...baseProps,
-                            startX: obj.startX,
-                            startY: obj.startY,
-                            endX: obj.endX,
-                            endY: obj.endY
-                        } as Line;
-                    } else if (obj.type === 'star') {
-                        return {
-                            ...baseProps,
-                            x_C: obj.x_C,
-                            y_C: obj.y_C,
-                            rad: obj.rad,
-                            amount_points: obj.amount_points,
-                            m: obj.m
-                        } as Star;
-                    } else if (obj.type === 'cloud') {
-                        return {
-                            ...baseProps,
-                            x_C: obj.x_C,
-                            y_C: obj.y_C,
-                            width: obj.width,
-                            height: obj.height
-                        } as Cloud;
-                    } else {
-                        throw new Error('Unknown shape type');
-                    }
-                });
+            const schemaData = JSON.parse(content);
+            if (!schemaData.objects || !Array.isArray(schemaData.objects)) {
+                console.error("Invalid schema format.");
                 return objects;
-            } else if (sizeMatch && !objectsMatch) {
-                const size = JSON.parse(sizeMatch[1]);
-                objects = [];
-                return objects;
-            } else {
-                throw new Error('Invalid file format');
             }
+
+            return schemaData.objects.map(obj => {
+                const baseProps = {
+                    id: obj.id || generateUniqueId(),
+                    type: obj.type,
+                    color: obj.color || '#000',
+                    rotation: obj.rotation || 0,
+                    info: obj.info || '',
+                    linkedObjects: obj.linkedObjects || [],
+                    outgoingLinks: obj.outgoingLinks || [],
+                    incomingLinks: obj.incomingLinks || [],
+                    colorAlpha: obj.colorAlpha || 1,
+                    borderPoints_X1: obj.borderPoints_X1,
+                    borderPoints_Y1: obj.borderPoints_Y1,
+                    borderPoints_X2: obj.borderPoints_X2,
+                    borderPoints_Y2: obj.borderPoints_Y2
+                };
+
+                switch (obj.type) {
+                    case 'rectangle':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height } as Rectangle;
+                    case 'circle':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, radius: obj.radius } as Circle;
+                    case 'line':
+                        return { ...baseProps, startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY } as Line;
+                    case 'star':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, rad: obj.rad, amount_points: obj.amount_points, m: obj.m } as Star;
+                    case 'cloud':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height } as Cloud;
+                    default:
+                        console.warn("Unknown shape type:", obj.type);
+                        return null;
+                }
+            }).filter(obj => obj !== null);
         } catch (error) {
-            console.error('Error processing file content:', error);
+            console.error("Error processing file content:", error);
+            return objects;  // Если ошибка, возвращаем текущий массив объектов
         }
     }
+
 
     document.getElementById('fileInput')?.addEventListener('change', function (event) {
         try {
@@ -172,37 +223,107 @@
 
     document.getElementById('contextMenu').style.display = 'none';
 
-    //window.addEventListener('DOMContentLoaded', () => {
-    //    setTimeout(() => {
-    //        if (objects.length === 0) {
-    //            const savedSchema = localStorage.getItem('savedSchema');
-    //            objects = processFileContent(savedSchema, objects);
-                
-    //            setTimeout(() => {
-    //                drawObjects();
-    //            }, 1000);
-    //        }
-    //    }, 4000);
-    //});
-
-
-    // Сохранение схемы между перезагрузками
-    // Функция для сохранения схемы в локальное хранилище
-    async function saveToLocalStorage() {
-        if ((objects && objects.length) === 0) {
-            //console.warn("Cannot save: no objects present");
+    function saveToLocalStorage() {
+        if (!objects || objects.length === 0) {
+            console.warn("Cannot save: no objects present");
             return;
         }
-        localStorage.removeItem('savedSchema');
-        const size = { width: canvas.width, height: canvas.height };
-        const shapes = JSON.stringify(objects, null, 2);
-        const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
-        await localStorage.setItem('savedSchema', content);
-        console.log("Schema saved");
+
+        try {
+            const schemaData = {
+                size: { width: canvas.width, height: canvas.height },
+                objects: objects
+            };
+
+            localStorage.setItem('savedSchema', JSON.stringify(schemaData));
+            console.log("Schema saved successfully.", JSON.stringify(schemaData));
+        } catch (error) {
+            console.error("Error saving schema:", error);
+        }
     }
+
+
     
     // Запуск периодического сохранения и восстановления
-    setInterval(saveToLocalStorage, 9000);
+    let lastSavedState = "";
+
+    function autoSaveToLocalStorage() {
+        const currentState = JSON.stringify(objects);
+        if (currentState !== lastSavedState) {
+            saveToLocalStorage();
+            lastSavedState = currentState;
+        }
+    }
+
+    setInterval(autoSaveToLocalStorage, 9000);
+
+    let isSchemaLoaded = false;
+
+    function loadFromLocalStorage() {
+        if (isSchemaLoaded) {
+            console.warn("Schema is already loaded. Skipping duplicate call.");
+            return;
+        }
+
+        try {
+            const savedSchema = localStorage.getItem('savedSchema');
+            if (!savedSchema) {
+                console.warn("No saved schema found.");
+                return;
+            }
+
+            const schemaData = JSON.parse(savedSchema);
+            if (!schemaData.objects || !Array.isArray(schemaData.objects)) {
+                console.error("Invalid schema format.");
+                return;
+            }
+
+            objects = schemaData.objects.map(obj => {
+                const baseProps = {
+                    id: obj.id || generateUniqueId(),
+                    type: obj.type,
+                    color: obj.color || '#000',
+                    rotation: obj.rotation || 0,
+                    info: obj.info || '',
+                    linkedObjects: obj.linkedObjects || [],
+                    outgoingLinks: obj.outgoingLinks || [],
+                    incomingLinks: obj.incomingLinks || [],
+                    colorAlpha: obj.colorAlpha || 1,
+                    borderPoints_X1: obj.borderPoints_X1,
+                    borderPoints_Y1: obj.borderPoints_Y1,
+                    borderPoints_X2: obj.borderPoints_X2,
+                    borderPoints_Y2: obj.borderPoints_Y2
+                };
+
+                switch (obj.type) {
+                    case 'rectangle':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height } as Rectangle;
+                    case 'circle':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, radius: obj.radius } as Circle;
+                    case 'line':
+                        return { ...baseProps, startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY } as Line;
+                    case 'star':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, rad: obj.rad, amount_points: obj.amount_points, m: obj.m } as Star;
+                    case 'cloud':
+                        return { ...baseProps, x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height } as Cloud;
+                    default:
+                        console.warn("Unknown shape type:", obj.type);
+                        return null;
+                }
+            }).filter(obj => obj !== null);
+
+            isSchemaLoaded = true;  // Устанавливаем флаг после успешной загрузки
+
+            drawObjects();
+            console.log("Schema loaded successfully.");
+            //console.log(objects);
+        } catch (error) {
+            console.error("Error loading schema:", error);
+        }
+    }
+
+
+
 
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
@@ -214,6 +335,16 @@
         logDebug("Canvas element found");
         
     }
+    //window.addEventListener('DOMContentLoaded', () => {
+    //    loadFromLocalStorage();
+    //});
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!isSchemaLoaded) {
+            loadFromLocalStorage();
+        }
+    });
+
 
     function resizeCanvas(canvas: HTMLCanvasElement) {
         
@@ -345,7 +476,14 @@
             logDebug("Canvas context obtained");
         }
         //console.log(objects);
-        drawObjects();
+        if (!isSchemaLoaded) {
+            drawObjects();
+        }
+
+        document.getElementById('recovery-scheme')?.addEventListener('click', function () {
+            logDebug("recovery-scheme button clicked");
+            loadFromLocalStorage();
+        });
 
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e: MouseEvent) {
@@ -614,14 +752,44 @@
             // Поиск объекта, по которому сделан двойной клик
             const clickedObject = objects.find(obj => {
                 switch (obj.type) {
-                    case 'rectangle':
+                    case 'rectangle': {
                         const rect = obj as Rectangle;
                         return isPointInRotatedRect(mouseX, mouseY, rect);
-                    case 'circle':
+                    }
+                    case 'circle': {
                         const circle = obj as Circle;
                         const dx = mouseX - circle.x_C;
                         const dy = mouseY - circle.y_C;
                         return dx * dx + dy * dy <= circle.radius * circle.radius;
+                    }
+                    case 'line': {
+                        const line = obj as Line;
+                        const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
+                        const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
+                        const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY +
+                            line.endX * line.startY - line.endY * line.startX) /
+                            Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
+                        return distStart < 10 || distEnd < 10 || distToLine < 10;
+                    }
+                    case 'star': {
+                        const star = obj as Star;
+                        const points = [];
+                        for (let i = 0; i < 2 * star.amount_points; i++) {
+                            const angle = Math.PI * i / star.amount_points;
+                            const radius = (i % 2 === 0) ? star.rad : star.rad * star.m;
+                            const x = star.x_C + radius * Math.sin(angle);
+                            const y = star.y_C + radius * Math.cos(angle);
+                            points.push({ x, y });
+                        }
+                        return pointInPolygon(mouseX, mouseY, points);
+                    }
+                    case 'cloud': {
+                        const cloud = obj as Cloud;
+                        const startX_Cloud = cloud.x_C - cloud.width / 2;
+                        const startY_Cloud = cloud.y_C - cloud.height / 2;
+                        return mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width &&
+                            mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height;
+                    }
                     default:
                         return false;
                 }
@@ -632,7 +800,26 @@
             }
         });
 
+
+        //const mainLayout = document.getElementById("main-layout") as HTMLCanvasElement;
+        //const debug = document.getElementById("debug-panel");
+
+        //if (!canvas || !mainLayout) return;
+
+        //const rect = canvas.getBoundingClientRect();
+        //const difference = mainLayout.getBoundingClientRect();
+
+
+        //offsetX = rect.left;
+        //offsetY = Math.max(0, rect.top - (difference.bottom - difference.top));
+
+        //debug.style.bottom += `${difference.bottom - difference.top}px`;
+        ////console.log(offsetX, offsetY, difference.top, difference.bottom)
+
         function createTextInput(obj: Shape, x: number, y: number) {
+            const mainLayout = document.getElementById("main-layout") as HTMLCanvasElement;
+            const difference = mainLayout.getBoundingClientRect();
+
             // Создаем input-элемент
             const input = document.createElement('input');
             input.type = 'text';
@@ -645,39 +832,43 @@
             input.style.background = 'none';
             input.style.zIndex = '1000';
 
+            input.style.whiteSpace = 'nowrap';
+            input.style.overflow = 'visible';
+            input.style.boxSizing = 'border-box';
+
             switch (obj.type) {
                 case 'rectangle':
                     const rect = obj as Rectangle;
-                    input.style.left = `${canvas.offsetLeft + rect.x_C}px`;
-                    input.style.top = `${canvas.offsetTop + rect.y_C}px`;
-                    input.style.width = `${rect.width}px`;
+                    input.style.left = `${canvas.offsetLeft + rect.x_C + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + rect.y_C + rect.height / 3 + offsetY + difference.bottom - difference.top}px`;
+                    input.style.width = `${rect.width + 100}px`;
+                    /*input.style.width = 'none';*/
                     input.style.height = `${rect.height / 3}px`;
+                    console.log(canvas.offsetLeft, canvas.offsetTop, rect.y_C, rect.x_C, x, y, canvas.offsetLeft + rect.x_C, canvas.offsetTop + rect.y_C, canvas.offsetLeft - rect.x_C, canvas.offsetTop - rect.y_C)
                     break;
 
                 case 'circle':
                     const circle = obj as Circle;
-                    input.style.left = `${canvas.offsetLeft + circle.x_C - circle.radius / 2}px`;
-                    input.style.top = `${canvas.offsetTop + circle.y_C - circle.radius / 3}px`;
+                    input.style.left = `${canvas.offsetLeft + circle.x_C - circle.radius / 2 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + circle.y_C - circle.radius / 3 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `${circle.radius}px`;
-                    input.style.height = `${circle.radius / 3}px`;
+                    input.style.height = `${circle.radius * 2 / 3}px`;
                     input.style.textAlign = 'center';
                     break;
 
                 case 'line':
                     const line = obj as Line;
-                    input.style.left = `${canvas.offsetLeft + (line.startX + line.endX) / 2 - 30}px`;
-                    input.style.top = `${canvas.offsetTop + (line.startY + line.endY) / 2 - 10}px`;
+                    input.style.left = `${canvas.offsetLeft + (line.startX + line.endX) / 2 - 30 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + (line.startY + line.endY) / 2 - 10 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `60px`;
                     input.style.height = `20px`;
                     input.style.textAlign = 'center';
-                    input.style.background = 'white';
-                    input.style.border = '1px solid black';
                     break;
 
                 case 'star':
                     const star = obj as Star;
-                    input.style.left = `${canvas.offsetLeft + star.x_C - star.rad / 2}px`;
-                    input.style.top = `${canvas.offsetTop + star.y_C - star.rad / 3}px`;
+                    input.style.left = `${canvas.offsetLeft + star.x_C - star.rad / 2 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + star.y_C - star.rad / 3 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `${star.rad}px`;
                     input.style.height = `${star.rad / 3}px`;
                     input.style.textAlign = 'center';
@@ -685,8 +876,8 @@
 
                 case 'cloud':
                     const cloud = obj as Cloud;
-                    input.style.left = `${canvas.offsetLeft + cloud.x_C - cloud.width / 2}px`;
-                    input.style.top = `${canvas.offsetTop + cloud.y_C - cloud.height / 3}px`;
+                    input.style.left = `${canvas.offsetLeft + cloud.x_C - cloud.width / 2 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + cloud.y_C - cloud.height / 3 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `${cloud.width}px`;
                     input.style.height = `${cloud.height / 3}px`;
                     input.style.textAlign = 'center';
@@ -713,8 +904,6 @@
                 if (e.key === 'Enter') saveText();
             });
         }
-
-
 
         function insertionImage(selectedObject_buf: Shape, file: File) {
             const reader = new FileReader();
@@ -900,7 +1089,7 @@
         }
 
         // Инициализация отрисовки объектов на холсте
-        drawObjects();
+        //drawObjects();
         function getObjectCenter(obj: Shape): [number, number] {
             switch (obj.type) {
                 case 'rectangle':
@@ -1008,31 +1197,89 @@
 
         let allConnectors: { id: string, x: number, y: number, type: string }[] = [];
 
-        function updateConnectors(rect: Rectangle) {
-            const { x_C, y_C, width, height } = rect;
-
+        function updateConnectors(obj: Shape) {
             // Если у объекта уже есть коннекторы, сохраняем их ID
-            const existingConnectors = rect.connectors || [];
+            const existingConnectors = obj.connectors || [];
             const getConnectorId = (type: string): string => {
                 const existing = existingConnectors.find(connector => connector.type === type);
                 return existing ? existing.id : generateRandomId(16);
             };
 
-            // Обновляем коннекторы объекта
-            rect.connectors = [
-                { id: getConnectorId('left'), x: x_C, y: y_C + height / 2, type: 'left' },
-                { id: getConnectorId('right'), x: x_C + width, y: y_C + height / 2, type: 'right' },
-                { id: getConnectorId('top'), x: x_C + width / 2, y: y_C, type: 'top' },
-                { id: getConnectorId('bottom'), x: x_C + width / 2, y: y_C + height, type: 'bottom' }
-            ];
+            let connectors = [];
+
+            switch (obj.type) {
+                case 'rectangle': {
+                    const rect = obj as Rectangle;
+                    const { x_C, y_C, width, height } = rect;
+                    connectors = [
+                        { id: getConnectorId('left'), x: x_C, y: y_C + height / 2, type: 'left' },
+                        { id: getConnectorId('right'), x: x_C + width, y: y_C + height / 2, type: 'right' },
+                        { id: getConnectorId('top'), x: x_C + width / 2, y: y_C, type: 'top' },
+                        { id: getConnectorId('bottom'), x: x_C + width / 2, y: y_C + height, type: 'bottom' }
+                    ];
+                    break;
+                }
+                case 'circle': {
+                    const circle = obj as Circle;
+                    const { x_C, y_C, radius } = circle;
+                    connectors = [
+                        { id: getConnectorId('left'), x: x_C - radius, y: y_C, type: 'left' },
+                        { id: getConnectorId('right'), x: x_C + radius, y: y_C, type: 'right' },
+                        { id: getConnectorId('top'), x: x_C, y: y_C - radius, type: 'top' },
+                        { id: getConnectorId('bottom'), x: x_C, y: y_C + radius, type: 'bottom' }
+                    ];
+                    break;
+                }
+                case 'line': {
+                    const line = obj as Line;
+                    // Для линии удобно использовать ее концевые точки в качестве коннекторов
+                    connectors = [
+                        { id: getConnectorId('start'), x: line.startX, y: line.startY, type: 'start' },
+                        { id: getConnectorId('end'), x: line.endX, y: line.endY, type: 'end' }
+                    ];
+                    break;
+                }
+                case 'star': {
+                    const star = obj as Star;
+                    // Предположим, что мы используем bounding box звезды
+                    const left = star.x_C - star.rad;
+                    const right = star.x_C + star.rad;
+                    const top = star.y_C - star.rad;
+                    const bottom = star.y_C + star.rad;
+                    connectors = [
+                        { id: getConnectorId('left'), x: left, y: star.y_C, type: 'left' },
+                        { id: getConnectorId('right'), x: right, y: star.y_C, type: 'right' },
+                        { id: getConnectorId('top'), x: star.x_C, y: top, type: 'top' },
+                        { id: getConnectorId('bottom'), x: star.x_C, y: bottom, type: 'bottom' }
+                    ];
+                    break;
+                }
+                case 'cloud': {
+                    const cloud = obj as Cloud;
+                    const left = cloud.x_C - cloud.width / 2;
+                    const top = cloud.y_C - cloud.height / 2;
+                    connectors = [
+                        { id: getConnectorId('left'), x: left, y: cloud.y_C, type: 'left' },
+                        { id: getConnectorId('right'), x: left + cloud.width, y: cloud.y_C, type: 'right' },
+                        { id: getConnectorId('top'), x: cloud.x_C, y: top, type: 'top' },
+                        { id: getConnectorId('bottom'), x: cloud.x_C, y: top + cloud.height, type: 'bottom' }
+                    ];
+                    break;
+                }
+                default:
+                    logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
+                    return;
+            }
+
+            // Обновляем коннекторы в объекте
+            obj.connectors = connectors;
 
             // Синхронизируем данные с массивом allConnectors
-            rect.connectors.forEach(connector => {
+            connectors.forEach(connector => {
                 const index = allConnectors.findIndex(existing => existing.id === connector.id);
-
                 if (index !== -1) {
-                    // Если коннектор уже существует в allConnectors, обновляем его координаты
-                    allConnectors[index] = { ...allConnectors[index], x: connector.x, y: connector.y };
+                    // Если коннектор уже существует в allConnectors, обновляем его координаты и тип
+                    allConnectors[index] = { ...allConnectors[index], x: connector.x, y: connector.y, type: connector.type };
                 } else {
                     // Если коннектор отсутствует, добавляем его
                     allConnectors.push({ id: connector.id, x: connector.x, y: connector.y, type: connector.type });
@@ -1040,76 +1287,6 @@
             });
         }
 
-        //function updateConnectors(rect: Rectangle) {
-        //    const { x_C, y_C, width, height, rotation } = rect;
-
-        //    // Центр прямоугольника
-        //    const centerX = x_C + width / 2;
-        //    const centerY = y_C + height / 2;
-        //    const angle = (rotation || 0) * Math.PI / 180; // Угол поворота в радианах
-
-        //    // Вращение точки вокруг центра
-        //    function rotatePoint(px: number, py: number, angle: number, centerX: number, centerY: number) {
-        //        let a = width / 2;
-        //        let b = height / 2;
-        //        let dx = 0;
-        //        let dy = 0;
-
-        //        if (a === b) {
-        //            dx = a * Math.cos(angle);
-        //            dy = a * Math.sin(angle);
-        //        } else {
-        //            dx = a * Math.cos(angle);
-        //            dy = b * Math.sin(angle);
-        //        }
-
-        //        return {
-        //            x: dx + centerX,
-        //            y: dy + centerY
-        //        };
-        //    }
-
-        //    // Вычисление позиций коннекторов до поворота
-        //    const connectors = [
-        //        { x: x_C, y: y_C + height / 2, type: 'left' },            // Левый коннектор
-        //        { x: x_C + width, y: y_C + height / 2, type: 'right' },   // Правый коннектор
-        //        { x: x_C + width / 2, y: y_C, type: 'top' },              // Верхний коннектор
-        //        { x: x_C + width / 2, y: y_C + height, type: 'bottom' }   // Нижний коннектор
-        //    ];
-
-        //    // Применяем поворот к каждому коннектору и сохраняем их позиции
-        //    rect.connectors = connectors.map(connector => {
-        //        const rotated = rotatePoint(connector.x, connector.y, angle, centerX, centerY);
-        //        return { ...rotated, type: connector.type };
-        //    });
-        //}
-
-        //function updateConnectors(rect: Rectangle) {
-        //    const { x_C, y_C, width, height, rotation } = rect;
-
-        //    // Центр прямоугольника
-        //    const centerX = x_C + width / 2;
-        //    const centerY = y_C + height / 2;
-        //    const angle = (rotation || 0) * Math.PI / 180; // Угол поворота в радианах
-        //    // Расстояние от центра до каждого коннектора и их исходный угол (в радианах)
-        //    const connectors = [
-        //        { r: width / 2, initialAngle: Math.PI, type: 'left' },              // Левый коннектор
-        //        { r: width / 2, initialAngle: 0, type: 'right' },                   // Правый коннектор
-        //        { r: height / 2, initialAngle: -Math.PI / 2, type: 'top' },         // Верхний коннектор
-        //        { r: height / 2, initialAngle: Math.PI / 2, type: 'bottom' }        // Нижний коннектор
-        //    ];
-
-        //    // Вычисление новых координат коннекторов
-        //    rect.connectors = connectors.map(connector => {
-        //        const totalAngle = connector.initialAngle + angle;
-        //        const x = centerX + connector.r * Math.cos(totalAngle);
-        //        const y = centerY + connector.r * Math.sin(totalAngle);
-        //        return { x, y, type: connector.type };
-        //    });
-        //}
-        //ctx.translate(centerX, centerY);
-        //ctx.rotate((obj.rotation * Math.PI) / 180);
-        //ctx.translate(-centerX, -centerY);
         function addRect() {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -1363,6 +1540,13 @@
                 line.borderPoints_Y1 = rectY;
                 line.borderPoints_X2 = rectX + rectWidth;
                 line.borderPoints_Y2 = rectY + rectHeight;
+
+                updateConnectors(line);
+                line.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
             drawArow(ctx, line);
         }
@@ -1382,31 +1566,6 @@
                 ctx.restore();
             }
             if (circle.selectionMarker || selectedObject_buf === circle) {
-                //ctx.beginPath();
-                //ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //ctx.beginPath();
-                //ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //ctx.beginPath();
-                //ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //ctx.beginPath();
-                //ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //
-                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                //ctx.lineWidth = 2;
-                //ctx.setLineDash([5, 3]);
-                //ctx.beginPath();
-                //ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
-                //ctx.stroke();
-                //ctx.setLineDash([]);  // Сбрасываем пунктир
-                //
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);  // Длина штриха и промежутка
@@ -1417,10 +1576,16 @@
                 circle.borderPoints_X2 = circle.x_C + circle.radius + 2;
                 circle.borderPoints_Y2 = circle.y_C + circle.radius + 2;
 
+                updateConnectors(circle);
+                circle.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
-        function drawStar(ctx, x_C, y_C, rad, amount_points, m, obj) {
-            const colorWithAlpha = hexToRgba(obj.color, obj.colorAlpha);
+        function drawStar(ctx, x_C, y_C, rad, amount_points, m, star) {
+            const colorWithAlpha = hexToRgba(star.color, star.colorAlpha);
             ctx.beginPath();
             let points = [];
             ctx.moveTo(x_C, y_C + rad);
@@ -1436,24 +1601,30 @@
             ctx.fillStyle = colorWithAlpha;
             ctx.fill();
 
-            if (obj.selectionMarker || selectedObject_buf === obj) {
+            if (star.selectionMarker || selectedObject_buf === star) {
 
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);
-                ctx.strokeRect(obj.x_C - obj.rad - 2, obj.y_C - obj.rad - 2, obj.rad * 2 + 4, obj.rad * 2 + 4);
+                ctx.strokeRect(star.x_C - star.rad - 2, star.y_C - star.rad - 2, star.rad * 2 + 4, star.rad * 2 + 4);
                 ctx.setLineDash([]);  // Сбрасываем пунктир
-                obj.borderPoints_X1 = obj.x_C - obj.rad - 2;
-                obj.borderPoints_Y1 = obj.y_C - obj.rad - 2;
-                obj.borderPoints_X2 = obj.x_C + obj.rad + 2;
-                obj.borderPoints_Y2 = obj.y_C + obj.rad + 2;
+                star.borderPoints_X1 = star.x_C - star.rad - 2;
+                star.borderPoints_Y1 = star.y_C - star.rad - 2;
+                star.borderPoints_X2 = star.x_C + star.rad + 2;
+                star.borderPoints_Y2 = star.y_C + star.rad + 2;
 
                 // Отрисовка квадратов на вершинах звезды
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+                updateConnectors(star);
+                star.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
-        function drawCloud(ctx, x_C, y_C, width, height, obj) {
-            const colorWithAlpha = hexToRgba(obj.color, obj.colorAlpha);
+        function drawCloud(ctx, x_C, y_C, width, height, cloud) {
+            const colorWithAlpha = hexToRgba(cloud.color, cloud.colorAlpha);
             ctx.beginPath();
             let startX_Cloud = x_C - width / 2;
             let startY_Cloud = y_C - height / 2;
@@ -1495,18 +1666,36 @@
             ctx.fillStyle = colorWithAlpha;
             ctx.fill();
 
-            if (obj.selectionMarker || selectedObject_buf === obj) {
+            if (cloud.selectionMarker || selectedObject_buf === cloud) {
                 // Отрисовка голубой пунктирной рамки
                 ctx.save();
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);
-                ctx.strokeRect(startX_Cloud - 2, startY_Cloud - 2, width + 1, height + 1);
+                //ctx.strokeRect(startX_Cloud - 2, startY_Cloud - 2, width + 1, height + 1);
+                ctx.strokeRect(startX_Cloud, startY_Cloud, width, height);
                 ctx.setLineDash([]);  // Сбрасываем пунктир
                 ctx.restore();
 
+
+                //cloud.borderPoints_X1 = startX_Cloud - 2;
+                //cloud.borderPoints_Y1 = startY_Cloud - 2;
+                //cloud.borderPoints_X2 = startX_Cloud - 2 + (width + 1);
+                //cloud.borderPoints_Y2 = startY_Cloud - 2 + (height + 1);
+
+                cloud.borderPoints_X1 = startX_Cloud;
+                cloud.borderPoints_Y1 = startY_Cloud;
+                cloud.borderPoints_X2 = startX_Cloud + width;
+                cloud.borderPoints_Y2 = startY_Cloud + height;
+
                 // Отрисовка квадратов на контрольных точках
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+                updateConnectors(cloud);
+                cloud.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
         function deleteShape() {
@@ -1766,16 +1955,16 @@
                 highlight = [];
             }
 
-            if (objects.length === 0) {
-                try {
-                    const savedSchema = localStorage.getItem('savedSchema');
-                    if (savedSchema) {
-                        objects = processFileContent(savedSchema, objects);
-                    }
-                } catch (error) {
-                    console.error("Ошибка загрузки схемы:", error);
-                }
-            }
+            //if (objects.length === 0) {
+            //    try {
+            //        const savedSchema = localStorage.getItem('savedSchema');
+            //        if (savedSchema) {
+            //            objects = processFileContent(savedSchema, objects);
+            //        }
+            //    } catch (error) {
+            //        console.error("Ошибка загрузки схемы:", error);
+            //    }
+            //}
 
             //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
 
@@ -1870,12 +2059,6 @@
                         }
                         break;
                     }
-
-
-                    
-
-                    
-
                 } else if (obj.type === 'star') {
                     const star = obj as Star;
                     const points = [];
@@ -2114,10 +2297,10 @@
             // Проходим по всем объектам и проверяем их на пересечение с полем выделения
             for (const obj of objects) {
                 // Координаты объекта
-                const objX1 = obj.borderPoints_X1;
-                const objY1 = obj.borderPoints_Y1;
-                const objX2 = obj.borderPoints_X2;
-                const objY2 = obj.borderPoints_Y2;
+                const objX1 = obj.borderPoints_X1 + offsetX;
+                const objY1 = obj.borderPoints_Y1 + offsetY;
+                const objX2 = obj.borderPoints_X2 + offsetX;
+                const objY2 = obj.borderPoints_Y2 + offsetY;
 
                 // Проверяем, пересекаются ли прямоугольники (поле выделения и объект)
                 if (
@@ -2226,8 +2409,6 @@
                 }
             }
         }
-
-
         function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
             const A = px - x1;
             const B = py - y1;
@@ -2254,9 +2435,6 @@
             const dy = py - yy;
             return Math.sqrt(dx * dx + dy * dy);
         }
-
-
-
         function leftButtonMove(selectedObject: Shape, mouseX: number, mouseY: number) {
             //console.log(mouseX, mouseY, startX, startY);
 
@@ -3209,7 +3387,7 @@
                     textX = obj.x_C + (obj as Rectangle).width / 2;
                     textY = obj.y_C + (obj as Rectangle).height / 2;
                 }
-                ctx.fillText(obj.info, textX, textY, 70);
+                ctx.fillText(obj.info, textX, textY/*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
             }
         }
         function drawingConnection(obj_s: Shape[], ctx: CanvasRenderingContext2D) {
@@ -3291,21 +3469,25 @@
                         case 'circle':
                             const circle = obj as Circle;
                             drawCircle(circle, ctx);
+                            updateConnectors(circle);
                             enteringText(obj);
                             break;
                         case 'line':
                             const line = obj as Line;
                             drawLine(line, ctx);
+                            updateConnectors(line);
                             enteringText(obj);
                             break;
                         case 'star':
                             const star = obj as Star;
                             drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
+                            updateConnectors(star);
                             enteringText(obj);
                             break;
                         case 'cloud':
                             const cloud = obj as Cloud;
                             drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
+                            updateConnectors(cloud);
                             enteringText(obj);
                             break;
                         default:
@@ -3321,11 +3503,6 @@
                 logDebug("Canvas context is not available");
             }
         }
-
-
-        
-
-
 
 
     } else {

@@ -7,6 +7,18 @@
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
+
+    #recovery-scheme.btn.btn-primary {
+        background-color: transparent !important;
+        border-color: transparent !important;
+    }
+
+    #recovery-scheme.btn.btn-primary:focus,
+    #recovery-scheme.btn.btn-primary:active {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
 </style>
 
 
@@ -17,14 +29,20 @@
 
 
     <main>
-        <div id="main-layout" class="top-row px-4">
-            <a href="/" target="_blank" class="custom-a">App</a>
-            <label>/</label>
-            <a href="reg" target="_blank" class="custom-a">Sign up</a>
-            <label>/</label>
-            <a href="Test.razor" target="_blank" class="custom-a">Sign in</a>
-            <a href="https://mephi.ru/" target="_blank">About us</a>
+        <div id="main-layout" class="top-row px-4 d-flex align-items-center justify-content-between">
+            <button id="recovery-scheme" class="btn btn-primary">
+                Восстановить последние изменения
+            </button>
+            <div>
+                <a href="/" target="_blank" class="custom-a">App</a>
+                <label>/</label>
+                <a href="reg" target="_blank" class="custom-a">Sign up</a>
+                <label>/</label>
+                <a href="Test.razor" target="_blank" class="custom-a">Sign in</a>
+                <a href="https://mephi.ru/" target="_blank">About us</a>
+            </div>
         </div>
+
         <MudThemeProvider/>
             <MudDialogProvider/>
                 <MudSnackbarProvider/>

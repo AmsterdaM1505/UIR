@@ -1,14 +1,5 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 (function () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4;
     let objects = [];
     let highlight = [];
     let allConnectors;
@@ -64,60 +55,129 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         }
         return result;
     }
+    //function processFileContent(content: string, objects: Shape[]) {
+    //    try {
+    //        const sizeMatch = content.match(/Size:({[^}]+})/);
+    //        const objectsMatch = content.match(/Objects:\(([^)]+)\)/);
+    //        if (sizeMatch && objectsMatch) {
+    //            const size = JSON.parse(sizeMatch[1]);
+    //            const shapes = JSON.parse(`[${objectsMatch[1]}]`);
+    //            objects = shapes.map((obj: any) => {
+    //                //if (obj.imageSrc) {
+    //                //    insertionImageFromFile(obj);
+    //                //}
+    //                const baseProps = {
+    //                    id: obj.id || generateUniqueId(),
+    //                    type: obj.type,
+    //                    color: obj.color || '#000',
+    //                    rotation: obj.rotation || 0,
+    //                    info: obj.info || '',
+    //                    linkedObjects: obj.linkedObjects || [],
+    //                    outgoingLinks: obj.outgoingLinks || [],
+    //                    incomingLinks: obj.incomingLinks || [],
+    //                    //imageSrc: obj.imageScr || []
+    //                };
+    //                if (obj.type === 'rectangle') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x,
+    //                        y_C: obj.y,
+    //                        width: obj.width,
+    //                        height: obj.height
+    //                    } as Rectangle;
+    //                } else if (obj.type === 'circle') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x,
+    //                        y_C: obj.y,
+    //                        radius: obj.radius
+    //                    } as Circle;
+    //                } else if (obj.type === 'line') {
+    //                    return {
+    //                        ...baseProps,
+    //                        startX: obj.startX,
+    //                        startY: obj.startY,
+    //                        endX: obj.endX,
+    //                        endY: obj.endY
+    //                    } as Line;
+    //                } else if (obj.type === 'star') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x_C,
+    //                        y_C: obj.y_C,
+    //                        rad: obj.rad,
+    //                        amount_points: obj.amount_points,
+    //                        m: obj.m
+    //                    } as Star;
+    //                } else if (obj.type === 'cloud') {
+    //                    return {
+    //                        ...baseProps,
+    //                        x_C: obj.x_C,
+    //                        y_C: obj.y_C,
+    //                        width: obj.width,
+    //                        height: obj.height
+    //                    } as Cloud;
+    //                } else {
+    //                    throw new Error('Unknown shape type');
+    //                }
+    //            });
+    //            return objects;
+    //        } else if (sizeMatch && !objectsMatch) {
+    //            const size = JSON.parse(sizeMatch[1]);
+    //            objects = [];
+    //            return objects;
+    //        } else {
+    //            throw new Error('Invalid file format');
+    //        }
+    //    } catch (error) {
+    //        console.error('Error processing file content:', error);
+    //    }
+    //}
     function processFileContent(content, objects) {
         try {
-            const sizeMatch = content.match(/Size:({[^}]+})/);
-            const objectsMatch = content.match(/Objects:\(([^)]+)\)/);
-            if (sizeMatch && objectsMatch) {
-                const size = JSON.parse(sizeMatch[1]);
-                const shapes = JSON.parse(`[${objectsMatch[1]}]`);
-                objects = shapes.map((obj) => {
-                    //if (obj.imageSrc) {
-                    //    insertionImageFromFile(obj);
-                    //}
-                    const baseProps = {
-                        id: obj.id || generateUniqueId(),
-                        type: obj.type,
-                        color: obj.color || '#000',
-                        rotation: obj.rotation || 0,
-                        info: obj.info || '',
-                        linkedObjects: obj.linkedObjects || [],
-                        outgoingLinks: obj.outgoingLinks || [],
-                        incomingLinks: obj.incomingLinks || [],
-                        //imageSrc: obj.imageScr || []
-                    };
-                    if (obj.type === 'rectangle') {
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x, y_C: obj.y, width: obj.width, height: obj.height });
-                    }
-                    else if (obj.type === 'circle') {
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x, y_C: obj.y, radius: obj.radius });
-                    }
-                    else if (obj.type === 'line') {
-                        return Object.assign(Object.assign({}, baseProps), { startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY });
-                    }
-                    else if (obj.type === 'star') {
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, rad: obj.rad, amount_points: obj.amount_points, m: obj.m });
-                    }
-                    else if (obj.type === 'cloud') {
+            if (!content)
+                return objects; // Проверяем, есть ли данные
+            const schemaData = JSON.parse(content);
+            if (!schemaData.objects || !Array.isArray(schemaData.objects)) {
+                console.error("Invalid schema format.");
+                return objects;
+            }
+            return schemaData.objects.map(obj => {
+                const baseProps = {
+                    id: obj.id || generateUniqueId(),
+                    type: obj.type,
+                    color: obj.color || '#000',
+                    rotation: obj.rotation || 0,
+                    info: obj.info || '',
+                    linkedObjects: obj.linkedObjects || [],
+                    outgoingLinks: obj.outgoingLinks || [],
+                    incomingLinks: obj.incomingLinks || [],
+                    colorAlpha: obj.colorAlpha || 1,
+                    borderPoints_X1: obj.borderPoints_X1,
+                    borderPoints_Y1: obj.borderPoints_Y1,
+                    borderPoints_X2: obj.borderPoints_X2,
+                    borderPoints_Y2: obj.borderPoints_Y2
+                };
+                switch (obj.type) {
+                    case 'rectangle':
                         return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height });
-                    }
-                    else {
-                        throw new Error('Unknown shape type');
-                    }
-                });
-                return objects;
-            }
-            else if (sizeMatch && !objectsMatch) {
-                const size = JSON.parse(sizeMatch[1]);
-                objects = [];
-                return objects;
-            }
-            else {
-                throw new Error('Invalid file format');
-            }
+                    case 'circle':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, radius: obj.radius });
+                    case 'line':
+                        return Object.assign(Object.assign({}, baseProps), { startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY });
+                    case 'star':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, rad: obj.rad, amount_points: obj.amount_points, m: obj.m });
+                    case 'cloud':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height });
+                    default:
+                        console.warn("Unknown shape type:", obj.type);
+                        return null;
+                }
+            }).filter(obj => obj !== null);
         }
         catch (error) {
-            console.error('Error processing file content:', error);
+            console.error("Error processing file content:", error);
+            return objects; // Если ошибка, возвращаем текущий массив объектов
         }
     }
     (_a = document.getElementById('fileInput')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', function (event) {
@@ -147,35 +207,91 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         }
     });
     document.getElementById('contextMenu').style.display = 'none';
-    //window.addEventListener('DOMContentLoaded', () => {
-    //    setTimeout(() => {
-    //        if (objects.length === 0) {
-    //            const savedSchema = localStorage.getItem('savedSchema');
-    //            objects = processFileContent(savedSchema, objects);
-    //            setTimeout(() => {
-    //                drawObjects();
-    //            }, 1000);
-    //        }
-    //    }, 4000);
-    //});
-    // Сохранение схемы между перезагрузками
-    // Функция для сохранения схемы в локальное хранилище
     function saveToLocalStorage() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if ((objects && objects.length) === 0) {
-                //console.warn("Cannot save: no objects present");
-                return;
-            }
-            localStorage.removeItem('savedSchema');
-            const size = { width: canvas.width, height: canvas.height };
-            const shapes = JSON.stringify(objects, null, 2);
-            const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
-            yield localStorage.setItem('savedSchema', content);
-            console.log("Schema saved");
-        });
+        if (!objects || objects.length === 0) {
+            console.warn("Cannot save: no objects present");
+            return;
+        }
+        try {
+            const schemaData = {
+                size: { width: canvas.width, height: canvas.height },
+                objects: objects
+            };
+            localStorage.setItem('savedSchema', JSON.stringify(schemaData));
+            console.log("Schema saved successfully.", JSON.stringify(schemaData));
+        }
+        catch (error) {
+            console.error("Error saving schema:", error);
+        }
     }
     // Запуск периодического сохранения и восстановления
-    setInterval(saveToLocalStorage, 9000);
+    let lastSavedState = "";
+    function autoSaveToLocalStorage() {
+        const currentState = JSON.stringify(objects);
+        if (currentState !== lastSavedState) {
+            saveToLocalStorage();
+            lastSavedState = currentState;
+        }
+    }
+    setInterval(autoSaveToLocalStorage, 9000);
+    let isSchemaLoaded = false;
+    function loadFromLocalStorage() {
+        if (isSchemaLoaded) {
+            console.warn("Schema is already loaded. Skipping duplicate call.");
+            return;
+        }
+        try {
+            const savedSchema = localStorage.getItem('savedSchema');
+            if (!savedSchema) {
+                console.warn("No saved schema found.");
+                return;
+            }
+            const schemaData = JSON.parse(savedSchema);
+            if (!schemaData.objects || !Array.isArray(schemaData.objects)) {
+                console.error("Invalid schema format.");
+                return;
+            }
+            objects = schemaData.objects.map(obj => {
+                const baseProps = {
+                    id: obj.id || generateUniqueId(),
+                    type: obj.type,
+                    color: obj.color || '#000',
+                    rotation: obj.rotation || 0,
+                    info: obj.info || '',
+                    linkedObjects: obj.linkedObjects || [],
+                    outgoingLinks: obj.outgoingLinks || [],
+                    incomingLinks: obj.incomingLinks || [],
+                    colorAlpha: obj.colorAlpha || 1,
+                    borderPoints_X1: obj.borderPoints_X1,
+                    borderPoints_Y1: obj.borderPoints_Y1,
+                    borderPoints_X2: obj.borderPoints_X2,
+                    borderPoints_Y2: obj.borderPoints_Y2
+                };
+                switch (obj.type) {
+                    case 'rectangle':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height });
+                    case 'circle':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, radius: obj.radius });
+                    case 'line':
+                        return Object.assign(Object.assign({}, baseProps), { startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY });
+                    case 'star':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, rad: obj.rad, amount_points: obj.amount_points, m: obj.m });
+                    case 'cloud':
+                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height });
+                    default:
+                        console.warn("Unknown shape type:", obj.type);
+                        return null;
+                }
+            }).filter(obj => obj !== null);
+            isSchemaLoaded = true; // Устанавливаем флаг после успешной загрузки
+            drawObjects();
+            console.log("Schema loaded successfully.");
+            //console.log(objects);
+        }
+        catch (error) {
+            console.error("Error loading schema:", error);
+        }
+    }
     const canvas = document.getElementById('canvas');
     if (!canvas) {
         logDebug("Canvas element not found");
@@ -185,6 +301,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         canvas.oncontextmenu = () => false;
         logDebug("Canvas element found");
     }
+    //window.addEventListener('DOMContentLoaded', () => {
+    //    loadFromLocalStorage();
+    //});
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!isSchemaLoaded) {
+            loadFromLocalStorage();
+        }
+    });
     function resizeCanvas(canvas) {
         if (!canvas)
             return;
@@ -294,7 +418,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             logDebug("Canvas context obtained");
         }
         //console.log(objects);
-        drawObjects();
+        if (!isSchemaLoaded) {
+            drawObjects();
+        }
+        (_b = document.getElementById('recovery-scheme')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', function () {
+            logDebug("recovery-scheme button clicked");
+            loadFromLocalStorage();
+        });
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e) {
             onMouseDown(e);
@@ -349,39 +479,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             document.removeEventListener("mousemove", resizeRightPanel);
             document.removeEventListener("mouseup", stopResizing);
         }
-        (_b = document.getElementById('addRectBtn')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', function () {
+        (_c = document.getElementById('addRectBtn')) === null || _c === void 0 ? void 0 : _c.addEventListener('click', function () {
             logDebug("Add rectangle button clicked");
             addRect();
         });
-        (_c = document.getElementById('addCircleBtn')) === null || _c === void 0 ? void 0 : _c.addEventListener('click', function () {
+        (_d = document.getElementById('addCircleBtn')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', function () {
             logDebug("Add circle button clicked");
             addCircle();
         });
-        (_d = document.getElementById('addLineBtn')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', function () {
+        (_e = document.getElementById('addLineBtn')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', function () {
             logDebug("Add line button clicked");
             addLine();
         });
-        (_e = document.getElementById('addCloudBtn')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', function () {
+        (_f = document.getElementById('addCloudBtn')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
             logDebug("Add cloud button clicked");
             addCloud();
         });
-        (_f = document.getElementById('addStarBtn')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
+        (_g = document.getElementById('addStarBtn')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', function () {
             logDebug("Add star button clicked");
             addStar();
         });
-        (_g = document.getElementById('delShapeBtn')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', function () {
+        (_h = document.getElementById('delShapeBtn')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
             logDebug("Delete shape button clicked");
             deleteShape();
         });
-        (_h = document.getElementById('rotateLeftBtn')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
+        (_j = document.getElementById('rotateLeftBtn')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
         });
-        (_j = document.getElementById('rotateRightBtn')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
+        (_k = document.getElementById('rotateRightBtn')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
             logDebug("Rotate right button clicked");
             rotateSelectedObject(10);
         });
-        (_k = document.getElementById('deleteItem')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
+        (_l = document.getElementById('deleteItem')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
             if (selectedObject_buf) {
                 deleteShape();
             }
@@ -393,21 +523,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
             selectedObject_buf = null;
         });
-        (_l = document.getElementById('rotateLeftItem')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
+        (_m = document.getElementById('rotateLeftItem')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(-10);
             }
             selectedObject_buf = null;
             drawObjects();
         });
-        (_m = document.getElementById('rotateRightItem')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
+        (_o = document.getElementById('rotateRightItem')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(10);
             }
             selectedObject_buf = null;
             drawObjects();
         });
-        (_o = document.getElementById('cycleCheck')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+        (_p = document.getElementById('cycleCheck')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
             const cycles = detectCycles(objects); // Находим все циклы
             highlight = []; // Сбрасываем выделение перед каждым новым поиском циклов
             if (cycles.length > 0) {
@@ -423,32 +553,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 console.log("Циклы не найдены");
             }
         });
-        (_p = document.getElementById('longWayCheck')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
+        (_q = document.getElementById('longWayCheck')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
             logDebug(`longWayCheck button clicked`);
             connectionServ = 5;
             waySelection();
         });
-        (_q = document.getElementById('connect_objects')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
+        (_r = document.getElementById('connect_objects')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
             logDebug(`connectionObjects button clicked`);
             connectionServ = 1;
             connectionObjects();
         });
-        (_r = document.getElementById('remove_connection')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
+        (_s = document.getElementById('remove_connection')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
             logDebug(`remove_connection button clicked`);
             connectionServ = 0;
             removeObjects();
         });
-        (_s = document.getElementById('outgoing_connect')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
+        (_t = document.getElementById('outgoing_connect')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
             logDebug(`outgoingConnectionObjects button clicked`);
             connectionServ = 3;
             connectionObjects();
         });
-        (_t = document.getElementById('remove_outgoing_connection')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
+        (_u = document.getElementById('remove_outgoing_connection')) === null || _u === void 0 ? void 0 : _u.addEventListener('click', function () {
             logDebug(`remove_connection button clicked`);
             connectionServ = 4;
             removeObjects();
         });
-        (_u = document.getElementById('additionInfo')) === null || _u === void 0 ? void 0 : _u.addEventListener('click', function () {
+        (_v = document.getElementById('additionInfo')) === null || _v === void 0 ? void 0 : _v.addEventListener('click', function () {
             addInfo(selectedObject_buf);
         });
         document.addEventListener('contextmenu', function (e) {
@@ -456,16 +586,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             //showContextMenu(e.clientX, e.clientY);
             onMouseDown(e);
         });
-        (_v = document.getElementById('insert_img')) === null || _v === void 0 ? void 0 : _v.addEventListener('click', function () {
+        (_w = document.getElementById('insert_img')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
             var _a;
             logDebug("Insert img button clicked");
             (_a = document.getElementById('imageInput')) === null || _a === void 0 ? void 0 : _a.click(); // Открываем диалог выбора файлов
         });
-        (_w = document.getElementById('debugInfo')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
+        (_x = document.getElementById('debugInfo')) === null || _x === void 0 ? void 0 : _x.addEventListener('click', function () {
             logDebug("debugInfo clicked");
             debugHide();
         });
-        (_x = document.getElementById('imageInput')) === null || _x === void 0 ? void 0 : _x.addEventListener('change', function (event) {
+        (_y = document.getElementById('imageInput')) === null || _y === void 0 ? void 0 : _y.addEventListener('change', function (event) {
             var _a, _b;
             const file = (_b = (_a = event.target) === null || _a === void 0 ? void 0 : _a.files) === null || _b === void 0 ? void 0 : _b[0];
             if (file && selectedObject_buf) {
@@ -526,14 +656,44 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             // Поиск объекта, по которому сделан двойной клик
             const clickedObject = objects.find(obj => {
                 switch (obj.type) {
-                    case 'rectangle':
+                    case 'rectangle': {
                         const rect = obj;
                         return isPointInRotatedRect(mouseX, mouseY, rect);
-                    case 'circle':
+                    }
+                    case 'circle': {
                         const circle = obj;
                         const dx = mouseX - circle.x_C;
                         const dy = mouseY - circle.y_C;
                         return dx * dx + dy * dy <= circle.radius * circle.radius;
+                    }
+                    case 'line': {
+                        const line = obj;
+                        const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
+                        const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
+                        const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY +
+                            line.endX * line.startY - line.endY * line.startX) /
+                            Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
+                        return distStart < 10 || distEnd < 10 || distToLine < 10;
+                    }
+                    case 'star': {
+                        const star = obj;
+                        const points = [];
+                        for (let i = 0; i < 2 * star.amount_points; i++) {
+                            const angle = Math.PI * i / star.amount_points;
+                            const radius = (i % 2 === 0) ? star.rad : star.rad * star.m;
+                            const x = star.x_C + radius * Math.sin(angle);
+                            const y = star.y_C + radius * Math.cos(angle);
+                            points.push({ x, y });
+                        }
+                        return pointInPolygon(mouseX, mouseY, points);
+                    }
+                    case 'cloud': {
+                        const cloud = obj;
+                        const startX_Cloud = cloud.x_C - cloud.width / 2;
+                        const startY_Cloud = cloud.y_C - cloud.height / 2;
+                        return mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width &&
+                            mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height;
+                    }
                     default:
                         return false;
                 }
@@ -542,7 +702,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 createTextInput(clickedObject, mouseX, mouseY);
             }
         });
+        //const mainLayout = document.getElementById("main-layout") as HTMLCanvasElement;
+        //const debug = document.getElementById("debug-panel");
+        //if (!canvas || !mainLayout) return;
+        //const rect = canvas.getBoundingClientRect();
+        //const difference = mainLayout.getBoundingClientRect();
+        //offsetX = rect.left;
+        //offsetY = Math.max(0, rect.top - (difference.bottom - difference.top));
+        //debug.style.bottom += `${difference.bottom - difference.top}px`;
+        ////console.log(offsetX, offsetY, difference.top, difference.bottom)
         function createTextInput(obj, x, y) {
+            const mainLayout = document.getElementById("main-layout");
+            const difference = mainLayout.getBoundingClientRect();
             // Создаем input-элемент
             const input = document.createElement('input');
             input.type = 'text';
@@ -554,44 +725,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             input.style.padding = '2px';
             input.style.background = 'none';
             input.style.zIndex = '1000';
+            input.style.whiteSpace = 'nowrap';
+            input.style.overflow = 'visible';
+            input.style.boxSizing = 'border-box';
             switch (obj.type) {
                 case 'rectangle':
                     const rect = obj;
-                    input.style.left = `${canvas.offsetLeft + rect.x_C}px`;
-                    input.style.top = `${canvas.offsetTop + rect.y_C}px`;
-                    input.style.width = `${rect.width}px`;
+                    input.style.left = `${canvas.offsetLeft + rect.x_C + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + rect.y_C + rect.height / 3 + offsetY + difference.bottom - difference.top}px`;
+                    input.style.width = `${rect.width + 100}px`;
+                    /*input.style.width = 'none';*/
                     input.style.height = `${rect.height / 3}px`;
+                    console.log(canvas.offsetLeft, canvas.offsetTop, rect.y_C, rect.x_C, x, y, canvas.offsetLeft + rect.x_C, canvas.offsetTop + rect.y_C, canvas.offsetLeft - rect.x_C, canvas.offsetTop - rect.y_C);
                     break;
                 case 'circle':
                     const circle = obj;
-                    input.style.left = `${canvas.offsetLeft + circle.x_C - circle.radius / 2}px`;
-                    input.style.top = `${canvas.offsetTop + circle.y_C - circle.radius / 3}px`;
+                    input.style.left = `${canvas.offsetLeft + circle.x_C - circle.radius / 2 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + circle.y_C - circle.radius / 3 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `${circle.radius}px`;
-                    input.style.height = `${circle.radius / 3}px`;
+                    input.style.height = `${circle.radius * 2 / 3}px`;
                     input.style.textAlign = 'center';
                     break;
                 case 'line':
                     const line = obj;
-                    input.style.left = `${canvas.offsetLeft + (line.startX + line.endX) / 2 - 30}px`;
-                    input.style.top = `${canvas.offsetTop + (line.startY + line.endY) / 2 - 10}px`;
+                    input.style.left = `${canvas.offsetLeft + (line.startX + line.endX) / 2 - 30 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + (line.startY + line.endY) / 2 - 10 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `60px`;
                     input.style.height = `20px`;
                     input.style.textAlign = 'center';
-                    input.style.background = 'white';
-                    input.style.border = '1px solid black';
                     break;
                 case 'star':
                     const star = obj;
-                    input.style.left = `${canvas.offsetLeft + star.x_C - star.rad / 2}px`;
-                    input.style.top = `${canvas.offsetTop + star.y_C - star.rad / 3}px`;
+                    input.style.left = `${canvas.offsetLeft + star.x_C - star.rad / 2 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + star.y_C - star.rad / 3 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `${star.rad}px`;
                     input.style.height = `${star.rad / 3}px`;
                     input.style.textAlign = 'center';
                     break;
                 case 'cloud':
                     const cloud = obj;
-                    input.style.left = `${canvas.offsetLeft + cloud.x_C - cloud.width / 2}px`;
-                    input.style.top = `${canvas.offsetTop + cloud.y_C - cloud.height / 3}px`;
+                    input.style.left = `${canvas.offsetLeft + cloud.x_C - cloud.width / 2 + offsetX}px`;
+                    input.style.top = `${canvas.offsetTop + cloud.y_C - cloud.height / 3 + offsetY + difference.bottom - difference.top}px`;
                     input.style.width = `${cloud.width}px`;
                     input.style.height = `${cloud.height / 3}px`;
                     input.style.textAlign = 'center';
@@ -780,7 +954,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
         }
         // Инициализация отрисовки объектов на холсте
-        drawObjects();
+        //drawObjects();
         function getObjectCenter(obj) {
             switch (obj.type) {
                 case 'rectangle':
@@ -880,27 +1054,85 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }
         }
         let allConnectors = [];
-        function updateConnectors(rect) {
-            const { x_C, y_C, width, height } = rect;
+        function updateConnectors(obj) {
             // Если у объекта уже есть коннекторы, сохраняем их ID
-            const existingConnectors = rect.connectors || [];
+            const existingConnectors = obj.connectors || [];
             const getConnectorId = (type) => {
                 const existing = existingConnectors.find(connector => connector.type === type);
                 return existing ? existing.id : generateRandomId(16);
             };
-            // Обновляем коннекторы объекта
-            rect.connectors = [
-                { id: getConnectorId('left'), x: x_C, y: y_C + height / 2, type: 'left' },
-                { id: getConnectorId('right'), x: x_C + width, y: y_C + height / 2, type: 'right' },
-                { id: getConnectorId('top'), x: x_C + width / 2, y: y_C, type: 'top' },
-                { id: getConnectorId('bottom'), x: x_C + width / 2, y: y_C + height, type: 'bottom' }
-            ];
+            let connectors = [];
+            switch (obj.type) {
+                case 'rectangle': {
+                    const rect = obj;
+                    const { x_C, y_C, width, height } = rect;
+                    connectors = [
+                        { id: getConnectorId('left'), x: x_C, y: y_C + height / 2, type: 'left' },
+                        { id: getConnectorId('right'), x: x_C + width, y: y_C + height / 2, type: 'right' },
+                        { id: getConnectorId('top'), x: x_C + width / 2, y: y_C, type: 'top' },
+                        { id: getConnectorId('bottom'), x: x_C + width / 2, y: y_C + height, type: 'bottom' }
+                    ];
+                    break;
+                }
+                case 'circle': {
+                    const circle = obj;
+                    const { x_C, y_C, radius } = circle;
+                    connectors = [
+                        { id: getConnectorId('left'), x: x_C - radius, y: y_C, type: 'left' },
+                        { id: getConnectorId('right'), x: x_C + radius, y: y_C, type: 'right' },
+                        { id: getConnectorId('top'), x: x_C, y: y_C - radius, type: 'top' },
+                        { id: getConnectorId('bottom'), x: x_C, y: y_C + radius, type: 'bottom' }
+                    ];
+                    break;
+                }
+                case 'line': {
+                    const line = obj;
+                    // Для линии удобно использовать ее концевые точки в качестве коннекторов
+                    connectors = [
+                        { id: getConnectorId('start'), x: line.startX, y: line.startY, type: 'start' },
+                        { id: getConnectorId('end'), x: line.endX, y: line.endY, type: 'end' }
+                    ];
+                    break;
+                }
+                case 'star': {
+                    const star = obj;
+                    // Предположим, что мы используем bounding box звезды
+                    const left = star.x_C - star.rad;
+                    const right = star.x_C + star.rad;
+                    const top = star.y_C - star.rad;
+                    const bottom = star.y_C + star.rad;
+                    connectors = [
+                        { id: getConnectorId('left'), x: left, y: star.y_C, type: 'left' },
+                        { id: getConnectorId('right'), x: right, y: star.y_C, type: 'right' },
+                        { id: getConnectorId('top'), x: star.x_C, y: top, type: 'top' },
+                        { id: getConnectorId('bottom'), x: star.x_C, y: bottom, type: 'bottom' }
+                    ];
+                    break;
+                }
+                case 'cloud': {
+                    const cloud = obj;
+                    const left = cloud.x_C - cloud.width / 2;
+                    const top = cloud.y_C - cloud.height / 2;
+                    connectors = [
+                        { id: getConnectorId('left'), x: left, y: cloud.y_C, type: 'left' },
+                        { id: getConnectorId('right'), x: left + cloud.width, y: cloud.y_C, type: 'right' },
+                        { id: getConnectorId('top'), x: cloud.x_C, y: top, type: 'top' },
+                        { id: getConnectorId('bottom'), x: cloud.x_C, y: top + cloud.height, type: 'bottom' }
+                    ];
+                    break;
+                }
+                default:
+                    logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
+                    return;
+            }
+            // Обновляем коннекторы в объекте
+            obj.connectors = connectors;
             // Синхронизируем данные с массивом allConnectors
-            rect.connectors.forEach(connector => {
+            connectors.forEach(connector => {
                 const index = allConnectors.findIndex(existing => existing.id === connector.id);
                 if (index !== -1) {
-                    // Если коннектор уже существует в allConnectors, обновляем его координаты
-                    allConnectors[index] = Object.assign(Object.assign({}, allConnectors[index]), { x: connector.x, y: connector.y });
+                    // Если коннектор уже существует в allConnectors, обновляем его координаты и тип
+                    allConnectors[index] = Object.assign(Object.assign({}, allConnectors[index]), { x: connector.x, y: connector.y, type: connector.type });
                 }
                 else {
                     // Если коннектор отсутствует, добавляем его
@@ -908,67 +1140,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 }
             });
         }
-        //function updateConnectors(rect: Rectangle) {
-        //    const { x_C, y_C, width, height, rotation } = rect;
-        //    // Центр прямоугольника
-        //    const centerX = x_C + width / 2;
-        //    const centerY = y_C + height / 2;
-        //    const angle = (rotation || 0) * Math.PI / 180; // Угол поворота в радианах
-        //    // Вращение точки вокруг центра
-        //    function rotatePoint(px: number, py: number, angle: number, centerX: number, centerY: number) {
-        //        let a = width / 2;
-        //        let b = height / 2;
-        //        let dx = 0;
-        //        let dy = 0;
-        //        if (a === b) {
-        //            dx = a * Math.cos(angle);
-        //            dy = a * Math.sin(angle);
-        //        } else {
-        //            dx = a * Math.cos(angle);
-        //            dy = b * Math.sin(angle);
-        //        }
-        //        return {
-        //            x: dx + centerX,
-        //            y: dy + centerY
-        //        };
-        //    }
-        //    // Вычисление позиций коннекторов до поворота
-        //    const connectors = [
-        //        { x: x_C, y: y_C + height / 2, type: 'left' },            // Левый коннектор
-        //        { x: x_C + width, y: y_C + height / 2, type: 'right' },   // Правый коннектор
-        //        { x: x_C + width / 2, y: y_C, type: 'top' },              // Верхний коннектор
-        //        { x: x_C + width / 2, y: y_C + height, type: 'bottom' }   // Нижний коннектор
-        //    ];
-        //    // Применяем поворот к каждому коннектору и сохраняем их позиции
-        //    rect.connectors = connectors.map(connector => {
-        //        const rotated = rotatePoint(connector.x, connector.y, angle, centerX, centerY);
-        //        return { ...rotated, type: connector.type };
-        //    });
-        //}
-        //function updateConnectors(rect: Rectangle) {
-        //    const { x_C, y_C, width, height, rotation } = rect;
-        //    // Центр прямоугольника
-        //    const centerX = x_C + width / 2;
-        //    const centerY = y_C + height / 2;
-        //    const angle = (rotation || 0) * Math.PI / 180; // Угол поворота в радианах
-        //    // Расстояние от центра до каждого коннектора и их исходный угол (в радианах)
-        //    const connectors = [
-        //        { r: width / 2, initialAngle: Math.PI, type: 'left' },              // Левый коннектор
-        //        { r: width / 2, initialAngle: 0, type: 'right' },                   // Правый коннектор
-        //        { r: height / 2, initialAngle: -Math.PI / 2, type: 'top' },         // Верхний коннектор
-        //        { r: height / 2, initialAngle: Math.PI / 2, type: 'bottom' }        // Нижний коннектор
-        //    ];
-        //    // Вычисление новых координат коннекторов
-        //    rect.connectors = connectors.map(connector => {
-        //        const totalAngle = connector.initialAngle + angle;
-        //        const x = centerX + connector.r * Math.cos(totalAngle);
-        //        const y = centerY + connector.r * Math.sin(totalAngle);
-        //        return { x, y, type: connector.type };
-        //    });
-        //}
-        //ctx.translate(centerX, centerY);
-        //ctx.rotate((obj.rotation * Math.PI) / 180);
-        //ctx.translate(-centerX, -centerY);
         function addRect() {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
@@ -1211,6 +1382,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 line.borderPoints_Y1 = rectY;
                 line.borderPoints_X2 = rectX + rectWidth;
                 line.borderPoints_Y2 = rectY + rectHeight;
+                updateConnectors(line);
+                line.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
             drawArow(ctx, line);
         }
@@ -1230,31 +1407,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 ctx.restore();
             }
             if (circle.selectionMarker || selectedObject_buf === circle) {
-                //ctx.beginPath();
-                //ctx.arc(circle.x, circle.y - circle.radius - 5, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //ctx.beginPath();
-                //ctx.arc(circle.x - circle.radius - 5, circle.y, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //ctx.beginPath();
-                //ctx.arc(circle.x, circle.y + circle.radius + 5, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //ctx.beginPath();
-                //ctx.arc(circle.x + circle.radius + 5, circle.y, 5, 0, 2 * Math.PI);
-                //ctx.fillStyle = 'black';
-                //ctx.fill();
-                //
-                //ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                //ctx.lineWidth = 2;
-                //ctx.setLineDash([5, 3]);
-                //ctx.beginPath();
-                //ctx.arc(circle.x_C, circle.y_C, circle.radius + 2, 0, 2 * Math.PI);
-                //ctx.stroke();
-                //ctx.setLineDash([]);  // Сбрасываем пунктир
-                //
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]); // Длина штриха и промежутка
@@ -1264,10 +1416,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 circle.borderPoints_Y1 = circle.y_C - circle.radius - 2;
                 circle.borderPoints_X2 = circle.x_C + circle.radius + 2;
                 circle.borderPoints_Y2 = circle.y_C + circle.radius + 2;
+                updateConnectors(circle);
+                circle.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
-        function drawStar(ctx, x_C, y_C, rad, amount_points, m, obj) {
-            const colorWithAlpha = hexToRgba(obj.color, obj.colorAlpha);
+        function drawStar(ctx, x_C, y_C, rad, amount_points, m, star) {
+            const colorWithAlpha = hexToRgba(star.color, star.colorAlpha);
             ctx.beginPath();
             let points = [];
             ctx.moveTo(x_C, y_C + rad);
@@ -1282,22 +1440,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             ctx.closePath();
             ctx.fillStyle = colorWithAlpha;
             ctx.fill();
-            if (obj.selectionMarker || selectedObject_buf === obj) {
+            if (star.selectionMarker || selectedObject_buf === star) {
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);
-                ctx.strokeRect(obj.x_C - obj.rad - 2, obj.y_C - obj.rad - 2, obj.rad * 2 + 4, obj.rad * 2 + 4);
+                ctx.strokeRect(star.x_C - star.rad - 2, star.y_C - star.rad - 2, star.rad * 2 + 4, star.rad * 2 + 4);
                 ctx.setLineDash([]); // Сбрасываем пунктир
-                obj.borderPoints_X1 = obj.x_C - obj.rad - 2;
-                obj.borderPoints_Y1 = obj.y_C - obj.rad - 2;
-                obj.borderPoints_X2 = obj.x_C + obj.rad + 2;
-                obj.borderPoints_Y2 = obj.y_C + obj.rad + 2;
+                star.borderPoints_X1 = star.x_C - star.rad - 2;
+                star.borderPoints_Y1 = star.y_C - star.rad - 2;
+                star.borderPoints_X2 = star.x_C + star.rad + 2;
+                star.borderPoints_Y2 = star.y_C + star.rad + 2;
                 // Отрисовка квадратов на вершинах звезды
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+                updateConnectors(star);
+                star.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
-        function drawCloud(ctx, x_C, y_C, width, height, obj) {
-            const colorWithAlpha = hexToRgba(obj.color, obj.colorAlpha);
+        function drawCloud(ctx, x_C, y_C, width, height, cloud) {
+            const colorWithAlpha = hexToRgba(cloud.color, cloud.colorAlpha);
             ctx.beginPath();
             let startX_Cloud = x_C - width / 2;
             let startY_Cloud = y_C - height / 2;
@@ -1315,17 +1479,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             ctx.closePath();
             ctx.fillStyle = colorWithAlpha;
             ctx.fill();
-            if (obj.selectionMarker || selectedObject_buf === obj) {
+            if (cloud.selectionMarker || selectedObject_buf === cloud) {
                 // Отрисовка голубой пунктирной рамки
                 ctx.save();
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 3]);
-                ctx.strokeRect(startX_Cloud - 2, startY_Cloud - 2, width + 1, height + 1);
+                //ctx.strokeRect(startX_Cloud - 2, startY_Cloud - 2, width + 1, height + 1);
+                ctx.strokeRect(startX_Cloud, startY_Cloud, width, height);
                 ctx.setLineDash([]); // Сбрасываем пунктир
                 ctx.restore();
+                //cloud.borderPoints_X1 = startX_Cloud - 2;
+                //cloud.borderPoints_Y1 = startY_Cloud - 2;
+                //cloud.borderPoints_X2 = startX_Cloud - 2 + (width + 1);
+                //cloud.borderPoints_Y2 = startY_Cloud - 2 + (height + 1);
+                cloud.borderPoints_X1 = startX_Cloud;
+                cloud.borderPoints_Y1 = startY_Cloud;
+                cloud.borderPoints_X2 = startX_Cloud + width;
+                cloud.borderPoints_Y2 = startY_Cloud + height;
                 // Отрисовка квадратов на контрольных точках
                 //points.forEach(point => drawSquare(ctx, point.x, point.y, 10));
+                updateConnectors(cloud);
+                cloud.connectors.forEach(connector => {
+                    ctx.fillStyle = 'black';
+                    ctx.fillRect(connector.x - 3, connector.y - 3, 6, 6);
+                    //console.log(connector.x - 3, connector.y - 3);
+                });
             }
         }
         function deleteShape() {
@@ -1559,17 +1738,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 logDebug(`highlight - (${highlight})`);
                 highlight = [];
             }
-            if (objects.length === 0) {
-                try {
-                    const savedSchema = localStorage.getItem('savedSchema');
-                    if (savedSchema) {
-                        objects = processFileContent(savedSchema, objects);
-                    }
-                }
-                catch (error) {
-                    console.error("Ошибка загрузки схемы:", error);
-                }
-            }
+            //if (objects.length === 0) {
+            //    try {
+            //        const savedSchema = localStorage.getItem('savedSchema');
+            //        if (savedSchema) {
+            //            objects = processFileContent(savedSchema, objects);
+            //        }
+            //    } catch (error) {
+            //        console.error("Ошибка загрузки схемы:", error);
+            //    }
+            //}
             //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
             for (let i = objects.length - 1; i >= 0; i--) {
                 const obj = objects[i];
@@ -1893,10 +2071,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             // Проходим по всем объектам и проверяем их на пересечение с полем выделения
             for (const obj of objects) {
                 // Координаты объекта
-                const objX1 = obj.borderPoints_X1;
-                const objY1 = obj.borderPoints_Y1;
-                const objX2 = obj.borderPoints_X2;
-                const objY2 = obj.borderPoints_Y2;
+                const objX1 = obj.borderPoints_X1 + offsetX;
+                const objY1 = obj.borderPoints_Y1 + offsetY;
+                const objX2 = obj.borderPoints_X2 + offsetX;
+                const objY2 = obj.borderPoints_Y2 + offsetY;
                 // Проверяем, пересекаются ли прямоугольники (поле выделения и объект)
                 if (objX2 >= selectionBoxX1 &&
                     objX1 <= selectionBoxX2 &&
@@ -2330,14 +2508,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             link.click(); // Программное кликанье по ссылке
             document.body.removeChild(link); //Удаление ссылки из документа. Это делается для очистки DOM после скачивания файла, так как ссылка больше не нужна
         }
-        (_y = document.getElementById('downloadBtn')) === null || _y === void 0 ? void 0 : _y.addEventListener('click', function () {
+        (_z = document.getElementById('downloadBtn')) === null || _z === void 0 ? void 0 : _z.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
             const shapes = JSON.stringify(objects, null, 2);
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         });
         //пробуем сделать с загрузкой на сервер
-        (_z = document.getElementById('uploadCssBtn')) === null || _z === void 0 ? void 0 : _z.addEventListener('click', function () {
+        (_0 = document.getElementById('uploadCssBtn')) === null || _0 === void 0 ? void 0 : _0.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -2387,7 +2565,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 console.error('No CSS found in local storage');
             }
         }
-        (_0 = document.getElementById('uploadCssBtn2')) === null || _0 === void 0 ? void 0 : _0.addEventListener('click', function () {
+        (_1 = document.getElementById('uploadCssBtn2')) === null || _1 === void 0 ? void 0 : _1.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput2');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -2398,7 +2576,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 logDebug("No file selected for upload");
             }
         });
-        (_1 = document.getElementById('cssFileInput2')) === null || _1 === void 0 ? void 0 : _1.addEventListener('change', function (event) {
+        (_2 = document.getElementById('cssFileInput2')) === null || _2 === void 0 ? void 0 : _2.addEventListener('change', function (event) {
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -2487,7 +2665,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
             }).join('\n');
             return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
         }
-        (_2 = document.getElementById('fileInput3')) === null || _2 === void 0 ? void 0 : _2.addEventListener('change', function (event) {
+        (_3 = document.getElementById('fileInput3')) === null || _3 === void 0 ? void 0 : _3.addEventListener('change', function (event) {
             var _a;
             try {
                 const input = event.target;
@@ -2518,7 +2696,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                 console.error('Error reading file:', error);
             }
         });
-        (_3 = document.getElementById('downloadBtn3')) === null || _3 === void 0 ? void 0 : _3.addEventListener('click', function () {
+        (_4 = document.getElementById('downloadBtn3')) === null || _4 === void 0 ? void 0 : _4.addEventListener('click', function () {
             const owlContent = convertObjectsToOWL(objects);
             downloadFile('shapes.owl', owlContent);
         });
@@ -2854,7 +3032,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                     textX = obj.x_C + obj.width / 2;
                     textY = obj.y_C + obj.height / 2;
                 }
-                ctx.fillText(obj.info, textX, textY, 70);
+                ctx.fillText(obj.info, textX, textY /*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
             }
         }
         function drawingConnection(obj_s, ctx) {
@@ -2939,21 +3117,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
                         case 'circle':
                             const circle = obj;
                             drawCircle(circle, ctx);
+                            updateConnectors(circle);
                             enteringText(obj);
                             break;
                         case 'line':
                             const line = obj;
                             drawLine(line, ctx);
+                            updateConnectors(line);
                             enteringText(obj);
                             break;
                         case 'star':
                             const star = obj;
                             drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
+                            updateConnectors(star);
                             enteringText(obj);
                             break;
                         case 'cloud':
                             const cloud = obj;
                             drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
+                            updateConnectors(cloud);
                             enteringText(obj);
                             break;
                         default:

@@ -23,29 +23,26 @@
     let selectedLineEnd = null;
     let selectedLineMid = null;
 
+    const leftPanel = document.getElementById("button-panel");
+    const rightPanel = document.getElementById("table-container");
+    const debugPanel = document.getElementById("debug-panel");
+
+    const resizeHandleLeft = document.getElementById("resize-handle-left");
+    const resizeHandleRight = document.getElementById("resize-handle-right");
+
+    let isResizingLeft = false;
+    let isResizingRight = false;
+
+    let isSchemaLoaded = false;
+
+    let isSelecting = false;
+    let selectionStartX = 0;
+    let selectionStartY = 0;
+    let selectionEndX = 0;
+    let selectionEndY = 0;
+
+    let activeConnector: { x: number, y: number, type: string } | null = null;
     //let complexObjects: ComplexShape[] = [];
-
-
-    function measureTextWidth(text: string, font: string): number {
-        // Создаём временный span
-        const span = document.createElement('span');
-
-        const help = document.getElementById("addRectBtn")
-        console.log("мой текст", help.style)
-        // Делаем его невидимым и не влияющим на layout
-        span.style.visibility = 'hidden';
-        span.style.whiteSpace = 'nowrap';
-        // Устанавливаем шрифт, который используется в кнопке (например, "16px Roboto")
-        span.style.font = font;
-        span.textContent = text;
-        // Добавляем элемент в body, чтобы он был отрендерен
-        document.body.appendChild(span);
-        // Измеряем его ширину
-        const width = span.getBoundingClientRect().width;
-        // Удаляем временный элемент
-        document.body.removeChild(span);
-        return width;
-    }
 
     // Пример вызова:
     const expectedWidth = measureTextWidth("Добавить прямоугольник", "16px Roboto");
@@ -236,14 +233,14 @@
             };
 
             localStorage.setItem('savedSchema', JSON.stringify(schemaData));
-            console.log("Schema saved successfully.", JSON.stringify(schemaData));
+            //console.log("Schema saved successfully.", JSON.stringify(schemaData));
         } catch (error) {
             console.error("Error saving schema:", error);
         }
     }
 
 
-    
+
     // Запуск периодического сохранения и восстановления
     let lastSavedState = "";
 
@@ -256,8 +253,6 @@
     }
 
     setInterval(autoSaveToLocalStorage, 9000);
-
-    let isSchemaLoaded = false;
 
     function loadFromLocalStorage() {
         if (isSchemaLoaded) {
@@ -333,7 +328,7 @@
     } else {
         canvas.oncontextmenu = () => false;
         logDebug("Canvas element found");
-        
+
     }
     //window.addEventListener('DOMContentLoaded', () => {
     //    loadFromLocalStorage();
@@ -347,7 +342,7 @@
 
 
     function resizeCanvas(canvas: HTMLCanvasElement) {
-        
+
         if (!canvas) return;
 
         const ctx = canvas.getContext("2d");
@@ -368,7 +363,7 @@
     }
 
     function updateOffsets(canvas: HTMLCanvasElement) {
-        
+
         const mainLayout = document.getElementById("main-layout") as HTMLCanvasElement;
         const debug = document.getElementById("debug-panel");
 
@@ -440,7 +435,7 @@
     const gridCtx = gridCanvas.getContext('2d')!;
     gridCanvas.width = canvas.width;
     gridCanvas.height = canvas.height;
-
+    console.log("w-h", gridCanvas.width, gridCanvas.height)
     //Функция для рисования сетки
     function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, gridSize: number) {
         //ctx.clearRect(0, 0, width, height); // Очищаем холст перед рисованием
@@ -467,7 +462,7 @@
 
     // Рисуем сетку на фоновом холсте
     drawGrid(gridCtx, gridCanvas.width, gridCanvas.height, 20);
-    
+
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -495,16 +490,6 @@
         canvas.addEventListener('mouseup', function (e: MouseEvent) {
             onMouseUp(e);
         });
-
-        const leftPanel = document.getElementById("button-panel");
-        const rightPanel = document.getElementById("table-container");
-        const debugPanel = document.getElementById("debug-panel");
-
-        const resizeHandleLeft = document.getElementById("resize-handle-left");
-        const resizeHandleRight = document.getElementById("resize-handle-right");
-
-        let isResizingLeft = false;
-        let isResizingRight = false;
 
         resizeHandleLeft.addEventListener("mousedown", function (e) {
             isResizingLeft = true;
@@ -1075,12 +1060,15 @@
                     const star = obj_ as Star;
                     // Код для отрисовки контура звезды
                     ctx_.beginPath();
-                    drawStar(ctx_, star.x_C, star.y_C, star.rad + 2, star.amount_points, star.m, star); // Увеличиваем радиус для контурного выделения
+                    star.rad += 2
+                    drawStar(star as Star, ctx);
                     ctx_.stroke();
                 } else if (obj_.type === 'cloud') {
                     const cloud = obj_ as Cloud;
                     ctx_.beginPath();
-                    drawCloud(ctx_, cloud.x_C, cloud.y_C, cloud.width + 4, cloud.height + 4, cloud); // Увеличиваем размеры для контурного выделения
+                    cloud.width += 4
+                    cloud.height += 4
+                    drawCloud(selectedObject_buf as Cloud, ctx);
                     ctx_.stroke();
                 }
 
@@ -1287,7 +1275,37 @@
             });
         }
 
-        function addRect() {
+        // Создание объектов
+        function objectAdditionPreprocessing(obj: Shape) {
+            updateConnectors(obj);
+            selectedObject_buf = obj;
+            selectedObject_buf.selectionMarker = true;
+            switch (obj.type) {
+                case 'rectangle':
+                    drawRect(selectedObject_buf as Rectangle, ctx);
+                    break;
+                case 'circle':
+                    drawCircle(selectedObject_buf as Circle, ctx);
+                    break;
+                case 'line':
+                    drawLine(selectedObject_buf as Line, ctx);
+                    break;
+                case 'star':
+                    drawStar(selectedObject_buf as Star, ctx);
+                    break;
+                case 'cloud':
+                    drawCloud(selectedObject_buf as Cloud, ctx);
+                    break;
+                default:
+                    console.warn("Unknown shape type:", obj.type);
+                    return null;
+            }
+            selectedObject_buf.selectionMarker = false;
+            objects.push(selectedObject_buf);
+            selectedObject_buf = null;
+            drawObjects();
+        }
+        function addRect(): void {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const newRect: Rectangle = {
@@ -1307,19 +1325,9 @@
                 colorAlpha: 1
             };
             console.log(newRect.x_C, newRect.y_C)
-            updateConnectors(newRect);
-
-
-            selectedObject_buf = newRect;
-            selectedObject_buf.selectionMarker = true;
-            drawRect(selectedObject_buf as Rectangle, ctx);
-            selectedObject_buf.selectionMarker = false;
-            objects.push(selectedObject_buf);
-            selectedObject_buf = null;
-            drawObjects();
-            //console.log(newRect)
+            objectAdditionPreprocessing(newRect)
         }
-        function addCircle() {
+        function addCircle(): void {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const newCircle: Circle = {
@@ -1337,40 +1345,9 @@
                 selectionMarker: false,
                 colorAlpha: 1
             };
-            selectedObject_buf = newCircle;
-            selectedObject_buf.selectionMarker = true;
-            drawCircle(selectedObject_buf as Circle, ctx);
-            selectedObject_buf.selectionMarker = false;
-            objects.push(selectedObject_buf);
-            selectedObject_buf = null;
-            drawObjects();
+            objectAdditionPreprocessing(newCircle)
         }
-        function addLine() {
-            //const startX = Math.random() * canvas.width;
-            //const startY = Math.random() * canvas.height;
-            //const endX = Math.random() * canvas.width;
-            //const endY = Math.random() * canvas.height;
-
-            //const newLine: Line = {
-            //    id: generateRandomId(16),
-            //    type: 'line',
-            //    startX: startX,
-            //    startY: startY,
-            //    endX: endX,
-            //    endY: endY,
-            //    color: getRandomColor(),
-            //    rotation: 0,
-            //    x_C: (startX + endX) / 2,  // Вычисляем центр по X
-            //    y_C: (startY + endY) / 2,   // Вычисляем центр по Y
-            //    borderPoints_X1: startX + 2,
-            //    borderPoints_Y1: startY + 2,
-            //    borderPoints_X2: endX + 2,
-            //    borderPoints_Y2: endY + 2,
-            //    selectionMarker: false,
-            //    arrowDirection: "none",
-            //    colorAlpha: 1,
-            //    punctuation: "none"
-            //};
+        function addLine(): void {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const offset = 50;  // половина длины линии
@@ -1393,18 +1370,12 @@
                 selectionMarker: false,
                 arrowDirection: "none",
                 colorAlpha: 1,
-                punctuation: "none"
+                punctuation: "none",
+                lineWidth: 2
             };
-
-            selectedObject_buf = newLine;
-            selectedObject_buf.selectionMarker = true;
-            drawLine(selectedObject_buf as Line, ctx);
-            selectedObject_buf.selectionMarker = false;
-            objects.push(selectedObject_buf);
-            selectedObject_buf = null;
-            drawObjects();
+            objectAdditionPreprocessing(newLine)
         }
-        function addStar() {
+        function addStar(): void {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const newStar: Star = {
@@ -1424,17 +1395,9 @@
                 selectionMarker: false,
                 colorAlpha: 1
             };
-
-            selectedObject_buf = newStar;
-            selectedObject_buf.selectionMarker = true;
-            drawStar(ctx, (selectedObject_buf as Star).x_C, (selectedObject_buf as Star).y_C, (selectedObject_buf as Star).rad, (selectedObject_buf as Star).amount_points, (selectedObject_buf as Star).m, (selectedObject_buf as Star));
-            selectedObject_buf.selectionMarker = false;
-            objects.push(selectedObject_buf);
-            selectedObject_buf = null;
-            drawObjects();
-            logDebug(`Star added: ${JSON.stringify(newStar)}`);
+            objectAdditionPreprocessing(newStar)
         }
-        function addCloud() {
+        function addCloud(): void {
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const newCloud: Cloud = {
@@ -1453,21 +1416,15 @@
                 selectionMarker: false,
                 colorAlpha: 1
             };
-            selectedObject_buf = newCloud;
-            selectedObject_buf.selectionMarker = true;
-            drawCloud(ctx, (selectedObject_buf as Cloud).x_C, (selectedObject_buf as Cloud).y_C, (selectedObject_buf as Cloud).width, (selectedObject_buf as Cloud).height, (selectedObject_buf as Cloud));
-            selectedObject_buf.selectionMarker = false;
-            objects.push(selectedObject_buf);
-            selectedObject_buf = null;
-            drawObjects();
-            logDebug(`Cloud added: ${JSON.stringify(newCloud)}`); 
+            objectAdditionPreprocessing(newCloud)
         }
 
+        // Отрисовка/удаление объектов
         function drawSquare(ctx, x, y, size) {
             ctx.fillStyle = 'black';
             ctx.fillRect(x - size / 2, y - size / 2, size, size);
         }
-        function drawRect(rect: Rectangle, ctx: CanvasRenderingContext2D) {
+        function drawRect(rect: Rectangle, ctx: CanvasRenderingContext2D): void {
             const colorWithAlpha = hexToRgba(rect.color, rect.colorAlpha);
             ctx.fillStyle = colorWithAlpha;
             ctx.fillRect(rect.x_C, rect.y_C, rect.width, rect.height);
@@ -1498,14 +1455,14 @@
                 });
             }
         }
-        function drawLine(line: Line, ctx: CanvasRenderingContext2D) {
+        function drawLine(line: Line, ctx: CanvasRenderingContext2D): void {
             const colorWithAlpha = hexToRgba(line.color, line.colorAlpha);
-            if (line.punctuation === "none" ) {
+            if (line.punctuation === "none") {
                 ctx.beginPath();
                 ctx.moveTo(line.startX, line.startY);
                 ctx.lineTo(line.endX, line.endY);
                 ctx.strokeStyle = colorWithAlpha;
-                ctx.lineWidth = 5;
+                ctx.lineWidth = line.lineWidth;
                 ctx.stroke();
             } else {
                 ctx.setLineDash([5, 3]);
@@ -1513,14 +1470,14 @@
                 ctx.moveTo(line.startX, line.startY);
                 ctx.lineTo(line.endX, line.endY);
                 ctx.strokeStyle = colorWithAlpha;
-                ctx.lineWidth = 5;
+                ctx.lineWidth = line.lineWidth;
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
-            
+
             if (line.selectionMarker || selectedObject_buf === line) {
                 ctx.strokeStyle = 'rgba(0, 120, 255, 0.7)';
-                ctx.lineWidth = 2;
+                ctx.lineWidth = line.lineWidth;
                 ctx.setLineDash([5, 3]);
 
                 // Определяем верхний левый угол прямоугольника
@@ -1550,7 +1507,7 @@
             }
             drawArow(ctx, line);
         }
-        function drawCircle(circle: Circle, ctx: CanvasRenderingContext2D) {
+        function drawCircle(circle: Circle, ctx: CanvasRenderingContext2D): void {
             const colorWithAlpha = hexToRgba(circle.color, circle.colorAlpha);
             ctx.beginPath();
             ctx.arc(circle.x_C, circle.y_C, circle.radius, 0, 2 * Math.PI);
@@ -1584,7 +1541,13 @@
                 });
             }
         }
-        function drawStar(ctx, x_C, y_C, rad, amount_points, m, star) {
+        function drawStar(star: Star, ctx: CanvasRenderingContext2D): void {
+            let x_C = star.x_C
+            let y_C = star.y_C
+            let rad = star.rad
+            let amount_points = star.amount_points
+            let m = star.m
+
             const colorWithAlpha = hexToRgba(star.color, star.colorAlpha);
             ctx.beginPath();
             let points = [];
@@ -1623,7 +1586,12 @@
                 });
             }
         }
-        function drawCloud(ctx, x_C, y_C, width, height, cloud) {
+        function drawCloud(cloud: Cloud, ctx: CanvasRenderingContext2D): void {
+            let x_C = cloud.x_C
+            let y_C = cloud.y_C
+            let width = cloud.width
+            let height = cloud.height
+
             const colorWithAlpha = hexToRgba(cloud.color, cloud.colorAlpha);
             ctx.beginPath();
             let startX_Cloud = x_C - width / 2;
@@ -1806,6 +1774,7 @@
             }
         }
 
+        // Управление объектами
         function rotateSelectedObject(angle: number) {
             if (selectedObject_buf) {
                 selectedObject_buf.rotation = (selectedObject_buf.rotation || 0) + angle;
@@ -1817,14 +1786,6 @@
         function addInfo(selectedObject_buf_: Shape) {
             showPrompt("Введите текст:");
             selectedObject_buf_.info = userInput;
-        }
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
         }
         function pointInPolygon(x, y, points) {
             let inside = false;
@@ -1872,7 +1833,7 @@
             } else {
                 console.log('Кратчайший путь не найден');
             }
-            
+
             highlight = []; // Сбрасываем выделение перед каждым новым поиском пути
 
             if (shortestPath && shortestPath.length > 0) {
@@ -1916,15 +1877,6 @@
             }
         }
 
-
-        let isSelecting = false;
-        let selectionStartX = 0;
-        let selectionStartY = 0;
-        let selectionEndX = 0;
-        let selectionEndY = 0;
-
-        let activeConnector: { x: number, y: number, type: string } | null = null;
-
         function isPointInRotatedRect(mouseX: number, mouseY: number, rect: Rectangle): boolean {
             // Центр вращения
             const centerX = rect.x_C + rect.width / 2;
@@ -1945,7 +1897,31 @@
             );
         }
 
+        let help_X: number = 0
+        let help_Y: number = 0
+
+        let help_Xm: number = 0
+        let help_Ym: number = 0
+
+        function clickedObjectPreprocessing(objects_: Shape[], obj_: Shape, mouseX: number, mouseY: number, foundObject_: boolean) {
+            for (let i = objects_.length - 1; i >= 0; i--) {
+                objects_[i].selectionMarker = false;
+            }
+            foundObject_ = true;
+            obj_.selectionMarker = true;
+            selectedObject = obj_;
+            selectedObject_buf = obj_;
+            startX = mouseX - obj_.x_C;
+            startY = mouseY - obj_.y_C;
+            //logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+            selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+            connectionServ = 2;
+            tableObjectCheck(selectedObject_buf);
+            return foundObject_;
+        }
+
         function leftButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
+            console.log(objects)
             logDebug("mouse_down");
             let foundObject = false;
             hideContextMenu();
@@ -1954,39 +1930,31 @@
                 logDebug(`highlight - (${highlight})`);
                 highlight = [];
             }
-
-            //if (objects.length === 0) {
-            //    try {
-            //        const savedSchema = localStorage.getItem('savedSchema');
-            //        if (savedSchema) {
-            //            objects = processFileContent(savedSchema, objects);
-            //        }
-            //    } catch (error) {
-            //        console.error("Ошибка загрузки схемы:", error);
-            //    }
-            //}
-
+            help_X = mouseX
+            help_Y = mouseY
+            help_Xm = mouseX
+            help_Ym = mouseY
             //logDebug(`onMouseDown - ${selectionStartX}, ${selectionStartY}, ${selectionEndX}, ${selectionEndY}`);
-
             for (let i = objects.length - 1; i >= 0; i--) {
                 const obj = objects[i];
                 if (obj.type === 'rectangle') {
                     const rect = obj as Rectangle;
                     if (/*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect)) {
                         //console.log("i am here");
-                        for (let i = objects.length - 1; i >= 0; i--) {
-                            objects[i].selectionMarker = false;
-                        }
-                        foundObject = true;
-                        rect.selectionMarker = true;
-                        selectedObject = rect;
-                        selectedObject_buf = rect;
-                        startX = mouseX - rect.x_C;
-                        startY = mouseY - rect.y_C;
-                        //logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
-                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                        connectionServ == 2;
-                        tableObjectCheck(selectedObject_buf);
+                        //for (let i = objects.length - 1; i >= 0; i--) {
+                        //    objects[i].selectionMarker = false;
+                        //}
+                        //foundObject = true;
+                        //rect.selectionMarker = true;
+                        //selectedObject = rect;
+                        //selectedObject_buf = rect;
+                        //startX = mouseX - rect.x_C;
+                        //startY = mouseY - rect.y_C;
+                        ////logDebug(`Selected rectangle: ${JSON.stringify(rect)}`);
+                        //selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        //connectionServ = 2;
+                        //tableObjectCheck(selectedObject_buf);
+                        foundObject = clickedObjectPreprocessing(objects, obj, mouseX, mouseY, foundObject);
                         break;
                     }
                 } else if (obj.type === 'circle') {
@@ -1994,19 +1962,20 @@
                     const dx = mouseX - circle.x_C;
                     const dy = mouseY - circle.y_C;
                     if (dx * dx + dy * dy <= circle.radius * circle.radius) {
-                        for (let i = objects.length - 1; i >= 0; i--) {
-                            objects[i].selectionMarker = false;
-                        }
-                        foundObject = true;
-                        circle.selectionMarker = true;
-                        selectedObject = circle;
-                        selectedObject_buf = circle;
-                        startX = dx;
-                        startY = dy;
-                        logDebug(`Selected circle: ${JSON.stringify(circle)}`);
-                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                        connectionServ == 2;
-                        tableObjectCheck(selectedObject_buf);
+                        //for (let i = objects.length - 1; i >= 0; i--) {
+                        //    objects[i].selectionMarker = false;
+                        //}
+                        //foundObject = true;
+                        //circle.selectionMarker = true;
+                        //selectedObject = circle;
+                        //selectedObject_buf = circle;
+                        //startX = dx;
+                        //startY = dy;
+                        //logDebug(`Selected circle: ${JSON.stringify(circle)}`);
+                        //selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        //connectionServ = 2;
+                        //tableObjectCheck(selectedObject_buf);
+                        foundObject = clickedObjectPreprocessing(objects, obj, mouseX, mouseY, foundObject);
                         break;
                     }
                 } else if (obj.type === 'line') {
@@ -2016,7 +1985,6 @@
 
                     const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
                         Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
-                    //const distToLine = pointToSegmentDistance(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
 
                     if (distStart < 5 || distEnd < 5 || distToLine < 10) {
                         for (let i = objects.length - 1; i >= 0; i--) {
@@ -2026,38 +1994,27 @@
                         line.selectionMarker = true;
                         selectedObject = line;
                         selectedObject_buf = line;
-                        startX = mouseX;
-                        startY = mouseY;
                         logDebug(`Selected line: ${JSON.stringify(line)}`);
                         selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                        connectionServ == 2;
+                        connectionServ = 2;
                         tableObjectCheck(selectedObject_buf);
-                        if (distStart < 10) {
+                        //foundObject = clickedObjectPreprocessing(objects, obj, mouseX, mouseY, foundObject);
+                        if (distStart < 5) {
                             selectedLineStart = true;
-                            selectedObject = line;
-                            selectedObject_buf = line;
-                            startX = mouseX;
-                            startY = mouseY;
+                            startX = mouseX - line.startX;
+                            startY = mouseY - line.startY;
                             logDebug(`Line start point selected`);
-                            break;
-                        } else if (distEnd < 10) {
+                        } else if (distEnd < 5) {
                             selectedLineEnd = true;
-                            selectedObject = line;
-                            selectedObject_buf = line;
-                            startX = mouseX;
-                            startY = mouseY;
+                            startX = mouseX - line.endX;
+                            startY = mouseY - line.endY;
                             logDebug(`Line end point selected`);
-                            break;
                         } else if (distToLine < 10) {
                             selectedLineMid = true;
-                            selectedObject = line;
-                            selectedObject_buf = line;
-                            startX = mouseX;
-                            startY = mouseY;
+                            startX = mouseX - line.x_C;
+                            startY = mouseY - line.y_C;
                             logDebug(`Line body selected`);
-                            break;
                         }
-                        break;
                     }
                 } else if (obj.type === 'star') {
                     const star = obj as Star;
@@ -2070,20 +2027,20 @@
                         points.push({ x, y });
                     }
                     if (pointInPolygon(mouseX, mouseY, points)) {
-                        for (let i = objects.length - 1; i >= 0; i--) {
-                            objects[i].selectionMarker = false;
-                        }
-                        foundObject = true;
-                        star.selectionMarker = true;
-                        selectedObject = star;
-                        selectedObject_buf = star;
-                        startX = mouseX - star.x_C;
-                        startY = mouseY - star.y_C;
-                        logDebug(`Selected star: ${JSON.stringify(star)}`);
-                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                        connectionServ == 2;
-                        tableObjectCheck(selectedObject_buf);
-                        break;
+                        //for (let i = objects.length - 1; i >= 0; i--) {
+                        //    objects[i].selectionMarker = false;
+                        //}
+                        //foundObject = true;
+                        //star.selectionMarker = true;
+                        //selectedObject = star;
+                        //selectedObject_buf = star;
+                        //startX = mouseX - star.x_C;
+                        //startY = mouseY - star.y_C;
+                        //logDebug(`Selected star: ${JSON.stringify(star)}`);
+                        //selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        //connectionServ = 2;
+                        //tableObjectCheck(selectedObject_buf);
+                        foundObject = clickedObjectPreprocessing(objects, obj, mouseX, mouseY, foundObject);
                     }
 
                 } else if (obj.type === 'cloud') {
@@ -2091,23 +2048,33 @@
                     let startX_Cloud = cloud.x_C - cloud.width / 2;
                     let startY_Cloud = cloud.y_C - cloud.height / 2;
                     if (mouseX >= startX_Cloud && mouseX <= startX_Cloud + cloud.width && mouseY >= startY_Cloud && mouseY <= startY_Cloud + cloud.height) {
-                        for (let i = objects.length - 1; i >= 0; i--) {
-                            objects[i].selectionMarker = false;
-                        }
-                        foundObject = true;
-                        cloud.selectionMarker = true;
-                        selectedObject = cloud;
-                        selectedObject_buf = cloud;
-                        startX = mouseX - cloud.x_C;
-                        startY = mouseY - cloud.y_C;
-                        logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
-                        selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
-                        connectionServ == 2;
-                        tableObjectCheck(selectedObject_buf);
-                        break;
+                        //for (let i = objects.length - 1; i >= 0; i--) {
+                        //    objects[i].selectionMarker = false;
+                        //}
+                        //foundObject = true;
+                        //cloud.selectionMarker = true;
+                        //selectedObject = cloud;
+                        //selectedObject_buf = cloud;
+                        //startX = mouseX - cloud.x_C;
+                        //startY = mouseY - cloud.y_C;
+                        //logDebug(`Selected cloud: ${JSON.stringify(cloud)}`);
+                        //selectedObject_buf_connect = selectionCheck(selectedObject_buf_connect, selectedObject_buf, connectionServ);
+                        //connectionServ = 2;
+                        //tableObjectCheck(selectedObject_buf);
+                        foundObject = clickedObjectPreprocessing(objects, obj, mouseX, mouseY, foundObject);
                     }
                 }
             }
+
+            //console.log(selectedObjectMass, selectedObject_buf, selectedObject)
+            //if (selectedObjectMass.length !== 0) {
+            //    for (let i = selectedObjectMass.length - 1; i >= 0; i--) {
+            //        if (selectedObjectMass[i].id !== selectedObject_buf?.id) {
+            //            selectedObjectMass = [];
+            //        }
+            //    }
+            //}
+
             if (foundObject === false) {
                 selectedObject = null;
                 selectedObject_buf = null;
@@ -2120,6 +2087,10 @@
                 selectionEndX = e.clientX - canvas.offsetLeft;
                 selectionEndY = e.clientY - canvas.offsetTop;
                 //console.log("now is selecting");
+            } else {
+                if (selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id)) {
+                    selectedObjectMass = [];
+                }
             }
             drawObjects();
             if (selectedObject_buf && selectedObject_buf.connectors) {
@@ -2180,7 +2151,7 @@
                         logDebug(`Selected line: ${JSON.stringify(line)}`);
                         break;
                     }
-                    
+
                 } else if (obj.type === 'star') {
                     const star = obj as Star;
                     const points = [];
@@ -2305,9 +2276,9 @@
                 // Проверяем, пересекаются ли прямоугольники (поле выделения и объект)
                 if (
                     objX2 >= selectionBoxX1 &&
-                    objX1 <= selectionBoxX2 && 
-                    objY2 >= selectionBoxY1 && 
-                    objY1 <= selectionBoxY2    
+                    objX1 <= selectionBoxX2 &&
+                    objY2 >= selectionBoxY1 &&
+                    objY1 <= selectionBoxY2
                 ) {
                     // Если объект попадает в поле выделения, добавляем его в массив выбранных объектов
                     obj.selectionMarker = true;
@@ -2348,7 +2319,7 @@
             );
             //console.log("Выбранные объекты:", selectedObjectMass);
             //console.log("Объекты на холсте:", objects);
-            console.log(x, y, w, h);
+            //console.log(x, y, w, h);
         }
         function onMouseDown(e: MouseEvent) {
             //logDebug(`(${objects})`);
@@ -2359,7 +2330,7 @@
             //const mouseX = e.clientX - canvas.offsetLeft - offsetX;
             //const mouseY = e.clientY - canvas.offsetTop - offsetY;
 
-            console.log(mouseX, mouseY);
+            //console.log(mouseX, mouseY);
 
             const mouse_meaning = e.button;
             if (mouse_meaning === 1) {
@@ -2374,25 +2345,14 @@
                 scrollingButtonDown(e, mouseX, mouseY);
             }
         }
-        function isLineEndpointNearConnector(line: Line, connectors: { id: string, x: number, y: number }[], threshold: number = 5) {
+
+        function isLineEndpointNearConnector_End(line: Line, connectors: { id: string, x: number, y: number }[], threshold: number = 5) {
             const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number =>
                 Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
 
             for (const connector of connectors) {
-                if (calculateDistance(line.startX, line.startY, connector.x, connector.y) <= threshold) {
-                    line.startX = connector.x;
-                    line.startY = connector.y;
+                if (line.endX === connector.x && line.endY === connector.y) return;
 
-                    for (const obj of objects) {
-                        if (obj.connectors?.some(conn => conn.id === connector.id)) {
-                            obj.lineConnectionStart = obj.lineConnectionStart || [];
-                            if (!obj.lineConnectionStart.find(entry => entry.id_line === line.id)) {
-                                obj.lineConnectionStart.push({ id_con: connector.id, id_line: line.id });
-                            }
-                            break;
-                        }
-                    }
-                }
                 if (calculateDistance(line.endX, line.endY, connector.x, connector.y) <= threshold) {
                     line.endX = connector.x;
                     line.endY = connector.y;
@@ -2403,11 +2363,38 @@
                             if (!obj.lineConnectionEnd.find(entry => entry.id_line === line.id)) {
                                 obj.lineConnectionEnd.push({ id_con: connector.id, id_line: line.id });
                             }
+                            console.log(obj)
                             break;
                         }
                     }
                 }
             }
+            //logDebug(`Selected cloud: ${JSON.stringify()}`);
+        }
+        function isLineEndpointNearConnector_Start(line: Line, connectors: { id: string, x: number, y: number }[], threshold: number = 5) {
+            const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number =>
+                Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+
+            for (const connector of connectors) {
+                if (line.startX === connector.x && line.startY === connector.y) return;
+
+                if (calculateDistance(line.startX, line.startY, connector.x, connector.y) <= threshold) {
+                    line.startX = connector.x;
+                    line.startY = connector.y;
+
+                    for (const obj of objects) {
+                        if (obj.connectors?.some(conn => conn.id === connector.id)) {
+                            obj.lineConnectionStart = obj.lineConnectionStart || [];
+                            if (!obj.lineConnectionStart.find(entry => entry.id_line === line.id)) {
+                                obj.lineConnectionStart.push({ id_con: connector.id, id_line: line.id });
+                            }
+                            console.log(obj)
+                            break;
+                        }
+                    }
+                }
+            }
+            //logDebug(`Selected cloud: ${JSON.stringify()}`);
         }
         function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
             const A = px - x1;
@@ -2435,60 +2422,69 @@
             const dy = py - yy;
             return Math.sqrt(dx * dx + dy * dy);
         }
-        function leftButtonMove(selectedObject: Shape, mouseX: number, mouseY: number) {
-            //console.log(mouseX, mouseY, startX, startY);
 
-            // Если есть несколько выделенных объектов
+        function updateLineConnectorConnection(obj_: Shape) {
+            for (const connector of obj_.connectors) {
+                // Перемещаем линии, связанные с коннектором
+                for (const line of objects.filter(obj => obj.type === 'line') as Line[]) {
+                    if (obj_.lineConnectionStart?.some(entry => entry.id_con === connector.id && entry.id_line === line.id)) {
+                        line.startX = connector.x;
+                        line.startY = connector.y;
+                    }
+                    if (obj_.lineConnectionEnd?.some(entry => entry.id_con === connector.id && entry.id_line === line.id)) {
+                        line.endX = connector.x;
+                        line.endY = connector.y;
+                    }
+                }
+            }
+        }
+
+        function leftButtonMove(selectedObject: Shape, mouseX: number, mouseY: number) {
+            //console.log(selectedObjectMass, mouseX - startX, mouseY - startY)
             if (selectedObjectMass.length > 0) {
-                // Перемещаем все выделенные объекты
+
+                //console.log("mx - ", mouseX, "my - ", mouseY, "sx - sy --", help_X, help_Y)
+                const dx = mouseX - help_X;
+                const dy = mouseY - help_Y;
+
                 for (const obj of selectedObjectMass) {
                     switch (obj.type) {
                         case 'rectangle':
-                            const rect = obj as Rectangle;
-                            rect.x_C = mouseX - startX;
-                            rect.y_C = mouseY - startY;
-                            updateConnectors(rect);
+                            (obj as Rectangle).x_C += dx;
+                            (obj as Rectangle).y_C += dy;
+                            updateConnectors(obj as Rectangle);
                             break;
-
                         case 'circle':
-                            const circle = obj as Circle;
-                            circle.x_C += mouseX - startX;
-                            circle.y_C += mouseY - startY;
+                            (obj as Circle).x_C += dx;
+                            (obj as Circle).y_C += dy;
                             break;
-
                         case 'line':
-                            const line = obj as Line;
-                            //line.startX += deltaX;
-                            //line.startY += deltaY;
-                            //line.endX += deltaX;
-                            //line.endY += deltaY;
+                            (obj as Line).startX += dx;
+                            (obj as Line).startY += dy;
+                            (obj as Line).endX += dx;
+                            (obj as Line).endY += dy;
                             break;
-
                         case 'star':
-                            const star = obj as Star;
-                            star.x_C += mouseX - startX;
-                            star.y_C += mouseY - startY;
+                            (obj as Star).x_C += dx;
+                            (obj as Star).y_C += dy;
                             break;
-
                         case 'cloud':
-                            const cloud = obj as Cloud;
-                            cloud.x_C += mouseX - startX;
-                            cloud.y_C += mouseY - startY;
-                            break;
-
-                        default:
+                            (obj as Cloud).x_C += dx;
+                            (obj as Cloud).y_C += dy;
                             break;
                     }
                 }
 
-                // Обновляем стартовые координаты мыши
-                //startX = mouseX;
-                //startY = mouseY;
+                // Обновляем стартовые координаты
+                help_X = mouseX
+                help_Y = mouseY
 
-                drawObjects(); // Перерисовываем все объекты
+                drawObjects();
                 return;
             }
 
+            //help_X = mouseX
+            //help_Y = mouseY
             //logDebug(`selectedObject - (${JSON.stringify(selectedObject)}, ${JSON.stringify(selectedObject_buf)})`);
             if (selectedObject.type === 'rectangle') {
                 const rect = selectedObject as Rectangle;
@@ -2510,7 +2506,7 @@
                             break;
 
                         case 'right':
-                            
+
                             const deltaXRight = mouseX - rect.x_C;
                             rect.width = deltaXRight;
 
@@ -2524,7 +2520,7 @@
                         case 'top':
                             const deltaYTop = rect.y_C - mouseY;
                             rect.height += deltaYTop;
-                            rect.y_C = mouseY; 
+                            rect.y_C = mouseY;
 
                             if (rect.height <= 0) {
                                 rect.y_C += rect.height;
@@ -2534,7 +2530,7 @@
                             break;
 
                         case 'bottom':
-                            
+
                             const deltaYBottom = mouseY - rect.y_C;
                             rect.height = deltaYBottom;
 
@@ -2551,38 +2547,25 @@
                     rect.x_C = mouseX - startX;
                     rect.y_C = mouseY - startY;
                     ////isLineEndpointNearConnector(rect, allConnectors);
-                    for (const connector of rect.connectors) {
-                        // Перемещаем линии, связанные с коннектором
-                        for (const line of objects.filter(obj => obj.type === 'line') as Line[]) {
-                            if (rect.lineConnectionStart?.some(entry => entry.id_con === connector.id)) {
-                                line.startX = connector.x;
-                                line.startY = connector.y;
-                            }
-                            if (rect.lineConnectionEnd?.some(entry => entry.id_con === connector.id)) {
-                                line.endX = connector.x;
-                                line.endY = connector.y;
-                            }
-                        }
-                    }
+                    updateLineConnectorConnection(rect)
                 }
 
             } else if (selectedObject.type === 'circle') {
                 const circle = selectedObject as Circle;
                 circle.x_C = mouseX - startX;
                 circle.y_C = mouseY - startY;
+                updateLineConnectorConnection(circle)
             } else if (selectedObject.type === 'line') {
                 //const line = selectedObject as Line;
                 //const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
                 //const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
 
                 //// Расчет расстояния от точки до линии
-                //const distToLine = pointToSegmentDistance(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
+                ////const distToLine = pointToSegmentDistance(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
                 //const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
                 //    Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
                 //const dx = mouseX - startX;
                 //const dy = mouseY - startY;
-                //startX = mouseX;
-                //startY = mouseY;
 
                 //if (distStart < 10 && !selectedLineStart) {
                 //    selectedLineStart = true;
@@ -2605,47 +2588,55 @@
                 //}
                 //line.x_C = (line.startX + line.endX) / 2,
                 //line.y_C = (line.startY + line.endY) / 2,
+
+                //startX = mouseX;
+                //startY = mouseY;
                 //drawObjects();
                 //2 вариант
                 const line = selectedObject as Line;
                 const dx = mouseX - startX;
                 const dy = mouseY - startY;
 
+                const dxm = mouseX - help_Xm;
+                const dym = mouseY - help_Ym;
+                //startX = mouseX;
+                //startY = mouseY;
                 if (selectedLineStart) {
-                    line.startX += dx;
-                    line.startY += dy;
-                    isLineEndpointNearConnector(line, allConnectors);
+                    line.startX = dx;
+                    line.startY = dy;
+                    isLineEndpointNearConnector_Start(line, allConnectors);
                 } else if (selectedLineEnd) {
-                    line.endX += dx;
-                    line.endY += dy;
-                    isLineEndpointNearConnector(line, allConnectors);
+                    line.endX = dx;
+                    line.endY = dy;
+                    isLineEndpointNearConnector_End(line, allConnectors);
                 } else if (selectedLineMid) {
-                    line.startX += dx;
-                    line.startY += dy;
-                    line.endX += dx;
-                    line.endY += dy;
+                    line.startX += dxm;
+                    line.startY += dym;
+                    line.endX += dxm;
+                    line.endY += dym;
                 }
-
-                startX = mouseX;
-                startY = mouseY;
 
                 // Обновление центра линии
                 line.x_C = (line.startX + line.endX) / 2;
                 line.y_C = (line.startY + line.endY) / 2;
 
-                drawObjects();
+                help_Xm = mouseX
+                help_Ym = mouseY
+                //drawObjects();
+
             } else if (selectedObject.type === 'star') {
                 const star = selectedObject as Star;
 
                 star.x_C = mouseX - startX;
                 star.y_C = mouseY - startY;
-
+                updateLineConnectorConnection(star)
             } else if (selectedObject.type === 'cloud') {
                 const cloud = selectedObject as Cloud;
                 //logDebug(`(${mouseX})(${mouseY})`);
                 //logDebug(`(${startX})(${startY})`);
                 cloud.x_C = mouseX - startX;
                 cloud.y_C = mouseY - startY;
+                updateLineConnectorConnection(cloud)
                 //logDebug(`(${mouseX - startX})(${mouseY - startY})`);
             }
             drawObjects();
@@ -2765,6 +2756,7 @@
             activeConnector = null;
             selectedObject = null;
             selectedLineEnd = null;
+            console.log(selectedObjectMass)
         }
         function downloadFile(filename: string, content: string) {
             const blob = new Blob([content], { type: 'text/plain' }); //Создание нового объекта Blob (Binary Large Object)
@@ -2775,7 +2767,7 @@
             link.click(); // Программное кликанье по ссылке
             document.body.removeChild(link); //Удаление ссылки из документа. Это делается для очистки DOM после скачивания файла, так как ссылка больше не нужна
         }
-        
+
         document.getElementById('downloadBtn')?.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
             const shapes = JSON.stringify(objects, null, 2);
@@ -2788,7 +2780,7 @@
         document.getElementById('uploadCssBtn')?.addEventListener('click', function () {
             const fileInput = document.getElementById('cssFileInput') as HTMLInputElement;
             const file = fileInput?.files?.[0];
-        
+
             if (file) {
                 uploadCssFile(file);
             } else {
@@ -2968,6 +2960,8 @@
             return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
         }
 
+
+
         document.getElementById('fileInput3')?.addEventListener('change', function (event) {
             try {
                 const input = event.target as HTMLInputElement;
@@ -2994,7 +2988,7 @@
             } catch (error) {
                 console.error('Error reading file:', error);
             }
-        });  
+        });
 
         document.getElementById('downloadBtn3')?.addEventListener('click', function () {
             const owlContent = convertObjectsToOWL(objects);
@@ -3448,7 +3442,7 @@
         }
         function drawObjects() {
             if (ctx) {
-                logDebug("NOW I AM DRAWING OBJECTS");
+                //logDebug("NOW I AM DRAWING OBJECTS");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
@@ -3480,13 +3474,13 @@
                             break;
                         case 'star':
                             const star = obj as Star;
-                            drawStar(ctx, star.x_C, star.y_C, star.rad, star.amount_points, star.m, star);
+                            drawStar(star as Star, ctx);
                             updateConnectors(star);
                             enteringText(obj);
                             break;
                         case 'cloud':
                             const cloud = obj as Cloud;
-                            drawCloud(ctx, cloud.x_C, cloud.y_C, cloud.width, cloud.height, cloud);
+                            drawCloud(cloud as Cloud, ctx);
                             updateConnectors(cloud);
                             enteringText(obj);
                             break;

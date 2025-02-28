@@ -38,6 +38,7 @@ interface Line extends Shape {
     endY: number;
     arrowDirection?: string; //start, end, both, none
     punctuation?: string;
+    lineWidth?: number;
 }
 
 interface Star extends Shape {
@@ -58,6 +59,49 @@ interface Cloud extends Shape {
 
 
 //}
+
+interface Column {
+    name: string;
+    dataType: string;
+    isPrimaryKey: boolean;
+    isForeignKey?: boolean;
+    isNullable?: boolean;
+    defaultValue?: any;
+}
+
+interface Table extends Rectangle {
+    tableName: string;
+    columns: Column[];
+    schema?: string;      // Например, "dbo"
+    description?: string; // Описание таблицы
+}
+
+interface RelationshipLine extends Line {
+    relationshipType: string; // Например, "one-to-one", "one-to-many", "many-to-many"
+    label?: string;           // Метка для связи (например, имя внешнего ключа)
+    sourceTableId: string;    // Идентификатор таблицы-источника
+    targetTableId: string;    // Идентификатор таблицы-приемника
+}
+
+interface Decision extends Shape {
+    ruleName: string;        // Название правила/решения
+    condition: string;       // Условие (логическая формула)
+    trueBranchLabel?: string;  // Метка ветки «Да»
+    falseBranchLabel?: string; // Метка ветки «Нет»
+}
+
+interface ProcessShape extends Shape {
+    processName: string;  // Название процесса
+    description?: string; // Описание процесса
+    duration?: number;    // Продолжительность процесса (например, в секундах)
+}
+
+
+
+
+
+
+
 interface ComplexShape extends Shape, Rectangle {
     children: Shape[];
     text: string[];
@@ -88,9 +132,40 @@ function generateUniqueId(): string {
     return result;
 }
 
+
 function hexToRgba(hex: string, alpha: number): string {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
+function measureTextWidth(text: string, font: string): number {
+    const span = document.createElement('span');
+
+    const help = document.getElementById("addRectBtn")
+    console.log("мой текст", help.style)
+
+    span.style.visibility = 'hidden';
+    span.style.whiteSpace = 'nowrap';
+
+    span.style.font = font;
+    span.textContent = text;
+
+    document.body.appendChild(span);
+
+    const width = span.getBoundingClientRect().width;
+
+    document.body.removeChild(span);
+    return width;
 }

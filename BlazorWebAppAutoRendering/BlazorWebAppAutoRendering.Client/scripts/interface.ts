@@ -3,9 +3,13 @@
     type: string;
     rotation?: number;
     info?: string;
+
     linkedObjects?: string[];
     outgoingLinks?: string[];
     incomingLinks?: string[];
+    lineConnectionStart?: { id_con: string, id_line: string }[];
+    lineConnectionEnd?: { id_con: string, id_line: string }[];
+
     color: string;
     image?: HTMLImageElement;
     imageSrc?: string;
@@ -17,14 +21,16 @@
     borderPoints_Y2: number;
     connectors?: {id: string, x: number, y: number, type: string }[];
     selectionMarker?: boolean;
-    lineConnectionStart?: { id_con: string, id_line: string }[];
-    lineConnectionEnd?: { id_con: string, id_line: string }[];
+
     colorAlpha?: number;
+
+    isHighlighted?: boolean;
 }
 
 interface Rectangle extends Shape {
     width: number;
     height: number;
+    border?: boolean;
 }
 
 interface Circle extends Shape {
@@ -52,64 +58,8 @@ interface Cloud extends Shape {
     height: number;
 }
 
-//interface ComplexShape {
-//    id: number;
-//    elements: Shape[];
-//    type: string;
-
-
-//}
-
-interface Column {
-    name: string;
-    dataType: string;
-    isPrimaryKey: boolean;
-    isForeignKey?: boolean;
-    isNullable?: boolean;
-    defaultValue?: any;
-}
-
-interface Table extends Rectangle {
-    tableName: string;
-    columns: Column[];
-    schema?: string;      // Например, "dbo"
-    description?: string; // Описание таблицы
-}
-
-interface RelationshipLine extends Line {
-    relationshipType: string; // Например, "one-to-one", "one-to-many", "many-to-many"
-    label?: string;           // Метка для связи (например, имя внешнего ключа)
-    sourceTableId: string;    // Идентификатор таблицы-источника
-    targetTableId: string;    // Идентификатор таблицы-приемника
-}
-
-interface Decision extends Shape {
-    ruleName: string;        // Название правила/решения
-    condition: string;       // Условие (логическая формула)
-    trueBranchLabel?: string;  // Метка ветки «Да»
-    falseBranchLabel?: string; // Метка ветки «Нет»
-}
-
-interface ProcessShape extends Shape {
-    processName: string;  // Название процесса
-    description?: string; // Описание процесса
-    duration?: number;    // Продолжительность процесса (например, в секундах)
-}
-
-
-
-
-
-
-
-interface ComplexShape extends Shape, Rectangle {
-    children: Shape[];
-    text: string[];
-    type: string;
-    layout?: "vertical" | "horizontal"; // Описание размещения
-    //startSize?: number; // Размер заголовка
-    //width: number;
-    //height: number;
+interface ComplexShape extends Rectangle {
+    parts: Shape[];
 }
 
 //type GraphObject = Rectangle | Circle | Line | Star | Cloud;

@@ -158,6 +158,45 @@
         right: 360px; /* Должно совпадать с шириной правого блока */
     }
 
+    
+
+
+    .popup {
+        position: absolute; /* Меняем с fixed на absolute */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border: 1px solid #000;
+        padding: 20px;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        width: 250px; /* Фиксированная ширина */
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    /* Заголовок, за который можно перетаскивать */
+    .popup-header {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        cursor: grab;
+        font-size: 14px;
+        text-align: center;
+        user-select: none; /* Запрещаем выделение текста */
+    }
+
 
 </style>
 
@@ -168,8 +207,23 @@
     <!-- Второй слой: левая панель с элементами управления -->
 
     <div id="button-panel" class="left-div-style">
-        <MudButton id="addComplex" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
-            Добавить сложную фигуру
+        <MudButton id="openPopupBtn" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Окно
+        </MudButton>
+        <MudButton id="addTable" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Добавить таблицу
+        </MudButton>
+        <MudButton id="short" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Короткие пути
+        </MudButton>
+        <MudButton id="cycle" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Циклы
+        </MudButton>
+        <MudButton id="shortor" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Короткие пути ор
+        </MudButton>
+        <MudButton id="cycleor" Variant="Variant.Filled" Style="width: 100%; height: 60px;" Color="Color.Primary">
+            Циклы ор
         </MudButton>
         <br>
         @* <MudExpansionPanels>
@@ -613,6 +667,16 @@
         </MudButton>
         <input type="file" id="imageInput" style="display: none;">
     </div>
+
+
+    <div id="popup" class="popup hidden">
+        <div class="popup-header" id="popupHeader">Перетащите меня</div>
+        <div class="popup-content">
+            <span id="closePopup" class="close-button">&times;</span>
+            <p>Это всплывающее окно!</p>
+        </div>
+    </div>
+
 
     <!-- Правая панель: таблица характеристик с кнопкой для скрытия/показа -->
     <div id="table-container">

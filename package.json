@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@jaames/iro": "^5.5.2",
+    "uuidv4": "^6.2.13"
+  },
+  "devDependencies": {
+    "@types/xml2js": "^0.4.14"
+  }
+}

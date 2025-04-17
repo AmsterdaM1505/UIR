@@ -1,5 +1,5 @@
 (function () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12;
     let objects = [];
     let highlight = [];
     let ctx = null;
@@ -50,24 +50,39 @@
         return result;
     }
     //////////////////////////
-    const openPopupBtn = document.getElementById('openPopupBtn');
+    //const openPopupBtn = document.getElementById('openPopupBtn') as HTMLElement;
     let isDragging = false;
-    openPopupBtn.addEventListener('click', openPopup);
+    //openPopupBtn.addEventListener('click', openPopup());
     const popup = document.getElementById('popup');
     const closePopup = document.getElementById('closePopup');
     const popupHeader = document.getElementById('popupHeader');
     // Функция для показа окна
-    function openPopup() {
+    function openPopup(newText, popupType) {
+        const popupText = document.getElementById('popupText');
+        if (popupType === "information") {
+            if (popupText) {
+                popupText.innerText = newText;
+            }
+        }
+        else if (popupType === "editing") {
+        }
         popup.classList.remove('hidden');
     }
-    // Функция для скрытия окна
     function hidePopup() {
         popup.classList.add('hidden');
     }
-    // Закрываем окно при клике на кнопку
     closePopup.addEventListener('click', hidePopup);
     // Добавляем перетаскивание
-    popupHeader.addEventListener('mousedown', (e) => {
+    //popupHeader.addEventListener('mousedown', (e) => {
+    //    isDragging = true;
+    //    offsetX = e.clientX - popup.offsetLeft;
+    //    offsetY = e.clientY - popup.offsetTop;
+    //    popup.style.cursor = "grabbing";
+    //});
+    popup.addEventListener('mousedown', (e) => {
+        // Игнорировать клик по кнопке закрытия, чтобы окно не начало перетаскиваться при попытке закрытия
+        if (e.target.id === 'closePopup')
+            return;
         isDragging = true;
         offsetX = e.clientX - popup.offsetLeft;
         offsetY = e.clientY - popup.offsetTop;
@@ -202,41 +217,51 @@
                 return;
             }
             objects = schemaData.objects.map(obj => {
+                var _a, _b;
                 const baseProps = {
+                    dialect: obj.dialect || 'base',
                     id: obj.id || generateUniqueId(),
                     type: obj.type,
-                    color: obj.color || '#000',
                     rotation: obj.rotation || 0,
                     info: obj.info || '',
                     linkedObjects: obj.linkedObjects || [],
                     outgoingLinks: obj.outgoingLinks || [],
                     incomingLinks: obj.incomingLinks || [],
-                    colorAlpha: obj.colorAlpha || 1,
+                    lineConnectionStart: obj.lineConnectionStart || [],
+                    lineConnectionEnd: obj.lineConnectionEnd || [],
+                    color: obj.color || '#000',
+                    colorAlpha: (_a = obj.colorAlpha) !== null && _a !== void 0 ? _a : 1,
+                    x_C: obj.x_C,
+                    y_C: obj.y_C,
                     borderPoints_X1: obj.borderPoints_X1,
                     borderPoints_Y1: obj.borderPoints_Y1,
                     borderPoints_X2: obj.borderPoints_X2,
-                    borderPoints_Y2: obj.borderPoints_Y2
+                    borderPoints_Y2: obj.borderPoints_Y2,
+                    connectors: obj.connectors || [],
+                    selectionMarker: obj.selectionMarker || false,
+                    isHighlighted: obj.isHighlighted || false
                 };
                 switch (obj.type) {
                     case 'rectangle':
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height });
+                        return Object.assign(Object.assign({}, baseProps), { width: obj.width, height: obj.height, border: (_b = obj.border) !== null && _b !== void 0 ? _b : false });
                     case 'circle':
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, radius: obj.radius });
+                        return Object.assign(Object.assign({}, baseProps), { radius: obj.radius });
                     case 'line':
-                        return Object.assign(Object.assign({}, baseProps), { startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY });
+                        return Object.assign(Object.assign({}, baseProps), { startX: obj.startX, startY: obj.startY, endX: obj.endX, endY: obj.endY, arrowDirection: obj.arrowDirection || 'none', punctuation: obj.punctuation || 'none', lineWidth: obj.lineWidth || 2, startArrowType: obj.startArrowType || 'none', endArrowType: obj.endArrowType || 'none' });
                     case 'star':
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, rad: obj.rad, amount_points: obj.amount_points, m: obj.m });
+                        return Object.assign(Object.assign({}, baseProps), { rad: obj.rad, amount_points: obj.amount_points, m: obj.m });
                     case 'cloud':
-                        return Object.assign(Object.assign({}, baseProps), { x_C: obj.x_C, y_C: obj.y_C, width: obj.width, height: obj.height });
+                        return Object.assign(Object.assign({}, baseProps), { width: obj.width, height: obj.height });
+                    case 'table':
+                        return Object.assign(Object.assign({}, baseProps), { width: obj.width, height: obj.height, cols: obj.cols || 1, rows: obj.rows || 1, parts: obj.parts || [] });
                     default:
                         console.warn("Unknown shape type:", obj.type);
                         return null;
                 }
             }).filter(obj => obj !== null);
-            isSchemaLoaded = true; // Устанавливаем флаг после успешной загрузки
+            isSchemaLoaded = true;
             drawObjects();
-            console.log("Schema loaded successfully.");
-            //console.log(objects);
+            console.log("Schema loaded successfully.", objects);
         }
         catch (error) {
             console.error("Error loading schema:", error);
@@ -251,9 +276,6 @@
         canvas.oncontextmenu = () => false;
         logDebug("Canvas element found");
     }
-    //window.addEventListener('DOMContentLoaded', () => {
-    //    loadFromLocalStorage();
-    //});
     window.addEventListener('DOMContentLoaded', () => {
         if (!isSchemaLoaded) {
             loadFromLocalStorage();
@@ -275,6 +297,7 @@
             canvas.style.height = `${height}px`;
             ctx.resetTransform();
             ctx.scale(dpr, dpr);
+            //drawObjects();
         }
     }
     function updateOffsets(canvas) {
@@ -287,7 +310,24 @@
         offsetX = rect.left;
         offsetY = Math.max(0, rect.top - (difference.bottom - difference.top));
         debug.style.bottom += `${difference.bottom - difference.top}px`;
-        //console.log(offsetX, offsetY, difference.top, difference.bottom)
+        //console.log(" top p pp ", offsetX, offsetY, difference.top, difference.bottom)
+    }
+    function updateLeftAndRightPanelHeight(canvas) {
+        const mainLayout = document.getElementById("main-layout");
+        const leftPanel = document.getElementById("button-panel");
+        const rightPanel = document.getElementById("table-container");
+        if (!mainLayout || !leftPanel || !rightPanel) {
+            console.error("❌ Ошибка: Один из элементов не найден.");
+            return;
+        }
+        const difference = mainLayout.getBoundingClientRect().bottom - mainLayout.getBoundingClientRect().top;
+        // Преобразуем текущую высоту из строки в число
+        const leftHeight = leftPanel.getBoundingClientRect().height;
+        const rightHeight = rightPanel.getBoundingClientRect().height;
+        // Устанавливаем новую высоту
+        leftPanel.style.height = `${leftHeight - difference}px`;
+        rightPanel.style.height = `${rightHeight - difference}px`;
+        console.log("he he he - ", leftHeight, rightHeight, leftPanel.style.height, rightPanel.style.height, difference);
     }
     function updateDebugPanelOffsets() {
         const leftPanel = document.getElementById("button-panel");
@@ -329,10 +369,12 @@
         resizeCanvas(canvas);
         updateOffsets(canvas);
         updateDebugPanelOffsets();
+        //updateLeftAndRightPanelHeight(canvas)
     });
     updateDebugPanelOffsets();
     resizeCanvas(canvas);
     updateOffsets(canvas);
+    updateLeftAndRightPanelHeight(canvas);
     const gridCanvas = document.createElement('canvas');
     const gridCtx = gridCanvas.getContext('2d');
     gridCanvas.width = canvas.width;
@@ -358,8 +400,8 @@
             ctx.stroke();
         }
     }
-    // Рисуем сетку на фоновом холсте
     drawGrid(gridCtx, gridCanvas.width, gridCanvas.height, 20);
+    // Рисуем сетку на фоновом холсте
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -695,43 +737,333 @@
             }
         }
         ///////////
-        (_h = document.getElementById('addTable')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
+        function exportGraphToFile(graph, fileName) {
+            let formatString = `<graph>\n`;
+            formatString += `  <canvas height="${canvas.height}" width="${canvas.width}"/>\n`;
+            graph.forEach(shape => {
+                var _a, _b, _c, _d;
+                if (shape.type === "line") {
+                    const line = shape;
+                    formatString += `  <edge dialect="${line.dialect}" id="${line.id}" type="${line.type}" label="${line.info || ""}" `;
+                    formatString += `source="${((_b = (_a = line.lineConnectionStart) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.id_shape) || ""}" target="${((_d = (_c = line.lineConnectionEnd) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.id_shape) || ""}" `;
+                    formatString += `endArrow="${line.endArrowType || "none"}" startArrow="${line.startArrowType || "none"}">\n`;
+                    formatString += `    <lineGeometry startX="${line.startX}" startY="${line.startY}" endX="${line.endX}" endY="${line.endY}"/>\n`;
+                    formatString += `    <background color="${line.color}"/>\n`;
+                    formatString += `    <edgeStyle edgeColor="${line.color}" lineWidth="${line.lineWidth || 2}"/>\n`;
+                    // Добавляем lineConnectionStart
+                    if (line.lineConnectionStart) {
+                        formatString += `    <lineConnectionStart>\n`;
+                        line.lineConnectionStart.forEach(conn => {
+                            formatString += `      <connection id_con="${conn.id_con}" id_shape="${conn.id_shape}"/>\n`;
+                        });
+                        formatString += `    </lineConnectionStart>\n`;
+                    }
+                    // Добавляем lineConnectionEnd
+                    if (line.lineConnectionEnd) {
+                        formatString += `    <lineConnectionEnd>\n`;
+                        line.lineConnectionEnd.forEach(conn => {
+                            formatString += `      <connection id_con="${conn.id_con}" id_shape="${conn.id_shape}"/>\n`;
+                        });
+                        formatString += `    </lineConnectionEnd>\n`;
+                    }
+                    formatString += `  </edge>\n`;
+                }
+                else {
+                    formatString += `  <node dialect="${shape.dialect}" id="${shape.id}" type="${shape.type}" label="${shape.info || ""}" rotation="${shape.rotation || 0}">\n`;
+                    if (shape.type === "circle") {
+                        const circle = shape;
+                        formatString += `    <geometry x="${circle.x_C}" y="${circle.y_C}" radius="${circle.radius}"/>\n`;
+                    }
+                    else if (shape.type === "rectangle") {
+                        const rect = shape;
+                        formatString += `    <geometry x="${rect.x_C}" y="${rect.y_C}" width="${rect.width}" height="${rect.height}"/>\n`;
+                        //formatString += `    <rectSile x="${rect.x_C}" y="${rect.y_C}" width="${rect.width}" height="${rect.height}"/>\n`
+                    }
+                    else if (shape.type === "star") {
+                        const star = shape;
+                        formatString += `    <geometry x="${star.x_C}" y="${star.y_C}" rad="${star.rad}" amount_points="${star.amount_points}" m="${star.m}"/>\n`;
+                    }
+                    else if (shape.type === "cloud") {
+                        const cloud = shape;
+                        formatString += `    <geometry x="${cloud.x_C}" y="${cloud.y_C}" width="${cloud.width}" height="${cloud.height}"/>\n`;
+                    }
+                    else if (shape.type === "table") {
+                        const table = shape;
+                        const rowHeight = table.parts.length ? table.parts[0].height : 1;
+                        const colWidth = table.parts.length ? table.parts[0].width : 1;
+                        const cols = Math.max(1, Math.round(table.width / colWidth));
+                        const rows = Math.max(1, Math.round(table.height / rowHeight));
+                        formatString += `    <geometry x_left_corner="${table.x_C}" y="${table.y_C}" `;
+                        formatString += `number_of_columns="${cols}" number_of_rows="${rows}" width="${table.width}" height="${table.height}"/>\n`;
+                        for (let row = 0; row < rows; row++) {
+                            formatString += `    <tableRow index="${row}">\n`;
+                            formatString += `      <geometry height="${rowHeight}"/>\n`;
+                            for (let col = 0; col < cols; col++) {
+                                const cellIndex = row * cols + col;
+                                if (cellIndex >= table.parts.length)
+                                    break;
+                                const cell = table.parts[cellIndex];
+                                formatString += `      <tableElement index="${col}">\n`;
+                                formatString += `        <geometry x="${cell.x_C}" y="${cell.y_C}" width="${cell.width}" height="${cell.height}"/>\n`;
+                                formatString += `        <label>${cell.info || ""}</label>\n`;
+                                if (cell.color) {
+                                    formatString += `        <background color="${cell.color}"/>\n`;
+                                }
+                                formatString += `        <labelSettings font="14px Arial" color="gold"/>\n`;
+                                formatString += `      </tableElement>\n`;
+                            }
+                            formatString += `    </tableRow>\n`;
+                        }
+                    }
+                    formatString += `    <background color="${shape.color}"/>\n`;
+                    formatString += `    <arealRect x1="${shape.borderPoints_X1}" y1="${shape.borderPoints_Y1}" x2="${shape.borderPoints_X2}" y2="${shape.borderPoints_Y2}"/>\n`;
+                    // Добавляем lineConnectionStart
+                    if (shape.lineConnectionStart) {
+                        formatString += `    <lineConnectionStart>\n`;
+                        shape.lineConnectionStart.forEach(conn => {
+                            formatString += `      <connection id_con="${conn.id_con}" id_shape="${conn.id_shape}"/>\n`;
+                        });
+                        formatString += `    </lineConnectionStart>\n`;
+                    }
+                    // Добавляем lineConnectionEnd
+                    if (shape.lineConnectionEnd) {
+                        formatString += `    <lineConnectionEnd>\n`;
+                        shape.lineConnectionEnd.forEach(conn => {
+                            formatString += `      <connection id_con="${conn.id_con}" id_shape="${conn.id_shape}"/>\n`;
+                        });
+                        formatString += `    </lineConnectionEnd>\n`;
+                    }
+                    if (shape.linkedObjects && shape.linkedObjects.length > 0) {
+                        formatString += `    <linkedObjects>\n`;
+                        shape.linkedObjects.forEach(id => {
+                            formatString += `      <linked id="${id}"/>\n`;
+                        });
+                        formatString += `    </linkedObjects>\n`;
+                    }
+                    if (shape.outgoingLinks && shape.outgoingLinks.length > 0) {
+                        formatString += `    <outgoingLinks>\n`;
+                        shape.outgoingLinks.forEach(id => {
+                            formatString += `      <link id="${id}"/>\n`;
+                        });
+                        formatString += `    </outgoingLinks>\n`;
+                    }
+                    if (shape.incomingLinks && shape.incomingLinks.length > 0) {
+                        formatString += `    <incomingLinks>\n`;
+                        shape.incomingLinks.forEach(id => {
+                            formatString += `      <link id="${id}"/>\n`;
+                        });
+                        formatString += `    </incomingLinks>\n`;
+                    }
+                    if (shape.connectors && shape.connectors.length > 0) {
+                        formatString += `    <connectors>\n`;
+                        shape.connectors.forEach(conn => {
+                            formatString += `      <connector id="${conn.id}" x="${conn.x}" y="${conn.y}" type="${conn.type}"/>\n`;
+                        });
+                        formatString += `    </connectors>\n`;
+                    }
+                    formatString += `  </node>\n`;
+                }
+            });
+            formatString += `</graph>\n`;
+            formatString += `<dialect name="databaseSchema">\n`;
+            formatString += `  <allowedNode type="table">\n`;
+            formatString += `    <basedOnType type="rectangle" />\n`;
+            formatString += `    <typeProperties setting="add">\n`;
+            formatString += `      <property>\n`;
+            formatString += `        <name>info</name>\n`;
+            formatString += `        <valueType>string</valueType>\n`;
+            formatString += `        <setValue>NewTable</setValue>\n`;
+            formatString += `      </property>\n`;
+            formatString += `      <complexProperty name="metadata">\n`;
+            formatString += `        <property>\n`;
+            formatString += `          <name>engine</name>\n`;
+            formatString += `          <valueType>string</valueType>\n`;
+            formatString += `          <setValue>InnoDB</setValue>\n`;
+            formatString += `        </property>\n`;
+            formatString += `        <property>\n`;
+            formatString += `          <name>charset</name>\n`;
+            formatString += `          <valueType>string</valueType>\n`;
+            formatString += `          <setValue>utf8mb4</setValue>\n`;
+            formatString += `        </property>\n`;
+            formatString += `      </complexProperty>\n`;
+            formatString += `    </typeProperties>\n`;
+            formatString += `    <geometryProperties setting="add">\n`;
+            formatString += `      <property><name>x_C</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>y_C</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>width</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>height</name><valueType>number</valueType></property>\n`;
+            formatString += `    </geometryProperties>\n`;
+            formatString += `    <geometryLimits minWidth="100" maxWidth="600" minHeight="50" maxHeight="400" />\n`;
+            formatString += `    <backgroundLimits allowAlpha="true" />\n`;
+            formatString += `    <connectsWith>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" />\n`;
+            formatString += `    </connectsWith>\n`;
+            formatString += `  </allowedNode>\n`;
+            formatString += `  <allowedEdge type="foreignKeyLine">\n`;
+            formatString += `    <basedOnType type="line" />\n`;
+            formatString += `    <typeProperties setting="add">\n`;
+            formatString += `      <property>\n`;
+            formatString += `        <name>constraintName</name>\n`;
+            formatString += `        <valueType>string</valueType>\n`;
+            formatString += `      </property>\n`;
+            formatString += `      <property>\n`;
+            formatString += `        <name>startArrowType</name>\n`;
+            formatString += `        <valueType>string</valueType>\n`;
+            formatString += `        <setValue>none</setValue>\n`;
+            formatString += `      </property>\n`;
+            formatString += `      <property>\n`;
+            formatString += `        <name>endArrowType</name>\n`;
+            formatString += `        <valueType>string</valueType>\n`;
+            formatString += `        <setValue>classic</setValue>\n`;
+            formatString += `      </property>\n`;
+            formatString += `    </typeProperties>\n`;
+            formatString += `    <geometryProperties setting="add">\n`;
+            formatString += `      <property><name>startX</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>startY</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>endX</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>endY</name><valueType>number</valueType></property>\n`;
+            formatString += `      <property><name>lineWidth</name><valueType>number</valueType><setValue>2</setValue></property>\n`;
+            formatString += `    </geometryProperties>\n`;
+            formatString += `    <requireArrow setting="end"/>\n`;
+            formatString += `    <allowedArrowheads>\n`;
+            formatString += `      <arrowheadType name="classic" position="end"/>\n`;
+            formatString += `      <arrowheadType name="diamond" position="start"/>\n`;
+            formatString += `      <arrowheadType name="none" position="both"/>\n`;
+            formatString += `    </allowedArrowheads>\n`;
+            formatString += `    <allowedConnections>\n`;
+            formatString += `      <nodeType name="table" position="source"/>\n`;
+            formatString += `      <nodeType name="table" position="target"/>\n`;
+            formatString += `    </allowedConnections>\n`;
+            formatString += `    <limits>\n`;
+            formatString += `      <propertyLimits name="startArrowType" allowedValues="none, -|->, -0->, -*->, >"/>\n`;
+            formatString += `      <propertyLimits name="endArrowType" allowedValues="none, -|->, -0->, -*->, >"/>\n`;
+            formatString += `    </limits>\n`;
+            formatString += `  </allowedEdge>\n`;
+            formatString += `  <allowedArrowhead type="-|->">\n`;
+            formatString += `    <basedOnType type="none"/>\n`;
+            formatString += `    <geometryLimits width="10" height="10"/>\n`;
+            formatString += `    <styleLimits fill="black"/>\n`;
+            formatString += `    <connectsWith>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="end"/>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="start"/>\n`;
+            formatString += `    </connectsWith>\n`;
+            formatString += `  </allowedArrowhead>\n`;
+            formatString += `  <allowedArrowhead type="-0->">\n`;
+            formatString += `    <basedOnType type="none"/>\n`;
+            formatString += `    <geometryLimits width="10" height="10"/>\n`;
+            formatString += `    <styleLimits fill="black"/>\n`;
+            formatString += `    <connectsWith>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="end"/>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="start"/>\n`;
+            formatString += `    </connectsWith>\n`;
+            formatString += `  </allowedArrowhead>\n`;
+            formatString += `  <allowedArrowhead type="-*->">\n`;
+            formatString += `    <basedOnType type="none"/>\n`;
+            formatString += `    <geometryLimits width="10" height="10"/>\n`;
+            formatString += `    <styleLimits fill="black"/>\n`;
+            formatString += `    <connectsWith>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="end"/>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="start"/>\n`;
+            formatString += `    </connectsWith>\n`;
+            formatString += `  </allowedArrowhead>\n`;
+            formatString += `  <allowedArrowhead type=">">\n`;
+            formatString += `    <basedOnType type="none"/>\n`;
+            formatString += `    <geometryLimits width="10" height="10"/>\n`;
+            formatString += `    <styleLimits fill="black"/>\n`;
+            formatString += `    <connectsWith>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="end"/>\n`;
+            formatString += `      <edgeType name="foreignKeyLine" position="start"/>\n`;
+            formatString += `    </connectsWith>\n`;
+            formatString += `  </allowedArrowhead>\n`;
+            formatString += `  <graphSettings>\n`;
+            formatString += `    <nodeSettings defaultColor="#eaeaea" />\n`;
+            formatString += `    <edgeSettings requireAllArrow="end" />\n`;
+            formatString += `    <backgroundSettings color="#ffffff" grid="true" />\n`;
+            formatString += `  </graphSettings>\n`;
+            formatString += `</dialect>\n`;
+            const blob = new Blob([formatString], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+        }
+        let currentDialect = 'none';
+        let dialectButtonClickedFlag = 'none';
+        (_h = document.getElementById('testFormat')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
             logDebug("Add table button clicked");
-            addTable();
+            exportGraphToFile(objects, "shapes");
         });
-        (_j = document.getElementById('addRectBtn')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
-            logDebug("Add rectangle button clicked");
-            addRect();
-        });
-        (_k = document.getElementById('addCircleBtn')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
-            logDebug("Add circle button clicked");
-            addCircle();
-        });
-        (_l = document.getElementById('addLineBtn')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
+        function dialectControl(flag, currentDialect_, func) {
+            if (currentDialect === 'none') {
+                currentDialect = flag;
+                func(currentDialect);
+                console.log("func currentDialect ===", flag, currentDialect);
+            }
+            else if (currentDialect === flag) {
+                func(currentDialect);
+                console.log("func currentDialect ===", flag, currentDialect);
+            }
+            else {
+                openPopup("Неверный диалект! Выберите другую фигуру", "information");
+            }
+        }
+        // DB dialect
+        (_j = document.getElementById('addLineBtnDB')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
             logDebug("Add line button clicked");
-            addLine();
+            //console.log("1 - ", currentDialect)
+            dialectButtonClickedFlag = "DB";
+            dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag));
         });
-        (_m = document.getElementById('addCloudBtn')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
+        (_k = document.getElementById('addTableDB')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
+            logDebug("Add table button clicked");
+            dialectButtonClickedFlag = "DB";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+        });
+        // Base dialect
+        (_l = document.getElementById('addTable')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
+            logDebug("Add table button clicked");
+            dialectButtonClickedFlag = "base";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+        });
+        (_m = document.getElementById('addRectBtn')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
+            logDebug("Add rectangle button clicked");
+            dialectButtonClickedFlag = "base";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag));
+        });
+        (_o = document.getElementById('addCircleBtn')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+            logDebug("Add circle button clicked");
+            dialectButtonClickedFlag = "base";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag));
+        });
+        (_p = document.getElementById('addLineBtn')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
+            logDebug("Add line button clicked");
+            dialectButtonClickedFlag = "base";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag));
+        });
+        (_q = document.getElementById('addCloudBtn')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
             logDebug("Add cloud button clicked");
-            addCloud();
+            dialectButtonClickedFlag = "base";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag));
         });
-        (_o = document.getElementById('addStarBtn')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+        (_r = document.getElementById('addStarBtn')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
             logDebug("Add star button clicked");
-            addStar();
+            dialectButtonClickedFlag = "base";
+            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag));
         });
-        (_p = document.getElementById('delShapeBtn')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
+        //
+        (_s = document.getElementById('delShapeBtn')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
             logDebug("Delete shape button clicked");
             deleteShape();
         });
-        (_q = document.getElementById('rotateLeftBtn')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
+        (_t = document.getElementById('rotateLeftBtn')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
         });
-        (_r = document.getElementById('rotateRightBtn')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
+        (_u = document.getElementById('rotateRightBtn')) === null || _u === void 0 ? void 0 : _u.addEventListener('click', function () {
             logDebug("Rotate right button clicked");
             rotateSelectedObject(10);
         });
-        (_s = document.getElementById('deleteItem')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
+        (_v = document.getElementById('deleteItem')) === null || _v === void 0 ? void 0 : _v.addEventListener('click', function () {
             if (selectedObject_buf) {
                 deleteShape();
             }
@@ -743,21 +1075,21 @@
             }
             selectedObject_buf = null;
         });
-        (_t = document.getElementById('rotateLeftItem')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
+        (_w = document.getElementById('rotateLeftItem')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(-10);
             }
             selectedObject_buf = null;
             drawObjects();
         });
-        (_u = document.getElementById('rotateRightItem')) === null || _u === void 0 ? void 0 : _u.addEventListener('click', function () {
+        (_x = document.getElementById('rotateRightItem')) === null || _x === void 0 ? void 0 : _x.addEventListener('click', function () {
             if (selectedObject_buf) {
                 rotateSelectedObject(10);
             }
             selectedObject_buf = null;
             drawObjects();
         });
-        (_v = document.getElementById('cycleCheck')) === null || _v === void 0 ? void 0 : _v.addEventListener('click', function () {
+        (_y = document.getElementById('cycleCheck')) === null || _y === void 0 ? void 0 : _y.addEventListener('click', function () {
             const cycles = detectCycles(objects); // Находим все циклы
             highlight = []; // Сбрасываем выделение перед каждым новым поиском циклов
             if (cycles.length > 0) {
@@ -773,44 +1105,43 @@
                 console.log("Циклы не найдены");
             }
         });
-        (_w = document.getElementById('connect_objects')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
+        (_z = document.getElementById('connect_objects')) === null || _z === void 0 ? void 0 : _z.addEventListener('click', function () {
             logDebug(`connectionObjects button clicked`);
             connectionServ = 1;
             connectionObjects();
         });
-        (_x = document.getElementById('remove_connection')) === null || _x === void 0 ? void 0 : _x.addEventListener('click', function () {
+        (_0 = document.getElementById('remove_connection')) === null || _0 === void 0 ? void 0 : _0.addEventListener('click', function () {
             logDebug(`remove_connection button clicked`);
             connectionServ = 0;
             removeObjects();
         });
-        (_y = document.getElementById('outgoing_connect')) === null || _y === void 0 ? void 0 : _y.addEventListener('click', function () {
+        (_1 = document.getElementById('outgoing_connect')) === null || _1 === void 0 ? void 0 : _1.addEventListener('click', function () {
             logDebug(`outgoingConnectionObjects button clicked`);
             connectionServ = 3;
             connectionObjects();
         });
-        (_z = document.getElementById('remove_outgoing_connection')) === null || _z === void 0 ? void 0 : _z.addEventListener('click', function () {
+        (_2 = document.getElementById('remove_outgoing_connection')) === null || _2 === void 0 ? void 0 : _2.addEventListener('click', function () {
             logDebug(`remove_connection button clicked`);
             connectionServ = 4;
             removeObjects();
         });
-        (_0 = document.getElementById('additionInfo')) === null || _0 === void 0 ? void 0 : _0.addEventListener('click', function () {
+        (_3 = document.getElementById('additionInfo')) === null || _3 === void 0 ? void 0 : _3.addEventListener('click', function () {
             addInfo(selectedObject_buf);
         });
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
-            //showContextMenu(e.clientX, e.clientY);
             onMouseDown(e);
         });
-        (_1 = document.getElementById('insert_img')) === null || _1 === void 0 ? void 0 : _1.addEventListener('click', function () {
+        (_4 = document.getElementById('insert_img')) === null || _4 === void 0 ? void 0 : _4.addEventListener('click', function () {
             var _a;
             logDebug("Insert img button clicked");
             (_a = document.getElementById('imageInput')) === null || _a === void 0 ? void 0 : _a.click(); // Открываем диалог выбора файлов
         });
-        (_2 = document.getElementById('debugInfo')) === null || _2 === void 0 ? void 0 : _2.addEventListener('click', function () {
+        (_5 = document.getElementById('debugInfo')) === null || _5 === void 0 ? void 0 : _5.addEventListener('click', function () {
             logDebug("debugInfo clicked");
             debugHide();
         });
-        (_3 = document.getElementById('imageInput')) === null || _3 === void 0 ? void 0 : _3.addEventListener('change', function (event) {
+        (_6 = document.getElementById('imageInput')) === null || _6 === void 0 ? void 0 : _6.addEventListener('change', function (event) {
             var _a, _b;
             const file = (_b = (_a = event.target) === null || _a === void 0 ? void 0 : _a.files) === null || _b === void 0 ? void 0 : _b[0];
             if (file && selectedObject_buf) {
@@ -821,48 +1152,6 @@
                 console.error("Не выбран объект или файл.");
             }
         });
-        //canvas.addEventListener('dblclick', function (event: MouseEvent) {
-        //    // Получаем координаты клика относительно канваса
-        //    const canvasRect = canvas.getBoundingClientRect();
-        //    const mouseX = event.clientX - canvasRect.left - offsetX;
-        //    const mouseY = event.clientY - canvasRect.top - offsetY;
-        //    // Поиск объекта, по которому сделан двойной клик
-        //    const clickedObject = objects.find(obj => {
-        //        switch (obj.type) {
-        //            case 'rectangle':
-        //                const rect = obj as Rectangle;
-        //                return /*mouseX >= rect.x_C && mouseX <= rect.x_C + rect.width && mouseY >= rect.y_C && mouseY <= rect.y_C + rect.height*/isPointInRotatedRect(mouseX, mouseY, rect);
-        //            case 'circle':
-        //                const circle = obj as Circle;
-        //                const dx = mouseX - circle.x_C;
-        //                const dy = mouseY - circle.y_C;
-        //                return dx * dx + dy * dy <= circle.radius * circle.radius;
-        //            // Добавьте другие типы объектов по аналогии
-        //            default:
-        //                return false;
-        //        }
-        //    });
-        //    if (clickedObject) {
-        //        // Запрашиваем текст у пользователя с помощью prompt
-        //        const text = prompt("Введите текст для объекта", clickedObject.info || "");
-        //        if (text !== null) {
-        //            // Сохраняем введенный текст в объекте
-        //            clickedObject.info = text;
-        //            drawObjects();  // Перерисовываем холст с новым текстом
-        //        }
-        //    }
-        //});
-        //function insertionImageFromFile(shape: Shape) {
-        //    const img = new Image();
-        //    if (!shape) {
-        //        console.error("Shape not found");
-        //        return;
-        //    }
-        //    img.src = shape.imageSrc;
-        //    img.onload = function () {
-        //        shape.image = img;
-        //    };
-        //}
         canvas.addEventListener('dblclick', function (event) {
             // Получаем координаты клика относительно канваса
             const canvasRect = canvas.getBoundingClientRect();
@@ -1046,61 +1335,96 @@
             };
             reader.readAsDataURL(file); // Преобразуем изображение в строку Base64
         }
-        function drawHeadArrow(ctx, x, y, angle, color) {
-            const headlen = 10; // Длина головы стрелки
-            // Координаты концов стрелки
-            const arrowX1 = x - headlen * Math.cos(angle - Math.PI / 6);
-            const arrowY1 = y - headlen * Math.sin(angle - Math.PI / 6);
-            const arrowX2 = x - headlen * Math.cos(angle + Math.PI / 6);
-            const arrowY2 = y - headlen * Math.sin(angle + Math.PI / 6);
-            // Рисуем треугольник стрелки
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(arrowX1, arrowY1);
-            ctx.lineTo(arrowX2, arrowY2);
-            ctx.lineTo(x, y);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.strokeStyle = color;
-            ctx.stroke();
-        }
-        function drawArow(ctx, line) {
+        function drawLineWithArrow(ctx, startX, startY, endX, endY, color, arrowPosition = 'none', headLength = 10, startCardinality = 'none', endCardinality = 'none') {
             // Вычисляем угол наклона линии
-            const drawArrowAt = line.arrowDirection;
-            const angle = Math.atan2(line.endY - line.startY, line.endX - line.startX);
-            // Рисуем стрелки
-            if (drawArrowAt === "start" || drawArrowAt === "both") {
-                drawHeadArrow(ctx, line.startX, line.startY, angle + Math.PI, line.color);
-            }
-            if (drawArrowAt === "end" || drawArrowAt === "both") {
-                drawHeadArrow(ctx, line.endX, line.endY, angle, line.color);
-            }
-        }
-        function drawDirectedLine(ctx, startX, startY, endX, endY, color) {
-            // Рисуем линию
+            const angle = Math.atan2(endY - startY, endX - startX);
             ctx.beginPath();
             ctx.moveTo(startX, startY);
             ctx.lineTo(endX, endY);
             ctx.strokeStyle = color;
             ctx.stroke();
-            // Вычисляем середину линии
-            const midX = (startX + endX) / 2;
-            const midY = (startY + endY) / 2;
-            // Вычисляем угол наклона линии
-            const angle = Math.atan2(endY - startY, endX - startX);
-            // Длина головы стрелки
-            const headlen = 10;
-            // Рисуем стрелку в середине линии
-            ctx.beginPath();
-            ctx.moveTo(midX, midY);
-            ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.lineTo(midX - headlen * Math.cos(angle + Math.PI / 6), midY - headlen * Math.sin(angle + Math.PI / 6));
-            ctx.lineTo(midX, midY);
-            ctx.lineTo(midX - headlen * Math.cos(angle - Math.PI / 6), midY - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.strokeStyle = color;
-            ctx.stroke();
-            ctx.fillStyle = color;
-            ctx.fill();
+            const drawHead = (x, y, directionAngle) => {
+                const arrowX1 = x - headLength * Math.cos(directionAngle - Math.PI / 6);
+                const arrowY1 = y - headLength * Math.sin(directionAngle - Math.PI / 6);
+                const arrowX2 = x - headLength * Math.cos(directionAngle + Math.PI / 6);
+                const arrowY2 = y - headLength * Math.sin(directionAngle + Math.PI / 6);
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(arrowX1, arrowY1);
+                ctx.lineTo(arrowX2, arrowY2);
+                ctx.closePath(); // Закрываем треугольник
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = color;
+                ctx.stroke();
+            };
+            const drawBar = (x, y, angle) => {
+                const dx = Math.cos(angle + Math.PI / 2) * 6;
+                const dy = Math.sin(angle + Math.PI / 2) * 6;
+                ctx.beginPath();
+                ctx.moveTo(x - dx, y - dy);
+                ctx.lineTo(x + dx, y + dy);
+                ctx.stroke();
+            };
+            const drawCircle = (x, y) => {
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.stroke();
+            };
+            const drawCrowFoot = (x, y, angle) => {
+                const spread = Math.PI / 10;
+                const len = 14;
+                for (let i = -1; i <= 1; i++) {
+                    const a = angle + i * spread;
+                    const dx = Math.cos(a) * len;
+                    const dy = Math.sin(a) * len;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - dx, y - dy);
+                    ctx.stroke();
+                }
+            };
+            const drawMarker = (type, x, y, angle) => {
+                if (!type)
+                    return;
+                if (type === '-|->')
+                    drawBar(x, y, angle);
+                if (type === '-0->') {
+                    drawCircle(x, y);
+                }
+                if (type === '-*->') {
+                    drawCrowFoot(x + Math.cos(angle) * 10, y + Math.sin(angle) * 10, angle);
+                }
+            };
+            const startOffsetX = startX + Math.cos(angle) * 8;
+            const startOffsetY = startY + Math.sin(angle) * 8;
+            const endOffsetX = endX - Math.cos(angle) * 8;
+            const endOffsetY = endY - Math.sin(angle) * 8;
+            if (startCardinality !== ">") {
+                drawMarker(startCardinality, startOffsetX, startOffsetY, angle);
+            }
+            else {
+                drawHead(startX, startY, angle + Math.PI);
+            }
+            if (endCardinality !== ">") {
+                drawMarker(endCardinality, endOffsetX, endOffsetY, angle + Math.PI);
+            }
+            else {
+                drawHead(endX, endY, angle);
+            }
+            if ((arrowPosition === 'start' || arrowPosition === 'both') && startCardinality === "none") {
+                drawHead(startX, startY, angle + Math.PI);
+                //startCardinality = ">";
+            }
+            if ((arrowPosition === 'end' || arrowPosition === 'both') && endCardinality === "none") {
+                drawHead(endX, endY, angle);
+                //endCardinality = ">";
+            }
+            if (arrowPosition === 'mid') {
+                const midX = (startX + startY) / 2;
+                const midY = (endX + endY) / 2;
+                drawHead(midX, midY, angle);
+            }
         }
         document.addEventListener('click', function () {
             hideContextMenu();
@@ -1367,8 +1691,9 @@
             if (!complex)
                 drawObjects();
         }
-        function addRect(x_C = canvas.width / 2, y_C = canvas.height / 2, width = 50, height = 50, color = getRandomColor(), rotation = 0, border = false) {
+        function addRect(dialect = "base", x_C = canvas.width / 2, y_C = canvas.height / 2, width = 50, height = 50, color = getRandomColor(), rotation = 0, border = false) {
             const newRect = {
+                dialect,
                 id: generateRandomId(16),
                 type: 'rectangle',
                 x_C,
@@ -1387,8 +1712,9 @@
             };
             objectAdditionPreprocessing(newRect);
         }
-        function addCircle(x_C = canvas.width / 2, y_C = canvas.height / 2, radius = 25, color = getRandomColor(), rotation = 0) {
+        function addCircle(dialect = "base", x_C = canvas.width / 2, y_C = canvas.height / 2, radius = 25, color = getRandomColor(), rotation = 0) {
             const newCircle = {
+                dialect,
                 id: generateRandomId(16),
                 type: 'circle',
                 x_C,
@@ -1405,10 +1731,11 @@
             };
             objectAdditionPreprocessing(newCircle);
         }
-        function addLine(startX = canvas.width / 2 - 50, startY = canvas.height / 2, endX = canvas.width / 2 + 50, endY = canvas.height / 2, color = getRandomColor(), rotation = 0, arrowDirection = "none", punctuation = "none", lineWidth = 2) {
+        function addLine(dialect = "base", startX = canvas.width / 2 - 50, startY = canvas.height / 2, endX = canvas.width / 2 + 50, endY = canvas.height / 2, color = getRandomColor(), rotation = 0, arrowDirection = "none", punctuation = "none", lineWidth = 2, startArrowType = 'none', endArrowType = 'none') {
             const centerX = (startX + endX) / 2;
             const centerY = (startY + endY) / 2;
             const newLine = {
+                dialect,
                 id: generateRandomId(16),
                 type: 'line',
                 startX,
@@ -1427,12 +1754,15 @@
                 arrowDirection,
                 colorAlpha: 1,
                 punctuation,
-                lineWidth
+                lineWidth,
+                startArrowType,
+                endArrowType
             };
             objectAdditionPreprocessing(newLine);
         }
-        function addStar(x_C = canvas.width / 2, y_C = canvas.height / 2, rad = 100, amount_points = 6, m = 0.5, color = getRandomColor(), rotation = 0) {
+        function addStar(dialect = "base", x_C = canvas.width / 2, y_C = canvas.height / 2, rad = 100, amount_points = 6, m = 0.5, color = getRandomColor(), rotation = 0) {
             const newStar = {
+                dialect,
                 id: generateRandomId(16),
                 type: 'star',
                 x_C,
@@ -1451,8 +1781,9 @@
             };
             objectAdditionPreprocessing(newStar);
         }
-        function addCloud(x_C = canvas.width / 2, y_C = canvas.height / 2, width = 200, height = 120, color = getRandomColor(), rotation = 0) {
+        function addCloud(dialect = "base", x_C = canvas.width / 2, y_C = canvas.height / 2, width = 200, height = 120, color = getRandomColor(), rotation = 0) {
             const newCloud = {
+                dialect,
                 id: generateRandomId(16),
                 type: 'cloud',
                 x_C,
@@ -1470,10 +1801,11 @@
             };
             objectAdditionPreprocessing(newCloud);
         }
-        function addTable(x_C = canvas.width / 2, y_C = canvas.height / 2, rows = 3, // Количество строк
+        function addTable(dialect = "base", x_C = canvas.width / 2, y_C = canvas.height / 2, rows = 3, // Количество строк
         cols = 3, // Количество столбцов
         cellWidth = 50, cellHeight = 50, color = getRandomColor(), rotation = 0) {
             const newTable = {
+                dialect,
                 id: generateRandomId(16),
                 type: 'table',
                 x_C,
@@ -1486,12 +1818,15 @@
                 borderPoints_X1: x_C,
                 borderPoints_Y1: y_C,
                 borderPoints_X2: x_C + cols * cellWidth,
-                borderPoints_Y2: y_C + rows * cellHeight
+                borderPoints_Y2: y_C + rows * cellHeight,
+                cols: cols,
+                rows: rows
             };
             // Создание ячеек таблицы
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < cols; col++) {
                     const cell = {
+                        dialect,
                         id: generateRandomId(16),
                         type: 'rectangle',
                         x_C: x_C + col * cellWidth,
@@ -1515,6 +1850,19 @@
             objects.push(newTable);
             drawObjects();
         }
+        function drawTable(table, ctx) {
+            table.parts.forEach(part => {
+                drawRect(part, ctx);
+                updateConnectors(part);
+                enteringText(part);
+                //console.log("draw")
+            });
+            console.log("table border upd");
+            table.borderPoints_X1 = table.x_C;
+            table.borderPoints_Y1 = table.y_C;
+            table.borderPoints_X2 = table.x_C + table.width;
+            table.borderPoints_Y2 = table.y_C + table.height;
+        }
         // Отрисовка/удаление объектов
         function drawSquare(ctx, x, y, size) {
             ctx.fillStyle = 'black';
@@ -1527,7 +1875,7 @@
             if (rect.image) {
                 ctx.drawImage(rect.image, rect.x_C, rect.y_C, rect.width, rect.height);
             }
-            if (rect.border) {
+            if (rect.border) { // чтобы в таблице были непунктирные границы
                 ctx.strokeStyle = 'black';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(rect.x_C, rect.y_C, rect.width, rect.height);
@@ -1596,7 +1944,8 @@
                     //console.log(connector.x - 3, connector.y - 3);
                 });
             }
-            drawArow(ctx, line);
+            //drawArrow(ctx, line);
+            drawLineWithArrow(ctx, line.startX, line.startY, line.endX, line.endY, line.color, line.arrowDirection, 10, line.startArrowType, line.endArrowType);
         }
         function drawCircle(circle, ctx) {
             const colorWithAlpha = hexToRgba(circle.color, circle.colorAlpha);
@@ -1755,8 +2104,8 @@
                         if (shapeToRemove.type === 'line') {
                             const lineToRemove = shapeToRemove;
                             for (const obj of objects) {
-                                obj.lineConnectionStart = ((_a = obj.lineConnectionStart) === null || _a === void 0 ? void 0 : _a.filter(conn => conn.id_line !== lineToRemove.id)) || [];
-                                obj.lineConnectionEnd = ((_b = obj.lineConnectionEnd) === null || _b === void 0 ? void 0 : _b.filter(conn => conn.id_line !== lineToRemove.id)) || [];
+                                obj.lineConnectionStart = ((_a = obj.lineConnectionStart) === null || _a === void 0 ? void 0 : _a.filter(conn => conn.id_shape !== lineToRemove.id)) || [];
+                                obj.lineConnectionEnd = ((_b = obj.lineConnectionEnd) === null || _b === void 0 ? void 0 : _b.filter(conn => conn.id_shape !== lineToRemove.id)) || [];
                             }
                         }
                         else if (shapeToRemove.type === "table") {
@@ -1781,8 +2130,8 @@
                     if (shapeToRemove.type === 'line') {
                         const lineToRemove = shapeToRemove;
                         for (const obj of objects) {
-                            obj.lineConnectionStart = ((_c = obj.lineConnectionStart) === null || _c === void 0 ? void 0 : _c.filter(conn => conn.id_line !== lineToRemove.id)) || [];
-                            obj.lineConnectionEnd = ((_d = obj.lineConnectionEnd) === null || _d === void 0 ? void 0 : _d.filter(conn => conn.id_line !== lineToRemove.id)) || [];
+                            obj.lineConnectionStart = ((_c = obj.lineConnectionStart) === null || _c === void 0 ? void 0 : _c.filter(conn => conn.id_shape !== lineToRemove.id)) || [];
+                            obj.lineConnectionEnd = ((_d = obj.lineConnectionEnd) === null || _d === void 0 ? void 0 : _d.filter(conn => conn.id_shape !== lineToRemove.id)) || [];
                         }
                     }
                     else if (shapeToRemove.type === "table") {
@@ -1802,6 +2151,10 @@
             while (container.firstChild) {
                 container.removeChild(container.firstChild);
             }
+            if (objects.length == 0) {
+                currentDialect = "none";
+            }
+            isSchemaLoaded = false;
         }
         // Управление объектами
         function rotateSelectedObject(angle) {
@@ -1940,11 +2293,6 @@
             return foundObject_;
         }
         function leftButtonDown(e, mouseX, mouseY) {
-            const button = document.getElementById('longWayCheck'); // Получаем кнопку
-            const computedStyle = window.getComputedStyle(button); // Получаем стили
-            const fontSize = computedStyle.fontSize; // Размер шрифта
-            const fontFamily = computedStyle.fontFamily; // Тип шрифта
-            console.log("leftButtonDown", fontSize, fontFamily);
             console.log("obj - ", objects);
             logDebug("mouse_down");
             let foundObject = false;
@@ -1967,13 +2315,17 @@
                         mouseX <= table.x_C + table.width &&
                         mouseY >= table.y_C &&
                         mouseY <= table.y_C + table.height) {
-                        console.log(`📌 Выбрана таблица ${table.id}`);
+                        console.log(`Выбрана таблица ${table.id}`);
                         foundObject = true;
                         table.selectionMarker = true;
-                        table.parts.forEach(part => part.selectionMarker = true);
+                        if (selectedObjectMass.length == 0) {
+                            table.parts.forEach(part => {
+                                part.selectionMarker = true;
+                                selectedObjectMass.push(part);
+                            });
+                        }
                         selectedObject = table;
                         selectedObject_buf = table;
-                        selectedObjectMass = table.parts; // Добавляем всю таблицу в список выделенных объектов
                         startX = mouseX - table.x_C;
                         startY = mouseY - table.y_C;
                         drawObjects();
@@ -2058,6 +2410,10 @@
                 }
             }
             if (foundObject === false) {
+                const infoPanel = document.getElementById("infoPanel");
+                if (infoPanel) {
+                    infoPanel.innerHTML = "";
+                }
                 selectedObject = null;
                 selectedObject_buf = null;
                 for (let i = objects.length - 1; i >= 0; i--) {
@@ -2066,6 +2422,7 @@
                         objects[i].parts.forEach(part => part.selectionMarker = false);
                     }
                 }
+                selectedObjectMass = [];
                 isSelecting = true;
                 selectionStartX = e.clientX - canvas.offsetLeft;
                 selectionStartY = e.clientY - canvas.offsetTop;
@@ -2073,10 +2430,27 @@
                 selectionEndY = e.clientY - canvas.offsetTop;
                 //console.log("now is selecting");
             }
-            else {
+            else { // если клик был сделан по объекту не яляющимся частью группы выделенных, то чистим группу выделенных (не считая таблицы)
+                console.log("so, sob, sm - ", selectedObject, selectedObject_buf, selectedObjectMass);
+                console.log("logic check - selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== table", selectedObjectMass.length > 0, !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id), selectedObject_buf.type !== 'table');
                 if (selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== 'table') {
                     selectedObjectMass = [];
+                    for (let i = objects.length - 1; i >= 0; i--) {
+                        if (objects[i].type === 'table') {
+                            objects[i].selectionMarker = false;
+                            objects[i].parts.forEach(part => part.selectionMarker = false);
+                        }
+                    }
                 }
+                if (selectedObjectMass.length > 0 && selectedObjectMass.every(selObj => objects.some(obj => obj.type === 'table' &&
+                    obj.parts.includes(selObj)))) {
+                    for (const obj of objects) {
+                        if (obj.type !== 'table' || !selectedObjectMass.every(selObj => obj.parts.includes(selObj))) {
+                            obj.selectionMarker = false;
+                        }
+                    }
+                }
+                console.log("foundO true");
             }
             drawObjects();
             if (selectedObject_buf && selectedObject_buf.connectors) {
@@ -2087,6 +2461,7 @@
                         mouseY <= connector.y + 5);
                 });
             }
+            console.log("status check - ", foundObject, selectedObject);
         }
         function rigtButtonDown(e, mouseX, mouseY) {
             for (let i = objects.length - 1; i >= 0; i--) {
@@ -2234,6 +2609,9 @@
             selectedObject_buf = null;
             for (let i = objects.length - 1; i >= 0; i--) {
                 objects[i].selectionMarker = false;
+                if (objects[i].type === "table") {
+                    objects[i].parts.forEach(part => part.selectionMarker = false);
+                }
             }
             selectedObjectMass = [];
             // Координаты прямоугольника выделения
@@ -2256,8 +2634,16 @@
                     // Если объект попадает в поле выделения, добавляем его в массив выбранных объектов
                     obj.selectionMarker = true;
                     selectedObjectMass.push(obj);
+                    if (obj.type === "table") {
+                        const table = obj;
+                        table.parts.forEach(part => {
+                            part.selectionMarker = true;
+                            selectedObjectMass.push(part);
+                        });
+                    }
                 }
             }
+            console.log("result selOM - ", selectedObjectMass);
         }
         // Функция для отрисовки рамки выделения
         function drawSelectionBox() {
@@ -2325,17 +2711,17 @@
                             line.lineConnectionStart = line.lineConnectionStart || [];
                             // Удаляем старое соединение, если линия была прикреплена к другому объекту
                             if (previousConnection && previousConnection.id_con !== connector.id) {
-                                const previousObj = objects.find(o => o.id === previousConnection.id_line);
+                                const previousObj = objects.find(o => o.id === previousConnection.id_shape);
                                 if (previousObj) {
-                                    previousObj.lineConnectionStart = ((_c = previousObj.lineConnectionStart) === null || _c === void 0 ? void 0 : _c.filter(entry => entry.id_line !== line.id)) || [];
+                                    previousObj.lineConnectionStart = ((_c = previousObj.lineConnectionStart) === null || _c === void 0 ? void 0 : _c.filter(entry => entry.id_shape !== line.id)) || [];
                                 }
                                 line.lineConnectionStart = [];
                             }
-                            if (!obj.lineConnectionStart.find(entry => entry.id_line === line.id)) {
-                                obj.lineConnectionStart.push({ id_con: connector.id, id_line: line.id });
+                            if (!obj.lineConnectionStart.find(entry => entry.id_shape === line.id)) {
+                                obj.lineConnectionStart.push({ id_con: connector.id, id_shape: line.id });
                             }
                             if (!line.lineConnectionStart.find(entry => entry.id_con === connector.id)) {
-                                line.lineConnectionStart.push({ id_con: connector.id, id_line: obj.id });
+                                line.lineConnectionStart.push({ id_con: connector.id, id_shape: obj.id });
                             }
                             console.log(`🔗 Линия ${line.id} соединена с объектом ${obj.id} в точке ${connector.id}`);
                             break;
@@ -2345,10 +2731,10 @@
             }
             // Если линия была привязана, но теперь не находится рядом с коннектором - удаляем связь
             if (!isConnected && previousConnection) {
-                console.log(`❌ Линия ${line.id} отключена от объекта ${previousConnection.id_line}`);
-                const previousObj = objects.find(o => o.id === previousConnection.id_line);
+                console.log(`❌ Линия ${line.id} отключена от объекта ${previousConnection.id_shape}`);
+                const previousObj = objects.find(o => o.id === previousConnection.id_shape);
                 if (previousObj) {
-                    previousObj.lineConnectionStart = ((_d = previousObj.lineConnectionStart) === null || _d === void 0 ? void 0 : _d.filter(entry => entry.id_line !== line.id)) || [];
+                    previousObj.lineConnectionStart = ((_d = previousObj.lineConnectionStart) === null || _d === void 0 ? void 0 : _d.filter(entry => entry.id_shape !== line.id)) || [];
                 }
                 line.lineConnectionStart = [];
             }
@@ -2369,17 +2755,17 @@
                             line.lineConnectionEnd = line.lineConnectionEnd || [];
                             // Удаляем старое соединение, если линия была прикреплена к другому объекту
                             if (previousConnection && previousConnection.id_con !== connector.id) {
-                                const previousObj = objects.find(o => o.id === previousConnection.id_line);
+                                const previousObj = objects.find(o => o.id === previousConnection.id_shape);
                                 if (previousObj) {
-                                    previousObj.lineConnectionEnd = ((_c = previousObj.lineConnectionEnd) === null || _c === void 0 ? void 0 : _c.filter(entry => entry.id_line !== line.id)) || [];
+                                    previousObj.lineConnectionEnd = ((_c = previousObj.lineConnectionEnd) === null || _c === void 0 ? void 0 : _c.filter(entry => entry.id_shape !== line.id)) || [];
                                 }
                                 line.lineConnectionEnd = [];
                             }
-                            if (!obj.lineConnectionEnd.find(entry => entry.id_line === line.id)) {
-                                obj.lineConnectionEnd.push({ id_con: connector.id, id_line: line.id });
+                            if (!obj.lineConnectionEnd.find(entry => entry.id_shape === line.id)) {
+                                obj.lineConnectionEnd.push({ id_con: connector.id, id_shape: line.id });
                             }
                             if (!line.lineConnectionEnd.find(entry => entry.id_con === connector.id)) {
-                                line.lineConnectionEnd.push({ id_con: connector.id, id_line: obj.id });
+                                line.lineConnectionEnd.push({ id_con: connector.id, id_shape: obj.id });
                             }
                             console.log(`🔗 Линия ${line.id} соединена с объектом ${obj.id} в точке ${connector.id}`);
                             break;
@@ -2389,10 +2775,10 @@
             }
             // Если линия была привязана, но теперь не находится рядом с коннектором - удаляем связь
             if (!isConnected && previousConnection) {
-                console.log(`❌ Линия ${line.id} отключена от объекта ${previousConnection.id_line}`);
-                const previousObj = objects.find(o => o.id === previousConnection.id_line);
+                console.log(`❌ Линия ${line.id} отключена от объекта ${previousConnection.id_shape}`);
+                const previousObj = objects.find(o => o.id === previousConnection.id_shape);
                 if (previousObj) {
-                    previousObj.lineConnectionEnd = ((_d = previousObj.lineConnectionEnd) === null || _d === void 0 ? void 0 : _d.filter(entry => entry.id_line !== line.id)) || [];
+                    previousObj.lineConnectionEnd = ((_d = previousObj.lineConnectionEnd) === null || _d === void 0 ? void 0 : _d.filter(entry => entry.id_shape !== line.id)) || [];
                 }
                 line.lineConnectionEnd = [];
             }
@@ -2414,10 +2800,10 @@
                     // Удаляем связь из объекта
                     for (const obj of objects) {
                         if (obj.lineConnectionStart) {
-                            obj.lineConnectionStart = obj.lineConnectionStart.filter(entry => entry.id_line !== line.id);
+                            obj.lineConnectionStart = obj.lineConnectionStart.filter(entry => entry.id_shape !== line.id);
                         }
                         if (obj.lineConnectionEnd) {
-                            obj.lineConnectionEnd = obj.lineConnectionEnd.filter(entry => entry.id_line !== line.id);
+                            obj.lineConnectionEnd = obj.lineConnectionEnd.filter(entry => entry.id_shape !== line.id);
                         }
                     }
                     // Удаляем связь из самой линии
@@ -2514,11 +2900,11 @@
             for (const connector of obj_.connectors) {
                 // Перемещаем линии, связанные с коннектором
                 for (const line of objects.filter(obj => obj.type === 'line')) {
-                    if ((_a = obj_.lineConnectionStart) === null || _a === void 0 ? void 0 : _a.some(entry => entry.id_con === connector.id && entry.id_line === line.id)) {
+                    if ((_a = obj_.lineConnectionStart) === null || _a === void 0 ? void 0 : _a.some(entry => entry.id_con === connector.id && entry.id_shape === line.id)) {
                         line.startX = connector.x;
                         line.startY = connector.y;
                     }
-                    if ((_b = obj_.lineConnectionEnd) === null || _b === void 0 ? void 0 : _b.some(entry => entry.id_con === connector.id && entry.id_line === line.id)) {
+                    if ((_b = obj_.lineConnectionEnd) === null || _b === void 0 ? void 0 : _b.some(entry => entry.id_con === connector.id && entry.id_shape === line.id)) {
                         line.endX = connector.x;
                         line.endY = connector.y;
                     }
@@ -2562,12 +2948,22 @@
                 //console.log("mx - ", mouseX, "my - ", mouseY, "sx - sy --", help_X, help_Y)
                 const dx = mouseX - help_X;
                 const dy = mouseY - help_Y;
+                let helper = false;
                 if (selectedObject_buf.type === 'table') {
                     selectedObject_buf.x_C += dx;
                     selectedObject_buf.y_C += dy;
+                    console.log("table x-y", selectedObject_buf.x_C, selectedObject_buf.y_C);
+                    helper = true;
                 }
                 for (const obj of selectedObjectMass) {
                     switch (obj.type) {
+                        case 'table':
+                            if (!helper) {
+                                obj.x_C += dx;
+                                obj.y_C += dy;
+                            }
+                            console.log("table x-y selOM", obj.x_C, obj.y_C);
+                            break;
                         case 'rectangle':
                             obj.x_C += dx;
                             obj.y_C += dy;
@@ -2780,14 +3176,14 @@
             link.click(); // Программное кликанье по ссылке
             document.body.removeChild(link); //Удаление ссылки из документа. Это делается для очистки DOM после скачивания файла, так как ссылка больше не нужна
         }
-        (_4 = document.getElementById('downloadBtn')) === null || _4 === void 0 ? void 0 : _4.addEventListener('click', function () {
+        (_7 = document.getElementById('downloadBtn')) === null || _7 === void 0 ? void 0 : _7.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
             const shapes = JSON.stringify(objects, null, 2);
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         });
         //пробуем сделать с загрузкой на сервер
-        (_5 = document.getElementById('uploadCssBtn')) === null || _5 === void 0 ? void 0 : _5.addEventListener('click', function () {
+        (_8 = document.getElementById('uploadCssBtn')) === null || _8 === void 0 ? void 0 : _8.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -2837,7 +3233,7 @@
                 console.error('No CSS found in local storage');
             }
         }
-        (_6 = document.getElementById('uploadCssBtn2')) === null || _6 === void 0 ? void 0 : _6.addEventListener('click', function () {
+        (_9 = document.getElementById('uploadCssBtn2')) === null || _9 === void 0 ? void 0 : _9.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput2');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -2848,7 +3244,7 @@
                 logDebug("No file selected for upload");
             }
         });
-        (_7 = document.getElementById('cssFileInput2')) === null || _7 === void 0 ? void 0 : _7.addEventListener('change', function (event) {
+        (_10 = document.getElementById('cssFileInput2')) === null || _10 === void 0 ? void 0 : _10.addEventListener('change', function (event) {
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -2931,13 +3327,59 @@
                     case 'cloud':
                         const cloud = obj;
                         return `<object ${baseProps} x_C="${cloud.x_C}" y_C="${cloud.y_C}" width="${cloud.width}" height="${cloud.height}"/>`;
+                    case 'table':
+                        const table = obj;
                     default:
                         throw new Error('Unknown object type');
                 }
             }).join('\n');
             return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
         }
-        (_8 = document.getElementById('fileInput3')) === null || _8 === void 0 ? void 0 : _8.addEventListener('change', function (event) {
+        //function convertObjectsToOWL(objects: Shape[]): string {
+        //    //const canvas = graphManager.getCanvas(); // Используем canvas из graphManager
+        //    const size = { width: canvas.width, height: canvas.height };
+        //    const sizeXML = `<size width="${size.width}" height="${size.height}"/>`;
+        //    const objectsXML = objects.map(obj => {
+        //        const baseProps = `id="${obj.id}" type="${obj.type}" color="${obj.color}" rotation="${obj.rotation || 0}" info="${obj.info || ''}" linkedObjects="${obj.linkedObjects?.join(',') || ''}" outgoingLinks="${obj.outgoingLinks?.join(',') || ''}" incomingLinks="${obj.incomingLinks?.join(',') || ''}"`;
+        //        switch (obj.type) {
+        //            case 'rectangle': {
+        //                const rect = obj as Rectangle;
+        //                return `<object ${baseProps} x="${rect.x_C}" y="${rect.y_C}" width="${rect.width}" height="${rect.height}"/>`;
+        //            }
+        //            case 'circle': {
+        //                const circle = obj as Circle;
+        //                return `<object ${baseProps} x="${circle.x_C}" y="${circle.y_C}" radius="${circle.radius}"/>`;
+        //            }
+        //            case 'line': {
+        //                const line = obj as Line;
+        //                return `<object ${baseProps} startX="${line.startX}" startY="${line.startY}" endX="${line.endX}" endY="${line.endY}"/>`;
+        //            }
+        //            case 'star': {
+        //                const star = obj as Star;
+        //                return `<object ${baseProps} x_C="${star.x_C}" y_C="${star.y_C}" rad="${star.rad}" amount_points="${star.amount_points}" m="${star.m}"/>`;
+        //            }
+        //            case 'cloud': {
+        //                const cloud = obj as Cloud;
+        //                return `<object ${baseProps} x_C="${cloud.x_C}" y_C="${cloud.y_C}" width="${cloud.width}" height="${cloud.height}"/>`;
+        //            }
+        //            case 'table': {
+        //                const table = obj as ComplexShape;
+        //                const tableXML = `<object ${baseProps} x_C="${table.x_C}" y_C="${table.y_C}" width="${table.width}" height="${table.height}">`;
+        //                const partsXML = table.parts.map(part => {
+        //                    if (part.type === 'rectangle') {
+        //                        const cell = part as Rectangle;
+        //                        return `<cell id="${cell.id}" x="${cell.x_C}" y="${cell.y_C}" width="${cell.width}" height="${cell.height}" color="${cell.color}"/>`;
+        //                    }
+        //                }).join('\n');
+        //                return `${tableXML}\n${partsXML}\n</object>`;
+        //            }
+        //            default:
+        //                throw new Error(`Unknown object type: ${obj.type}`);
+        //        }
+        //    }).join('\n');
+        //    return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
+        //}
+        (_11 = document.getElementById('fileInput3')) === null || _11 === void 0 ? void 0 : _11.addEventListener('change', function (event) {
             var _a;
             try {
                 const input = event.target;
@@ -2968,11 +3410,11 @@
                 console.error('Error reading file:', error);
             }
         });
-        (_9 = document.getElementById('downloadBtn3')) === null || _9 === void 0 ? void 0 : _9.addEventListener('click', function () {
+        (_12 = document.getElementById('downloadBtn3')) === null || _12 === void 0 ? void 0 : _12.addEventListener('click', function () {
             const owlContent = convertObjectsToOWL(objects);
             downloadFile('shapes.owl', owlContent);
         });
-        //function createVerticalTable(object: Shape): HTMLTableElement {
+        //function createVerticalTablekk(object: Shape): HTMLTableElement {
         //    const table = document.createElement('table');
         //    table.style.border = '1px solid black';
         //    table.style.borderCollapse = 'collapse';
@@ -3121,9 +3563,22 @@
                     if (typeof (object[key]) === "number" ||
                         key === "color" ||
                         key === "arrowDirection" ||
-                        key === "punctuation") {
+                        key === "punctuation" ||
+                        key === "startArrowType" ||
+                        key === "endArrowType") {
                         cellValue.style.cursor = "pointer";
                         cellValue.addEventListener('click', () => {
+                            const optionsEntering = (object, options, input) => {
+                                options.forEach(option => {
+                                    const opt = document.createElement('option');
+                                    opt.value = option;
+                                    opt.textContent = option;
+                                    if (object[key] === option) {
+                                        opt.selected = true;
+                                    }
+                                    input.appendChild(opt);
+                                });
+                            };
                             if (cellValue.querySelector('input, select'))
                                 return;
                             // Очистим содержимое ячейки
@@ -3136,29 +3591,19 @@
                             }
                             else if (key === "arrowDirection") {
                                 input = document.createElement('select');
-                                const options = ["start", "end", "both", "none"];
-                                options.forEach(option => {
-                                    const opt = document.createElement('option');
-                                    opt.value = option;
-                                    opt.textContent = option;
-                                    if (object[key] === option) {
-                                        opt.selected = true;
-                                    }
-                                    input.appendChild(opt);
-                                });
+                                const options = ["start", "end", "both", "mid", "none"];
+                                //const options = [ "mid landmark", "none"];
+                                optionsEntering(object, options, input);
                             }
                             else if (key === "punctuation") {
                                 input = document.createElement('select');
                                 const options = ["yes", "none"];
-                                options.forEach(option => {
-                                    const opt = document.createElement('option');
-                                    opt.value = option;
-                                    opt.textContent = option;
-                                    if (object[key] === option) {
-                                        opt.selected = true;
-                                    }
-                                    input.appendChild(opt);
-                                });
+                                optionsEntering(object, options, input);
+                            }
+                            else if (key === "startArrowType" || key === "endArrowType") {
+                                input = document.createElement('select');
+                                const options = ["-|->", "-0->", "-*->", ">", "none"];
+                                optionsEntering(object, options, input);
                             }
                             else {
                                 input = document.createElement('input');
@@ -3166,30 +3611,107 @@
                                 input.value = valueElement.innerText;
                             }
                             input.focus();
-                            input.addEventListener('keydown', (e) => {
-                                if (e.key === 'Enter') {
-                                    const newValue = input.value.trim();
-                                    if (typeof object[key] === 'number') {
-                                        const parsedValue = parseFloat(newValue);
-                                        if (isNaN(parsedValue)) {
-                                            alert("Некорректное числовое значение.");
-                                            return;
-                                        }
-                                        object[key] = parsedValue;
-                                        valueElement.innerText = parsedValue.toString();
+                            //const editButton = document.createElement('button');
+                            //editButton.innerText = 'Изменить';
+                            //editButton.style.float = 'right';
+                            //editButton.style.margin = '0 auto';
+                            //cellValue.innerHTML = '';
+                            //cellValue.appendChild(input);
+                            //cellValue.appendChild(editButton);
+                            const applyNewValue = () => {
+                                const newValue = input.value.trim();
+                                if (typeof object[key] === 'number') {
+                                    const parsed = parseFloat(newValue);
+                                    if (isNaN(parsed)) {
+                                        alert("Некорректное числовое значение.");
+                                        return;
                                     }
-                                    else {
-                                        object[key] = newValue;
-                                        valueElement.innerText = newValue;
-                                    }
-                                    cellValue.innerHTML = '';
-                                    cellValue.appendChild(valueElement);
-                                    drawObjects();
+                                    object[key] = parsed;
+                                    valueElement.innerText = parsed.toString();
                                 }
-                            });
-                            input.addEventListener('blur', () => {
+                                else if (typeof object[key] === 'string') {
+                                    object[key] = newValue;
+                                    valueElement.innerText = newValue;
+                                }
+                                //if (object.type === "line") {
+                                //    console.log("enter the func - ", object)
+                                //    const myline = object as Line;
+                                //    if (myline.startArrowType === ">") {
+                                //        myline.arrowDirection = "start"
+                                //    }
+                                //    if (myline.endArrowType === ">") {
+                                //        myline.arrowDirection = "end"
+                                //    }
+                                //    if (myline.arrowDirection === "start") {
+                                //        myline.startArrowType = ">"
+                                //        console.log("i an here - ", object, myline)
+                                //    }
+                                //    if (myline.arrowDirection === "end") {
+                                //        myline.endArrowType = ">"
+                                //    }
+                                //}
+                                if (object.type === "line") {
+                                    const line = object;
+                                    if (key === "arrowDirection") {
+                                        switch (newValue) {
+                                            case "start":
+                                                line.startArrowType = ">";
+                                                line.endArrowType = "none";
+                                                break;
+                                            case "end":
+                                                line.startArrowType = "none";
+                                                line.endArrowType = ">";
+                                                break;
+                                            case "both":
+                                                line.startArrowType = ">";
+                                                line.endArrowType = ">";
+                                                break;
+                                            default:
+                                                line.startArrowType = "none";
+                                                line.endArrowType = "none";
+                                                break;
+                                        }
+                                    }
+                                    if (key === "startArrowType" || key === "endArrowType") {
+                                        const start = line.startArrowType;
+                                        const end = line.endArrowType;
+                                        if (start === ">" && end === ">") {
+                                            line.arrowDirection = "both";
+                                        }
+                                        else if (start === ">" && end !== ">") {
+                                            line.arrowDirection = "start";
+                                        }
+                                        else if (start !== ">" && end === ">") {
+                                            line.arrowDirection = "end";
+                                        }
+                                        else {
+                                            line.arrowDirection = "none";
+                                        }
+                                    }
+                                }
                                 cellValue.innerHTML = '';
                                 cellValue.appendChild(valueElement);
+                                const debugPanel = document.getElementById('table-container');
+                                if (debugPanel) {
+                                    debugPanel.innerHTML = '';
+                                    debugPanel.appendChild(createVerticalTable(object));
+                                }
+                                drawObjects();
+                            };
+                            input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') {
+                                    applyNewValue();
+                                }
+                            });
+                            //editButton.addEventListener('click', applyNewValue);
+                            input.addEventListener('blur', () => {
+                                //setTimeout(() => {
+                                // Если кнопка не в фокусе, возвращаем span
+                                //if (document.activeElement !== editButton) {
+                                cellValue.innerHTML = '';
+                                cellValue.appendChild(valueElement);
+                                //}
+                                //}, 50); // 100 мс — достаточно
                             });
                             cellValue.appendChild(input);
                         });
@@ -3331,7 +3853,8 @@
                         if (linkedObj) {
                             const [startX, startY] = getObjectCenter(obj);
                             const [endX, endY] = getObjectCenter(linkedObj);
-                            drawDirectedLine(ctx, startX, startY, endX, endY, 'blue');
+                            //drawDirectedLine_Mid(ctx, startX, startY, endX, endY, 'blue');
+                            drawLineWithArrow(ctx, startX, startY, endX, endY, 'blue', "mid");
                         }
                     });
                 }
@@ -3367,6 +3890,22 @@
                 ctx.translate(-centerX, -centerY);
             }
         }
+        function drawRectangleByPoints(ctx, points, strokeStyle = "black", fillStyle = "transparent") {
+            if (points.length !== 4) {
+                console.error("Функция требует ровно 4 точки");
+                return;
+            }
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < 4; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = strokeStyle;
+            ctx.fillStyle = fillStyle;
+            ctx.fill();
+            ctx.stroke();
+        }
         function drawObjects() {
             if (ctx) {
                 //logDebug("NOW I AM DRAWING OBJECTS");
@@ -3379,50 +3918,50 @@
                 for (const obj of objects) {
                     //logDebug(`Drawing object: ${JSON.stringify(obj)}`);
                     rotationCheck(obj, ctx);
-                    if (obj.type === "table") {
-                        const table = obj;
-                        table.parts.forEach(part => {
-                            drawRect(part, ctx);
-                            updateConnectors(part);
-                            enteringText(part);
-                            console.log("draw");
-                        });
-                    }
-                    else {
-                        switch (obj.type) {
-                            case 'rectangle':
-                                const rect = obj;
-                                drawRect(rect, ctx);
-                                updateConnectors(rect);
-                                enteringText(obj);
-                                break;
-                            case 'circle':
-                                const circle = obj;
-                                drawCircle(circle, ctx);
-                                updateConnectors(circle);
-                                enteringText(obj);
-                                break;
-                            case 'line':
-                                const line = obj;
-                                drawLine(line, ctx);
-                                updateConnectors(line);
-                                enteringText(obj);
-                                break;
-                            case 'star':
-                                const star = obj;
-                                drawStar(star, ctx);
-                                updateConnectors(star);
-                                enteringText(obj);
-                                break;
-                            case 'cloud':
-                                const cloud = obj;
-                                drawCloud(cloud, ctx);
-                                updateConnectors(cloud);
-                                enteringText(obj);
-                                break;
-                            default:
-                                logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
-                        }
+                    switch (obj.type) {
+                        case 'table':
+                            const table = obj;
+                            drawTable(table, ctx);
+                            const points = [
+                                { x: table.x_C - 1, y: table.y_C - 1 },
+                                { x: table.x_C + 1, y: table.y_C - 1 },
+                                { x: table.x_C + 1, y: table.y_C + 1 },
+                                { x: table.x_C - 1, y: table.y_C + 1 }
+                            ];
+                            drawRectangleByPoints(ctx, points, "black");
+                            break;
+                        case 'rectangle':
+                            const rect = obj;
+                            drawRect(rect, ctx);
+                            updateConnectors(rect);
+                            enteringText(obj);
+                            break;
+                        case 'circle':
+                            const circle = obj;
+                            drawCircle(circle, ctx);
+                            updateConnectors(circle);
+                            enteringText(obj);
+                            break;
+                        case 'line':
+                            const line = obj;
+                            drawLine(line, ctx);
+                            updateConnectors(line);
+                            enteringText(obj);
+                            break;
+                        case 'star':
+                            const star = obj;
+                            drawStar(star, ctx);
+                            updateConnectors(star);
+                            enteringText(obj);
+                            break;
+                        case 'cloud':
+                            const cloud = obj;
+                            drawCloud(cloud, ctx);
+                            updateConnectors(cloud);
+                            enteringText(obj);
+                            break;
+                        default:
+                            logDebug(`Unknown object type: ${JSON.stringify(obj)}`);
                     }
                     highlighting(obj, ctx); // Подсветка выбранного объекта
                     ctx.restore();

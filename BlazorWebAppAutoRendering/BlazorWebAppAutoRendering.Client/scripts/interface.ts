@@ -1,4 +1,6 @@
 ﻿interface Shape {
+    dialect: string;
+
     id: string;
     type: string;
     rotation?: number;
@@ -7,8 +9,8 @@
     linkedObjects?: string[];
     outgoingLinks?: string[];
     incomingLinks?: string[];
-    lineConnectionStart?: { id_con: string, id_line: string }[];
-    lineConnectionEnd?: { id_con: string, id_line: string }[];
+    lineConnectionStart?: { id_con: string, id_shape: string }[];
+    lineConnectionEnd?: { id_con: string, id_shape: string }[];
 
     color: string;
     image?: HTMLImageElement;
@@ -42,9 +44,12 @@ interface Line extends Shape {
     startY: number;
     endX: number;
     endY: number;
-    arrowDirection?: string; //start, end, both, none
+    arrowDirection?: string; // none, mid
     punctuation?: string;
     lineWidth?: number;
+
+    startArrowType?: '-|->' | '-0->' | '-*->' | '>' | 'none'; // 
+    endArrowType?: '-|->' | '-0->' | '-*->' | '>' | 'none';
 }
 
 interface Star extends Shape {
@@ -60,6 +65,8 @@ interface Cloud extends Shape {
 
 interface ComplexShape extends Rectangle {
     parts: Shape[];
+    cols: number;
+    rows: number;
 }
 
 //type GraphObject = Rectangle | Circle | Line | Star | Cloud;

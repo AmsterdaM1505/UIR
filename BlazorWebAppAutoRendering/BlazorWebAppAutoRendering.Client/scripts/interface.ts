@@ -69,8 +69,6 @@ interface ComplexShape extends Rectangle {
     rows: number;
 }
 
-//type GraphObject = Rectangle | Circle | Line | Star | Cloud;
-
 function logDebug(message: string) {
     const debugOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;
     if (debugOutput) {
@@ -89,8 +87,7 @@ function generateUniqueId(): string {
     return result;
 }
 
-
-function hexToRgba(hex: string, alpha: number): string {
+function hexToRgba(hex: string, alpha: number = 1): string {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
@@ -105,7 +102,6 @@ function getRandomColor() {
     }
     return color;
 }
-
 
 function measureTextWidth(text: string, font: string): number {
     const span = document.createElement('span');

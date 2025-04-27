@@ -9,10 +9,8 @@
 @inject IDialogService DialogService
 @inherits LayoutComponentBase
 
-<PageTitle>pageee</PageTitle>
+<PageTitle>GraphEditor</PageTitle>
 <style>
-
-
     html, body {
         margin: 0;
         padding: 0;
@@ -33,7 +31,6 @@
         position: relative;
     }
 
-    /* Canvas занимает всю доступную область */
     #canvas {
         flex-grow: 1;
         top: 0;
@@ -42,24 +39,6 @@
         border: 1px solid grey;
         z-index: 1;
     }
-
-    /* Контейнер страницы. Абсолютные дочерние элементы будут позиционироваться относительно него */
-    /* #container {
-        position: relative;
-        width: 90vw;
-        height: 85vh;
-    }
-
-    
-    #canvas {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        border: 1px solid grey;
-    } */
 
     /* Левая панель с кнопками для добавления фигур */
     .left-div-style {
@@ -72,6 +51,7 @@
         z-index: 2;
         overflow-y: auto;
         padding: 10px;
+        user-select: none;
     }
 
     /* Правая панель — таблица характеристик выбранных фигур */
@@ -92,15 +72,14 @@
         position: absolute;
         left: 200px; /* отступ слева, чтобы не перекрывать левую панель */
         right: 250px; /* отступ справа, чтобы не перекрывать правую панель */
-        /* bottom: 10%; */
         bottom: 0;
-        height: 20vh; /* задаём высоту отладочной панели */
+        height: 20vh;
         background: rgba(200,200,200,0.8);
         z-index: 2;
         padding: 10px;
     }
 
-    /* Контекстное меню (оставляем без изменений) */
+    /* Контекстное меню */
     .context-menu {
         position: absolute;
         background-color: #333;
@@ -126,8 +105,12 @@
 
     .custom-file-upload {
         display: block;
-        width: 100%;
+        width: 80%;
         margin-bottom: 10px;
+        cursor: pointer;
+        border: 1px solid #555;
+        border-radius: 2px;
+        background-color: #dbdbdb;
     }
 
     .custom-button {
@@ -158,11 +141,8 @@
         right: 360px; /* Должно совпадать с шириной правого блока */
     }
 
-    
-
-
     .popup {
-        position: absolute; /* Меняем с fixed на absolute */
+        position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -171,7 +151,7 @@
         padding: 20px;
         z-index: 1000;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        width: 250px; /* Фиксированная ширина */
+        width: 250px;
     }
 
     .hidden {
@@ -196,14 +176,12 @@
         text-align: center;
         user-select: none; /* Запрещаем выделение текста */
     }
-
-
 </style>
 
 <div id="container">
     <!-- Первый слой: canvas -->
     @* <canvas id="canvas" width="698" height="598"></canvas> *@
-    <canvas id="canvas" position: "absolute"></canvas>
+    <canvas id="canvas" position:"absolute"></canvas>
     <!-- Второй слой: левая панель с элементами управления -->
 
     <div id="button-panel" class="left-div-style">
@@ -211,7 +189,7 @@
             <MudExpansionPanel Text="Базовые фигуры">
                 <MudTooltip>
                     <ChildContent>
-                        <MudButton id="addTable" Class="_button" data-action="addRectBtn" StartIcon="@Icons.Material.Filled.TableBar" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                        <MudButton id="addTable" Class="_button" data-action="addRectBtn" StartIcon="@Icons.Material.Filled.TableBar" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
                             <MudText Typo="Typo.body2">Добавить таблицу</MudText>
                         </MudButton>
                     </ChildContent>
@@ -224,7 +202,7 @@
                 <br />
                 <MudTooltip>
                     <ChildContent>
-                        <MudButton id="addRectBtn" Class="_button" data-action="addRectBtn" StartIcon="@Icons.Material.Filled.Square" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                        <MudButton id="addRectBtn" Class="_button" data-action="addRectBtn" StartIcon="@Icons.Material.Filled.Square" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
                             <MudText Typo="Typo.body2">Добавить прямоугольник</MudText>
                         </MudButton>
                     </ChildContent>
@@ -237,7 +215,7 @@
                 <br />
                 <MudTooltip>
                     <ChildContent>
-                        <MudButton id="addCircleBtn" Class="_button" data-action="addCircleBtn" StartIcon="@Icons.Material.Filled.Circle" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                        <MudButton id="addCircleBtn" Class="_button" data-action="addCircleBtn" StartIcon="@Icons.Material.Filled.Circle" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
                             <MudText Typo="Typo.body2">Добавить круг</MudText>
                         </MudButton>
                     </ChildContent>
@@ -292,7 +270,7 @@
             <MudExpansionPanel Text="БД фигуры">
                 <MudTooltip>
                     <ChildContent>
-                        <MudButton id="addTableDB" Variant="Variant.Filled" Style="width: 100%; height: 60px;">
+                        <MudButton id="addTableDB" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.TableBar" Style="width: 100%; height: 60px;">
                             <MudText Typo="Typo.body2">Добавить таблицу</MudText>
                         </MudButton>
                     </ChildContent>
@@ -514,9 +492,10 @@
             </MudExpansionPanel>
 
             <MudExpansionPanel Text="Управление файлами">
-                <MudTooltip>
+                <MudTooltip> 
+                    @* проверено *@
                     <ChildContent>
-                        <MudButton id="downloadBtn3" Class="_button" data-action="downloadBtn3" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
+                        <MudButton id="owlExport" Class="_button" data-action="owlExport" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
                             <MudText Typo="Typo.body2">OWL скачивание</MudText>
                         </MudButton>
                     </ChildContent>
@@ -527,11 +506,13 @@
                     </TooltipContent>
                 </MudTooltip>
                 <br />
-                <MudTooltip>
+                <MudTooltip> 
+                    @* проверено *@
                     <ChildContent>
-                        <label for="fileInput3" class="custom-file-upload">
+                        <label for="owlImport" class="custom-file-upload">
                             Загрузить диаграмму в виде OWL
                         </label>
+                        <input type="file" id="owlImport" style="display: none;" />
                     </ChildContent>
                     <TooltipContent>
                         <MudText Typo="Typo.body2">Загрузить OWL</MudText>
@@ -541,8 +522,9 @@
                 </MudTooltip>
                 <br />
                 <MudTooltip>
-                    <ChildContent>
-                        <MudButton id="downloadBtn" Class="_button" data-action="downloadBtn" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
+                    @* проверено *@
+                    <ChildContent> 
+                        <MudButton id="customJsonExport" Class="_button" data-action="customJsonExport" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
                             <MudText Typo="Typo.body2">Скачать диаграмму</MudText>
                         </MudButton>
                     </ChildContent>
@@ -554,14 +536,43 @@
                 </MudTooltip>
                 <br />
                 <MudTooltip>
+                    @* проверено *@
                     <ChildContent>
-                        <label for="fileInput" class="custom-file-upload">
+                        <label for="customJsonImport" class="custom-file-upload">
                             Загрузить диаграмму в обычном виде
                         </label>
+                        <input type="file" id="customJsonImport" style="display: none;" />
                     </ChildContent>
                     <TooltipContent>
                         <MudText Typo="Typo.body2">Загрузить диаграмму</MudText>
                         <MudText Typo="Typo.body2">Выберите файл для загрузки диаграммы</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <MudButton id="formatExport" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Выгрузить файл в формате</MudText>
+                        </MudButton>
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
+                        <MudText Typo="Typo.body2">Выберите файл CSS для загрузки</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                    </TooltipContent>
+                </MudTooltip>
+                <br />
+                <MudTooltip>
+                    <ChildContent>
+                        <label for="formatImport" class="custom-file-upload">
+                            Загрузить файл в формате
+                        </label>
+                        <input type="file" id="formatImport" style="display: none;" />
+                    </ChildContent>
+                    <TooltipContent>
+                        <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
+                        <MudText Typo="Typo.body2">Выберите файл CSS для загрузки</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.Upload" />
                     </TooltipContent>
                 </MudTooltip>
@@ -584,6 +595,7 @@
                         <label for="cssFileInput2" class="custom-file-upload">
                             Загрузить файл css с (ЛХ)
                         </label>
+                        <input type="file" id="cssFileInput2" style="display: none;" />
                     </ChildContent>
                     <TooltipContent>
                         <MudText Typo="Typo.body2">Загрузить CSS (ЛХ)</MudText>
@@ -610,19 +622,7 @@
                         <label for="cssFileInput" class="custom-file-upload">
                             Загрузить файл css
                         </label>
-                    </ChildContent>
-                    <TooltipContent>
-                        <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
-                        <MudText Typo="Typo.body2">Выберите файл CSS для загрузки</MudText>
-                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
-                    </TooltipContent>
-                </MudTooltip>
-                <MudTooltip>
-                    <ChildContent>
-                        <MudButton id="testFormat" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 80%; height: 60px;">
-                            <MudText Typo="Typo.body2">Выгрузить схему</MudText>
-                        </MudButton>
-                        
+                        <input type="file" id="cssFileInput" style="display: none;" />
                     </ChildContent>
                     <TooltipContent>
                         <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
@@ -663,8 +663,6 @@
         </div>
     </div>
 
-
-
     <!-- Правая панель: таблица характеристик с кнопкой для скрытия/показа -->
     <div id="table-container">
         <h4>Характеристики</h4>
@@ -676,6 +674,7 @@
         </table>
     </div>
     <div id="resize-handle-right"></div>
+
     <!-- Нижняя панель: отладочная информация -->
     <div id="debug-panel">
         <h3 id="debugInfo" style="cursor: pointer">Debug Information</h3>
@@ -704,4 +703,3 @@
 <script src="js/file.js"></script>
 <script src="js/file1.js"></script> 
 <script src="https://cdn.jsdelivr.net/npm/xml2js/dist/xml2js.min.js"></script>
-

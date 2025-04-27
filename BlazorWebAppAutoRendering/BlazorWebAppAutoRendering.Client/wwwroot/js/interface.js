@@ -1,4 +1,3 @@
-//type GraphObject = Rectangle | Circle | Line | Star | Cloud;
 function logDebug(message) {
     const debugOutput = document.getElementById('debugOutput');
     if (debugOutput) {
@@ -15,7 +14,7 @@ function generateUniqueId() {
     }
     return result;
 }
-function hexToRgba(hex, alpha) {
+function hexToRgba(hex, alpha = 1) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);

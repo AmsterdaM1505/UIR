@@ -2434,7 +2434,7 @@
                 enteringText(part as Rectangle);
                 //console.log("draw")
             });
-            console.log("table border upd")
+            //console.log("table border upd")
             table.borderPoints_X1 = table.x_C;
             table.borderPoints_Y1 = table.y_C;
             table.borderPoints_X2 = table.x_C + table.width;
@@ -2776,6 +2776,7 @@
             isSchemaLoaded = false;
         }
 
+
         // Управление объектами
         function rotateSelectedObject(angle: number) {
             if (selectedObject_buf) {
@@ -2906,8 +2907,10 @@
         let help_Ym: number = 0
 
         function clickedObjectPreprocessing(objects_: Shape[], obj_: Shape, mouseX: number, mouseY: number, foundObject_: boolean) {
-            for (let i = objects_.length - 1; i >= 0; i--) {
-                objects_[i].selectionMarker = false;
+            if (!selectedObjectMass.some(object => object.id === obj_.id)) {
+                for (let i = objects_.length - 1; i >= 0; i--) {
+                    objects_[i].selectionMarker = false;
+                }
             }
             foundObject_ = true;
             obj_.selectionMarker = true;
@@ -2923,6 +2926,8 @@
         }
 
         function leftButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
+            //console.log("so - ", selectedObject);
+            //console.log("sob - ", selectedObject_buf);
             //console.log("obj - ", objects)
             //console.log("som - ", selectedObjectMass)
             console.log("sob - ", selectedObject_buf)
@@ -2949,6 +2954,18 @@
                         mouseY >= table.y_C &&
                         mouseY <= table.y_C + table.height
                     ) {
+
+                        if (!table.parts.some(part => selectedObjectMass.some(sel => sel.id === part.id))) {
+                            selectedObjectMass = [];
+                        }
+                        if (!selectedObjectMass.some(object => object.id === table.id)) {
+                            for (let i = objects.length - 1; i >= 0; i--) {
+                                objects[i].selectionMarker = false;
+                                if (objects[i].type === "table") {
+                                    (objects[i] as ComplexShape).parts.forEach(part => part.selectionMarker = false);
+                                }
+                            }
+                        }
                         console.log(`Выбрана таблица ${table.id}`);
                         foundObject = true;
                         table.selectionMarker = true;
@@ -2957,6 +2974,7 @@
                                 part.selectionMarker = true;
                                 selectedObjectMass.push(part);
                             });
+                            selectedObjectMass.push(table)
                         }
                         selectedObject = table;
                         selectedObject_buf = table;
@@ -2988,8 +3006,10 @@
                         Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
 
                     if (distStart < 5 || distEnd < 5 || distToLine < 10) {
-                        for (let i = objects.length - 1; i >= 0; i--) {
-                            objects[i].selectionMarker = false;
+                        if (!selectedObjectMass.some(object => object.id === obj.id)) {
+                            for (let i = objects.length - 1; i >= 0; i--) {
+                                objects[i].selectionMarker = false;
+                            }
                         }
                         foundObject = true;
                         line.selectionMarker = true;
@@ -3039,7 +3059,7 @@
                     }
                 }
             }
-            
+
 
             if (foundObject === false) {
                 const infoPanel = document.getElementById("infoPanel");
@@ -3063,7 +3083,7 @@
                 //console.log("now is selecting");
             } else { // если клик был сделан по объекту не яляющимся частью группы выделенных, то чистим группу выделенных (не считая таблицы)
                 console.log("so, sob, sm - ", selectedObject, selectedObject_buf, selectedObjectMass)
-                console.log("logic check - selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== table", selectedObjectMass.length > 0, !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id), selectedObject_buf.type !== 'table')
+                //console.log("logic check - selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== table", selectedObjectMass.length > 0, !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id), selectedObject_buf.type !== 'table')
                 if (selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== 'table') {
                     selectedObjectMass = [];
                     for (let i = objects.length - 1; i >= 0; i--) {
@@ -3080,15 +3100,15 @@
                         )
                     )
                 ) {
-                    for (const obj of objects) {
-                        if (obj.type !== 'table' || !selectedObjectMass.every(selObj => (obj as ComplexShape).parts.includes(selObj))) {
+                    objects.forEach(obj => {
+                        if (obj.type !== 'table' || !selectedObjectMass.every(sel => (obj as ComplexShape).parts.includes(sel))) {
                             obj.selectionMarker = false;
                         }
-                    }
+                    });
                 }
                 console.log("foundO true")
 
-            } 
+            }
             drawObjects();
             if (selectedObject_buf && selectedObject_buf.connectors) {
                 activeConnector = selectedObject_buf.connectors.find(connector => {
@@ -3100,7 +3120,7 @@
                     );
                 });
             }
-            console.log("status check - ", foundObject, selectedObject, )
+            //console.log("status check - ", foundObject, selectedObject, )
         }
         function rigtButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
             for (let i = objects.length - 1; i >= 0; i--) {
@@ -3308,7 +3328,7 @@
                     }
                 }
             }
-            console.log("result selOM - ", selectedObjectMass);
+            //console.log("result selOM - ", selectedObjectMass);
         }
 
         // Функция для отрисовки рамки выделения
@@ -3604,22 +3624,22 @@
                 const dy = mouseY - help_Y;
 
                 let helper = false
-
-                if (selectedObject_buf.type === 'table') {
-                    selectedObject_buf.x_C += dx;
-                    selectedObject_buf.y_C += dy;
-                    console.log("table x-y", selectedObject_buf.x_C, selectedObject_buf.y_C);
-                    helper = true;
-                }
-
+                console.log(helper)
+                //if (selectedObject_buf.type === 'table') { // если перемещаем только таблицу
+                    //selectedObject_buf.x_C += dx;
+                    //selectedObject_buf.y_C += dy;
+                    //console.log("table x-y", selectedObject_buf.x_C, selectedObject_buf.y_C);
+                    //helper = true;
+                //}
+                console.log(helper)
                 for (const obj of selectedObjectMass) {
                     switch (obj.type) {
                         case 'table':
-                            if (!helper) {
-                                (obj as ComplexShape).x_C += dx;
-                                (obj as ComplexShape).y_C += dy;
-                            }
-                            console.log("table x-y selOM", (obj as ComplexShape).x_C, (obj as ComplexShape).y_C);
+                            //if (!helper) { // а если не только таблицу
+                            (obj as ComplexShape).x_C += dx;
+                            (obj as ComplexShape).y_C += dy;
+                            //}
+                            //console.log("table x-y selOM", (obj as ComplexShape).x_C, (obj as ComplexShape).y_C);
                             break;
                         case 'rectangle':
                             (obj as Rectangle).x_C += dx;
@@ -3647,6 +3667,15 @@
                     }
                 }
 
+                objects.forEach(obj => {
+                    if (obj.type === "table") {
+                        console.log("there - ", (obj as ComplexShape).x_C, (obj as ComplexShape).y_C)
+                    }
+                })
+
+
+                console.log()
+
                 // Обновляем стартовые координаты
                 help_X = mouseX
                 help_Y = mouseY
@@ -3654,6 +3683,7 @@
                 drawObjects();
                 return;
             }
+
 
             if (selectedObject.type === 'rectangle') {
                 const rect = selectedObject as Rectangle;
@@ -3705,6 +3735,10 @@
                 cloud.x_C = mouseX - startX;
                 cloud.y_C = mouseY - startY;
                 updateLineConnectorConnection(cloud)
+            } else if (selectedObject.type === 'table') {
+                const table = selectedObject as ComplexShape;
+                table.x_C = mouseX - startX;
+                table.y_C = mouseY - startY;
             }
             drawObjects();
         }

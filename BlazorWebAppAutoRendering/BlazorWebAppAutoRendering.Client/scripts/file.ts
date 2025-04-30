@@ -86,7 +86,7 @@
 
     closePopup.addEventListener('click', hidePopup);
 
-    popup.addEventListener('mousedown', (e) => {
+    popup.addEventListener('mousedown', (e: MouseEvent) => {
         // Игнорировать клик по кнопке закрытия, чтобы окно не начало перетаскиваться при попытке закрытия
         if ((e.target as HTMLElement).id === 'closePopup') return;
 
@@ -97,7 +97,7 @@
     });
 
 
-    document.addEventListener('mousemove', (e) => {
+    document.addEventListener('mousemove', (e: MouseEvent) => {
         if (isDragging) {
             popup.style.left = `${e.clientX - offsetX}px`;
             popup.style.top = `${e.clientY - offsetY}px`;
@@ -629,19 +629,19 @@
             onMouseUp(e);
         });
 
-        resizeHandleLeft.addEventListener("mousedown", function (e) {
+        resizeHandleLeft.addEventListener("mousedown", function (e: MouseEvent) {
             isResizingLeft = true;
             document.addEventListener("mousemove", resizeLeftPanel);
             document.addEventListener("mouseup", stopResizing);
         });
 
-        resizeHandleRight.addEventListener("mousedown", function (e) {
+        resizeHandleRight.addEventListener("mousedown", function (e: MouseEvent) {
             isResizingRight = true;
             document.addEventListener("mousemove", resizeRightPanel);
             document.addEventListener("mouseup", stopResizing);
         });
 
-        function resizeLeftPanel(e) {
+        function resizeLeftPanel(e: MouseEvent) {
             if (!isResizingLeft) return;
             const newWidth = e.clientX;
             if (newWidth > 50 && newWidth < window.innerWidth / 2) {
@@ -651,7 +651,7 @@
             }
         }
 
-        function resizeRightPanel(e) {
+        function resizeRightPanel(e: MouseEvent) {
             if (!isResizingRight) return;
             const newWidth = window.innerWidth - e.clientX;
             if (newWidth > 50 && newWidth < window.innerWidth / 2) {
@@ -1453,16 +1453,16 @@
 
 
         function dialectControl(flag: string, currentDialect_: string, func: (x: string) => void) {
+            console.log("func currentDialect 1 ===", flag, currentDialect_);
             if (currentDialect_ === 'none') {
                 currentDialect_ = flag;
                 func(currentDialect_);
-                console.log("func currentDialect ===", flag, currentDialect_);
             } else if (currentDialect_ === flag) {
                 func(currentDialect_);
-                console.log("func currentDialect ===", flag, currentDialect_);
             } else {
                 openPopup("Неверный диалект! Выберите другую фигуру", "information");
             }
+            return currentDialect_;
         }
 
 
@@ -1470,15 +1470,15 @@
 
         document.getElementById('addLineBtnDB')?.addEventListener('click', function () {
             logDebug("Add line button clicked");
-            //console.log("1 - ", currentDialect)
+            console.log("1 - ", currentDialect)
             dialectButtonClickedFlag = "DB";
-            dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag));
         });
 
         document.getElementById('addTableDB')?.addEventListener('click', function () {
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "DB";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
         });
 
         // Base dialect
@@ -1486,37 +1486,37 @@
         document.getElementById('addTable')?.addEventListener('click', function () {
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
         });
 
         document.getElementById('addRectBtn')?.addEventListener('click', function () {
             logDebug("Add rectangle button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag));
         });
 
         document.getElementById('addCircleBtn')?.addEventListener('click', function () {
             logDebug("Add circle button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag));
         });
 
         document.getElementById('addLineBtn')?.addEventListener('click', function () {
             logDebug("Add line button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag));
         });
 
         document.getElementById('addCloudBtn')?.addEventListener('click', function () {
             logDebug("Add cloud button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag));
         });
 
         document.getElementById('addStarBtn')?.addEventListener('click', function () {
             logDebug("Add star button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag));
         });
 
         //
@@ -1612,7 +1612,7 @@
             addInfo(selectedObject_buf);
         });
 
-        document.addEventListener('contextmenu', function (e) {
+        document.addEventListener('contextmenu', function (e: MouseEvent) {
             e.preventDefault();
             onMouseDown(e);
         });
@@ -1795,7 +1795,7 @@
             }
 
             input.addEventListener('blur', saveText);  // Потеря фокуса
-            input.addEventListener('keydown', function (e) {
+            input.addEventListener('keydown', function (e: KeyboardEvent) {
                 if (e.key === 'Enter') saveText();
             });
         }

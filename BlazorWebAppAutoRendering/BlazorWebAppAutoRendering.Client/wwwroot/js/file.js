@@ -1198,61 +1198,61 @@
             }
         });
         function dialectControl(flag, currentDialect_, func) {
+            console.log("func currentDialect 1 ===", flag, currentDialect_);
             if (currentDialect_ === 'none') {
                 currentDialect_ = flag;
                 func(currentDialect_);
-                console.log("func currentDialect ===", flag, currentDialect_);
             }
             else if (currentDialect_ === flag) {
                 func(currentDialect_);
-                console.log("func currentDialect ===", flag, currentDialect_);
             }
             else {
                 openPopup("Неверный диалект! Выберите другую фигуру", "information");
             }
+            return currentDialect_;
         }
         // DB dialect
         (_k = document.getElementById('addLineBtnDB')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
             logDebug("Add line button clicked");
-            //console.log("1 - ", currentDialect)
+            console.log("1 - ", currentDialect);
             dialectButtonClickedFlag = "DB";
-            dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag));
         });
         (_l = document.getElementById('addTableDB')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "DB";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
         });
         // Base dialect
         (_m = document.getElementById('addTable')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
         });
         (_o = document.getElementById('addRectBtn')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
             logDebug("Add rectangle button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag));
         });
         (_p = document.getElementById('addCircleBtn')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
             logDebug("Add circle button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag));
         });
         (_q = document.getElementById('addLineBtn')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
             logDebug("Add line button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag));
         });
         (_r = document.getElementById('addCloudBtn')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
             logDebug("Add cloud button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag));
         });
         (_s = document.getElementById('addStarBtn')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
             logDebug("Add star button clicked");
             dialectButtonClickedFlag = "base";
-            dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag));
         });
         //
         (_t = document.getElementById('delShapeBtn')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
@@ -2558,8 +2558,10 @@
                     const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
                         Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
                     if (distStart < 5 || distEnd < 5 || distToLine < 10) {
-                        for (let i = objects.length - 1; i >= 0; i--) {
-                            objects[i].selectionMarker = false;
+                        if (!selectedObjectMass.some(object => object.id === obj.id)) {
+                            for (let i = objects.length - 1; i >= 0; i--) {
+                                objects[i].selectionMarker = false;
+                            }
                         }
                         foundObject = true;
                         line.selectionMarker = true;

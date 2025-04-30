@@ -33,12 +33,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50Mi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Registr.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ci5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Test.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVzdC5yYXpvcg==
+[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Tool.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVG9vbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/_Imports.razor]

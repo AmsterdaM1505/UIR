@@ -1,0 +1,35 @@
+﻿@namespace BlazorWebAppAutoRendering.Client.Pages
+
+<!-- GraphToolButton.razor -->
+<MudTooltip>
+    <ChildContent>
+        <MudButton Id="@Id"
+                   Class="@CssClass"
+                   @attributes="AdditionalAttributes"
+                   StartIcon="@Icon"
+                   Variant="Variant.Filled"
+                   Style="@Style"
+                   @onclick="OnClick">
+            <MudText Typo="Typo.body2">@Text</MudText>
+        </MudButton>
+    </ChildContent>
+    <TooltipContent>
+        <MudText Typo="Typo.body2">@TooltipTitle</MudText>
+        <MudText Typo="Typo.body2">@TooltipDescription</MudText>
+        <MudIcon Icon="@Icon" />
+    </TooltipContent>
+</MudTooltip>
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = string.Empty;
+    [Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public string TooltipTitle { get; set; } = string.Empty;
+    [Parameter] public string TooltipDescription { get; set; } = string.Empty;
+    [Parameter] public string CssClass { get; set; } = "_button";
+    [Parameter] public string Style { get; set; } = "width:80%; height:60px;";
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = new Dictionary<string, object>(); 
+    @* AdditionalAttributes="@(new Dictionary<string, object> { { "data-action", "addTable" } })" *@
+}

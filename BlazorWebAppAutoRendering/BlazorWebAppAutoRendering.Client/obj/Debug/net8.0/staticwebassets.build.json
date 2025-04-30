@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "YWGlX3J5KWWEFA0EMYxp2m8M8gT60E2zDPyQ8ueHd38=",
+  "Hash": "eW9mctswTbDWo7jY4nI7SLJ6Kmv9+Qj9PreZub2sOR8=",
   "Source": "BlazorWebAppAutoRendering.Client",
   "BasePath": "/",
   "Mode": "Default",
@@ -7957,6 +7957,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\appsettings.json"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\css\\PageStyles.css",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "css/PageStyles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\PageStyles.css"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\img\\yyy.jpg",

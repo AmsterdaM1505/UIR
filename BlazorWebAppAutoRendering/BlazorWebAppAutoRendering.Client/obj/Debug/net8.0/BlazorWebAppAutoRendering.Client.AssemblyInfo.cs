@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlazorWebAppAutoRendering.Client")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2c62a3d2772a39bcb54316dc14ff8af0bed8c932")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b1efe8a37a867fc0668634ebb85f10c64b66444e")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlazorWebAppAutoRendering.Client")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlazorWebAppAutoRendering.Client")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -4,6 +4,7 @@
 @using MudBlazor.Services
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@inject HttpClient Http
 
 <style>
     .custom-border {
@@ -63,6 +64,21 @@
         </MudPaper>
     </MudItem> *@
 </MudGrid>
+
+<h3>Список элементов</h3>
+
+<input @bind="newItemName" placeholder="Название" />
+<button @onclick="AddItem">Добавить</button>
+
+<ul>
+    @foreach (var item in items)
+    {
+        <li>
+            @item.Name
+            <button @onclick="() => DeleteItem(item.Id)">Удалить</button>
+        </li>
+    }
+</ul>
 @code {
     bool success;
     string[] errors = { };
@@ -91,6 +107,48 @@
         if (pwField1.Value != arg)
             return "Passwords don't match";
         return string.Empty;
+    }
+
+    List<Item> items = new();
+    string newItemName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadItems();
+    }
+
+    async Task LoadItems()
+    {
+        items = await Http.GetFromJsonAsync<List<Item>>("api/items") ?? new List<Item>(); ;
+    }
+
+    async Task AddItem()
+    {
+        if (string.IsNullOrWhiteSpace(newItemName)) return;
+
+        var newItem = new Item { Name = newItemName };
+        var response = await Http.PostAsJsonAsync("api/items", newItem);
+
+        if (response.IsSuccessStatusCode)
+        {
+            newItemName = "";
+            await LoadItems();
+        }
+    }
+
+    async Task DeleteItem(int id)
+    {
+        var response = await Http.DeleteAsync($"api/items/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadItems();
+        }
+    }
+
+    public class Item
+    {
+        public int Id { get; set; } = 0;
+        public string Name { get; set; } = string.Empty;
     }
 
 }

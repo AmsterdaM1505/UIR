@@ -21,7 +21,6 @@
 
 </style>
 
-
 <div class="page">
 @*     <div class="sidebar">
         <NavMenu />
@@ -36,26 +35,21 @@
             <div>
                 <a href="/" target="_blank" class="custom-a">App</a>
                 <label>/</label>
-                <a href="reg" target="_blank" class="custom-a">Sign up</a>
+                <a href="auth" target="_blank" class="custom-a">Sign up</a>
                 <label>/</label>
                 <a href="Test.razor" target="_blank" class="custom-a">Sign in</a>
                 <a href="https://mephi.ru/" target="_blank">About us</a>
             </div>
         </div>
 
-        <MudThemeProvider/>
-            <MudDialogProvider/>
-                <MudSnackbarProvider/>
-                    <MudPopoverProvider/>
-                        <article class="content px-4">
-                            @Body
-                        </article>
+        <MudThemeProvider @rendermode="InteractiveServer" />
+        <MudPopoverProvider @rendermode="InteractiveServer" />
+        <MudDialogProvider @rendermode="InteractiveServer" />
+        <MudSnackbarProvider @rendermode="InteractiveServer" />
+        
+        <article class="content px-4">
+            @Body
+        </article>
                     
     </main>
 </div>
-
-@* <div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div> *@

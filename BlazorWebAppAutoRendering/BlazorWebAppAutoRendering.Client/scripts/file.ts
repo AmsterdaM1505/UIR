@@ -15,8 +15,6 @@
     let mouse_meaning_check = 0;
     let connectionServ = 2;
     const container = document.getElementById('table-container');
-    let cyclePath = null;
-    let savedSchema = null;
     let selectedObjectMass: Shape[] = [];
     let selectedLineStart = null;
     let selectedLineEnd = null;
@@ -41,11 +39,65 @@
     let selectionEndY = 0;
 
     let activeConnector: { x: number, y: number, type: string } | null = null;
-    //let complexObjects: ComplexShape[] = [];
 
-    // Пример вызова:
+    let undoStack: Shape[][] = [];
+    let redoStack: Shape[][] = [];
+    let flag: string; 
+    function saveStateForUndo() {
+        console.log(flag);
+        function cleanShape(shape: Shape): any {
+            const {
+                selectionMarker,
+                isHighlighted,
+                image,
+                imageSrc,
+                ...rest
+            } = shape;
+            return rest;
+        }
+
+        const clean = (shapes: Shape[]) => shapes.map(cleanShape);
+
+        const currentState = clean(objects);
+        const lastState = undoStack.length > 0 ? clean(undoStack[undoStack.length - 1]) : null;
+
+        if (lastState && JSON.stringify(currentState) === JSON.stringify(lastState)) {
+            console.log("Изменений не было");
+            return;
+        }
+
+        undoStack.push(structuredClone(objects));
+        redoStack = [];
+
+        if (undoStack.length > 10) undoStack.shift();
+    }
+    let counter = 0;
+    function undo() {
+        if (!undoStack.length) return;
+        selectedObject_buf = null;
+        highlight = [];
+        selectedObjectMass = [];
+        redoStack.push(structuredClone(objects));
+        counter += 1;
+        //console.log(counter, " - objs before - ", objects, undoStack[0], undoStack[1], undoStack[2]);
+        objects = undoStack.pop();
+        //console.log(" - objs after - ", objects, "\n");
+        drawObjects();
+    }
+
+    function redo() {
+        if (!redoStack.length) return;
+        selectedObject_buf = null;
+        highlight = [];
+        selectedObjectMass = [];
+        undoStack.push(structuredClone(objects));
+        objects = redoStack.pop();
+        drawObjects();
+    }
+
+
     const expectedWidth = measureTextWidth("Добавить прямоугольник", "16px Roboto");
-    console.log("Ожидаемая ширина текста:", expectedWidth);
+    //console.log("Ожидаемая ширина текста:", expectedWidth);
 
     function generateRandomId(length: number): string {
         let result = '';
@@ -59,24 +111,157 @@
         return result;
     }
 
-    //////////////////////////
-    //const openPopupBtn = document.getElementById('openPopupBtn') as HTMLElement;
     let isDragging = false
-    //openPopupBtn.addEventListener('click', openPopup());
 
     const popup = document.getElementById('popup') as HTMLElement;
+
     const closePopup = document.getElementById('closePopup') as HTMLElement;
-    const popupHeader = document.getElementById('popupHeader') as HTMLElement;
     // Функция для показа окна
-    function openPopup(newText: string, popupType: string): void {
+    //function openPopup(newText: string, popupType: string): void {
+    //    const popupText = document.getElementById('popupText');
+    //    if (popupType === "information") {
+    //        if (popupText) {
+    //            popupText.innerText = newText;
+    //        }
+    //    } else if (popupType === "editing") {
+
+    //    }
+    //    popup.classList.remove('hidden');
+    //}
+
+    function openPopup(newTextOrObject: string | Shape, popupType: "information" | "editing"): void {
         const popupText = document.getElementById('popupText');
+
         if (popupType === "information") {
-            if (popupText) {
-                popupText.innerText = newText;
+            if (typeof newTextOrObject === "string" && popupText) {
+                popupText.innerText = newTextOrObject;
             }
         } else if (popupType === "editing") {
+            if (typeof newTextOrObject !== "object") return;
 
+            const target = newTextOrObject as Shape;
+            const container = popupText!;
+            container.innerHTML = "";
+
+            const title = document.createElement("h6");
+            title.innerText = `Редактирование объекта: ${target.type}`;
+            title.style.userSelect = "none";
+            container.appendChild(title);
+
+            // Создаём форму параметров по типу
+            const form = document.createElement("form");
+            form.style.display = "flex";
+            form.style.flexDirection = "column";
+            form.style.gap = "10px";
+            form.style.userSelect = "none";
+
+            function addNumberField(labelText: string, value: number, onChange: (v: number) => void) {
+                const label = document.createElement("label");
+                label.innerText = labelText;
+
+                const input = document.createElement("input");
+                input.type = "number";
+                input.value = value.toString();
+                input.style.border = "none";
+                input.style.marginLeft = "5px";
+                input.addEventListener("input", () => onChange(parseFloat(input.value)));
+
+                label.appendChild(input);
+                form.appendChild(label);
+            }
+
+            function addCheckboxField(labelText: string, checked: boolean, onChange: (v: boolean) => void) {
+                const label = document.createElement("label");
+                label.innerText = labelText;
+
+                const input = document.createElement("input");
+                input.type = "checkbox";
+                input.checked = checked;
+                input.style.border = "none";
+                input.style.marginLeft = "5px";
+                input.addEventListener("change", () => onChange(input.checked));
+
+                label.appendChild(input);
+                label.style.display = "flex";
+                label.style.justifyContent = "space-between";
+                label.style.alignItems = "center";
+                label.style.gap = "10px";
+                form.appendChild(label);
+            }
+
+            function addSelectField<T extends string>(labelText: string, options: T[], value: T, onChange: (v: T) => void) {
+                const label = document.createElement("label");
+                label.innerText = labelText;
+
+                const select = document.createElement("select");
+                for (const opt of options) {
+                    const option = document.createElement("option");
+                    option.value = opt;
+                    option.innerText = opt;
+                    if (opt === value) option.selected = true;
+                    select.appendChild(option);
+                }
+                select.style.border = "none";
+                select.style.marginLeft = "5px";
+                select.addEventListener("change", () => onChange(select.value as T));
+
+                label.appendChild(select);
+                form.appendChild(label);
+            }
+
+            switch (target.type) {
+                case "rectangle":
+                case "cloud":
+                    const rect = target as Rectangle | Cloud;
+                    addNumberField("Width", rect.width, val => rect.width = val);
+                    addNumberField("Height", rect.height, val => rect.height = val);
+                    addCheckboxField("Border", !!rect.border, val => rect.border = val);
+                    break;
+                case "table":
+                    const table = target as ComplexShape;
+                    addNumberField("Cols", table.cols, val => {
+                        table.cols = val;
+                        editTable(table);
+                    });
+                    addNumberField("Rows", table.rows, val => {
+                        table.rows = val;
+                        editTable(table);
+                    });
+                    addCheckboxField("Border", !!table.border, val => table.border = val);
+                    //editTable(table);
+                    break;
+                case "circle":
+                    const circle = target as Circle;
+                    addNumberField("Radius", circle.radius, val => circle.radius = val);
+                    break;
+                case "line":
+                    const line = target as Line;
+                    addNumberField("Line Width", line.lineWidth || 1, val => line.lineWidth = val);
+                    addSelectField("Start Arrow", ['-|->', '-0->', '-*->', '>', 'none'], line.startArrowType || 'none', val => line.startArrowType = val);
+                    addSelectField("End Arrow", ['-|->', '-0->', '-*->', '>', 'none'], line.endArrowType || 'none', val => line.endArrowType = val);
+                    break;
+                case "star":
+                    const star = target as Star;
+                    addNumberField("Radius", star.rad, val => star.rad = val);
+                    addNumberField("Points", star.amount_points, val => star.amount_points = val);
+                    addNumberField("m", star.m, val => star.m = val);
+                    break;
+            }
+
+            // Кнопка закрытия
+            const closeBtn = document.createElement("button");
+            closeBtn.innerText = "Применить";
+            closeBtn.type = "button";
+            closeBtn.addEventListener("click", () => {
+                hidePopup();
+                console.log(objects);
+                drawObjects();
+            });
+            form.appendChild(closeBtn);
+
+            container.appendChild(form);
         }
+
         popup.classList.remove('hidden');
     }
 
@@ -89,13 +274,13 @@
     popup.addEventListener('mousedown', (e: MouseEvent) => {
         // Игнорировать клик по кнопке закрытия, чтобы окно не начало перетаскиваться при попытке закрытия
         if ((e.target as HTMLElement).id === 'closePopup') return;
+        if ((e.target as HTMLElement).closest('button, input, select, textarea')) return;
 
         isDragging = true;
         offsetX = e.clientX - popup.offsetLeft;
         offsetY = e.clientY - popup.offsetTop;
         popup.style.cursor = "grabbing";
     });
-
 
     document.addEventListener('mousemove', (e: MouseEvent) => {
         if (isDragging) {
@@ -305,7 +490,6 @@
     }
 
 
-
     // Запуск периодического сохранения и восстановления
     let lastSavedState = "";
 
@@ -432,9 +616,6 @@
     }
 
 
-
-
-
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 
     if (!canvas) {
@@ -451,8 +632,26 @@
             loadFromLocalStorage();
         }
     });
+    // общение с бд
+    async function loadItemsFromServer(): Promise<Item[]> {
+        const response = await fetch("/api/items");
 
+        if (!response.ok) {
+            console.error("Ошибка при загрузке items:", response.statusText);
+            return [];
+        }
 
+        const items: Item[] = await response.json();
+        console.log("Загружено с сервера:", items);
+        return items;
+    }
+
+    async function loadAndDrawItems() {
+        const items = await loadItemsFromServer();
+    }
+
+    loadAndDrawItems();
+    // общение с бд
     function resizeCanvas(canvas: HTMLCanvasElement) {
 
         if (!canvas) return;
@@ -513,7 +712,7 @@
         leftPanel.style.height = `${leftHeight - difference}px`;
         rightPanel.style.height = `${rightHeight - difference}px`;
 
-        console.log("he he he - ", leftHeight, rightHeight, leftPanel.style.height, rightPanel.style.height, difference);
+        //console.log("he he he - ", leftHeight, rightHeight, leftPanel.style.height, rightPanel.style.height, difference);
     }
 
     function updateDebugPanelOffsets(): void {
@@ -561,45 +760,40 @@
         resizeCanvas(canvas);
         updateOffsets(canvas);
         updateDebugPanelOffsets();
+        drawObjects();
         //updateLeftAndRightPanelHeight(canvas)
     });
     updateDebugPanelOffsets();
     resizeCanvas(canvas)
     updateOffsets(canvas);
     updateLeftAndRightPanelHeight(canvas)
-    
-    const gridCanvas = document.createElement('canvas');
-    const gridCtx = gridCanvas.getContext('2d')!;
-    gridCanvas.width = canvas.width;
-    gridCanvas.height = canvas.height;
-    console.log("w-h", gridCanvas.width, gridCanvas.height)
-    //Функция для рисования сетки
-    function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number, gridSize: number) {
-        //ctx.clearRect(0, 0, width, height); // Очищаем холст перед рисованием
-        ctx.strokeStyle = '#e0e0e0'; // Цвет линий сетки
+
+    function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number, size: number) {
+        ctx.save();
+        ctx.strokeStyle = '#e0e0e0';
         ctx.lineWidth = 1;
+        // смещение сетки так, чтобы линии «следили» за offsetX/offsetY
+        const ox = offsetX % size;
+        const oy = offsetY % size;
+        ctx.translate(ox, oy);
 
-        // Вертикальные линии
-        for (let x = 0; x <= width; x += gridSize) {
+        for (let x = -size; x < w; x += size) {
             ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
+            ctx.moveTo(x, -size);
+            ctx.lineTo(x, h);
+            ctx.stroke();
+        }
+        for (let y = -size; y < h; y += size) {
+            ctx.beginPath();
+            ctx.moveTo(-size, y);
+            ctx.lineTo(w, y);
             ctx.stroke();
         }
 
-        // Горизонтальные линии
-        for (let y = 0; y <= height; y += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(width, y);
-            ctx.stroke();
-        }
+        ctx.restore();
     }
 
-
-
-    drawGrid(gridCtx, gridCanvas.width, gridCanvas.height, 20)
-    // Рисуем сетку на фоновом холсте
+    
 
     if (canvas.getContext) {
         ctx = canvas.getContext('2d');
@@ -613,6 +807,11 @@
             drawObjects();
         }
 
+        drawGrid(ctx, canvas.width, canvas.height, 20);
+
+        flag = "body";
+        saveStateForUndo();
+
         document.getElementById('recovery-scheme')?.addEventListener('click', function () {
             logDebug("recovery-scheme button clicked");
             loadFromLocalStorage();
@@ -620,6 +819,7 @@
 
         // Обработчики событий
         canvas.addEventListener('mousedown', function (e: MouseEvent) {
+            saveStateForUndo();
             onMouseDown(e);
         });
         canvas.addEventListener('mousemove', function (e: MouseEvent) {
@@ -1451,113 +1651,153 @@
             } 
         });
 
-
-        function dialectControl(flag: string, currentDialect_: string, func: (x: string) => void) {
-            console.log("func currentDialect 1 ===", flag, currentDialect_);
+        function dialectControl<T extends Shape>(flag: string, currentDialect_: string, func: (x: string) => T, onObjectAdded?: (obj: T) => void): string {
             if (currentDialect_ === 'none') {
                 currentDialect_ = flag;
-                func(currentDialect_);
+                const result = func(currentDialect_);
+                onObjectAdded?.(result);
             } else if (currentDialect_ === flag) {
-                func(currentDialect_);
+                const result = func(currentDialect_);
+                onObjectAdded?.(result);
             } else {
                 openPopup("Неверный диалект! Выберите другую фигуру", "information");
             }
             return currentDialect_;
         }
 
-
         // DB dialect
 
         document.getElementById('addLineBtnDB')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add line button clicked");
             console.log("1 - ", currentDialect)
             dialectButtonClickedFlag = "DB";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         document.getElementById('addTableDB')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "DB";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         // Base dialect
 
         document.getElementById('addTable')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "base";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         document.getElementById('addRectBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add rectangle button clicked");
             dialectButtonClickedFlag = "base";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
 
         document.getElementById('addCircleBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add circle button clicked");
             dialectButtonClickedFlag = "base";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         document.getElementById('addLineBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add line button clicked");
             dialectButtonClickedFlag = "base";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         document.getElementById('addCloudBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add cloud button clicked");
             dialectButtonClickedFlag = "base";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         document.getElementById('addStarBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Add star button clicked");
             dialectButtonClickedFlag = "base";
-            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag));
+            currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
+            
         });
 
         //
 
         document.getElementById('delShapeBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Delete shape button clicked");
             deleteShape();
+            
         });
 
         document.getElementById('rotateLeftBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
+            
         });
 
         document.getElementById('rotateRightBtn')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug("Rotate right button clicked");
             rotateSelectedObject(10);
+            
         });
         document.getElementById('deleteItem')?.addEventListener('click', function () {
+            saveStateForUndo();
             if (selectedObject_buf) {
                 deleteShape();
             }
             selectedObject_buf = null;
+            
         });
 
-        document.addEventListener('keydown', function (event) {
+        document.addEventListener('keydown', (event) => {
+            const activeTag = document.activeElement?.tagName.toLowerCase();
+            if (['input', 'textarea', 'select'].includes(activeTag)) return;
+
+            if (event.ctrlKey && (event.key.toLowerCase() === 'z' || event.key.toLowerCase() === 'я')) {
+                event.preventDefault();
+                undo();
+            }
+
+            if (event.ctrlKey && (event.key.toLowerCase() === 'y' || event.key.toLowerCase() === 'н')) {
+                event.preventDefault();
+                redo();
+            }
+
             if (event.key === 'Delete') {
+                saveStateForUndo();
+                event.preventDefault();
                 deleteShape();
             }
-            selectedObject_buf = null;
         });
 
+
         document.getElementById('rotateLeftItem')?.addEventListener('click', function () {
+            saveStateForUndo();
             if (selectedObject_buf) {
                 rotateSelectedObject(-10);
             }
             selectedObject_buf = null;
             drawObjects();
+            
         });
 
         document.getElementById('rotateRightItem')?.addEventListener('click', function () {
+            saveStateForUndo();
             if (selectedObject_buf) {
                 rotateSelectedObject(10);
             }
@@ -1585,36 +1825,43 @@
         });
 
         document.getElementById('connect_objects')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug(`connectionObjects button clicked`);
             connectionServ = 1;
             connectionObjects();
+            
         });
 
         document.getElementById('remove_connection')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug(`remove_connection button clicked`);
             connectionServ = 0;
             removeObjects();
+            
         });
 
         document.getElementById('outgoing_connect')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug(`outgoingConnectionObjects button clicked`);
             connectionServ = 3;
             connectionObjects();
+            
         });
 
         document.getElementById('remove_outgoing_connection')?.addEventListener('click', function () {
+            saveStateForUndo();
             logDebug(`remove_connection button clicked`);
             connectionServ = 4;
             removeObjects();
         });
 
         document.getElementById('additionInfo')?.addEventListener('click', function () {
+            saveStateForUndo();
             addInfo(selectedObject_buf);
         });
 
         document.addEventListener('contextmenu', function (e: MouseEvent) {
             e.preventDefault();
-            onMouseDown(e);
         });
 
         document.getElementById('insert_img')?.addEventListener('click', function () {
@@ -1708,7 +1955,7 @@
                 } else {
                     createTextInput(clickedObject, mouseX, mouseY);
                 }
-            }
+            } 
         });
 
         function createTextInput(obj: Shape, x: number, y: number) {
@@ -2218,7 +2465,7 @@
             color: string = getRandomColor(),
             rotation: number = 0,
             border: boolean = false
-        ): void {
+        ): Rectangle {
             const newRect: Rectangle = {
                 dialect,
                 id: generateRandomId(16),
@@ -2238,6 +2485,7 @@
                 border: border
             };
             objectAdditionPreprocessing(newRect);
+            return newRect;
         }
         function addCircle(
             dialect: string = "base",
@@ -2246,7 +2494,7 @@
             radius: number = 25,
             color: string = getRandomColor(),
             rotation: number = 0
-        ): void {
+        ): Circle {
             const newCircle: Circle = {
                 dialect,
                 id: generateRandomId(16),
@@ -2264,6 +2512,7 @@
                 colorAlpha: 1
             };
             objectAdditionPreprocessing(newCircle);
+            return newCircle;
         }
         function addLine(
             dialect: string = "base",
@@ -2278,7 +2527,7 @@
             lineWidth: number = 2,
             startArrowType: '-|->' | '-0->' | '-*->' | 'none' = 'none',
             endArrowType: '-|->' | '-0->' | '-*->' | 'none' = 'none'
-        ): void {
+        ): Line {
             const centerX = (startX + endX) / 2;
             const centerY = (startY + endY) / 2;
 
@@ -2307,6 +2556,7 @@
                 endArrowType
             };
             objectAdditionPreprocessing(newLine);
+            return newLine;
         }
         function addStar(
             dialect: string = "base",
@@ -2317,7 +2567,7 @@
             m: number = 0.5,
             color: string = getRandomColor(),
             rotation: number = 0
-        ): void {
+        ): Star {
             const newStar: Star = {
                 dialect,
                 id: generateRandomId(16),
@@ -2337,6 +2587,7 @@
                 colorAlpha: 1
             };
             objectAdditionPreprocessing(newStar);
+            return newStar;
         }
         function addCloud(
             dialect: string = "base",
@@ -2346,7 +2597,7 @@
             height: number = 120,
             color: string = getRandomColor(),
             rotation: number = 0
-        ): void {
+        ): Cloud {
             const newCloud: Cloud = {
                 dialect,
                 id: generateRandomId(16),
@@ -2365,18 +2616,21 @@
                 colorAlpha: 1
             };
             objectAdditionPreprocessing(newCloud);
+            return newCloud;
         }
+
         function addTable(
             dialect: string = "base",
             x_C: number = canvas.width / 2,
             y_C: number = canvas.height / 2,
-            rows: number = 3,   // Количество строк
-            cols: number = 3,   // Количество столбцов
+            rows: number = 3,
+            cols: number = 3,
             cellWidth: number = 50,
             cellHeight: number = 50,
             color: string = getRandomColor(),
             rotation: number = 0
-        ): void {
+        ): ComplexShape {
+            console.log("begin", rows, cols);
             const newTable: ComplexShape = {
                 dialect,
                 id: generateRandomId(16),
@@ -2419,12 +2673,70 @@
                     };
 
                     objectAdditionPreprocessing(cell, true);
-
+                    
+                    console.log(row, col, cell);
                     newTable.parts.push(cell);
                 }
             }
-            objects.push(newTable)
-            drawObjects()
+            objects.push(newTable);
+            console.log(objects, "\n");
+            drawObjects();
+            return newTable;
+        }
+
+        function editTable(editedTable: ComplexShape): void {
+            const cellWidth = 50;
+            const cellHeight = 50;
+            saveStateForUndo();
+            console.log("edit");
+            const table = objects.find(o => o.id === editedTable.id && o.type === 'table') as ComplexShape;
+            if (!table) {
+                console.error(`Таблица ${editedTable} не найдена`);
+                return;
+            }
+            for (const cell of table.parts) {
+                const idx = objects.findIndex(o => o.id === cell.id);
+                if (idx >= 0) objects.splice(idx, 1);
+            }
+            table.parts.length = 0;
+
+            table.x_C = editedTable.x_C;
+            table.y_C = editedTable.y_C;
+            table.cols = editedTable.cols;
+            table.rows = editedTable.rows;
+            table.width = editedTable.cols * cellWidth;
+            table.height = editedTable.rows * cellHeight;
+            table.color = editedTable.color;
+            table.rotation = editedTable.rotation;
+            table.borderPoints_X1 = editedTable.x_C;
+            table.borderPoints_Y1 = editedTable.y_C;
+            table.borderPoints_X2 = table.borderPoints_X1 + table.width;
+            table.borderPoints_Y2 = table.borderPoints_Y1 + table.height;
+
+            for (let row = 0; row < table.rows; row++) {
+                for (let col = 0; col < table.cols; col++) {
+                    const cell: Rectangle = {
+                        dialect: table.dialect,
+                        id: generateRandomId(16),
+                        type: 'rectangle',
+                        x_C: table.x_C + col * cellWidth,
+                        y_C: table.y_C + row * cellHeight,
+                        width: cellWidth,
+                        height: cellHeight,
+                        color: editedTable.color,
+                        rotation: editedTable.rotation,
+                        borderPoints_X1: 0,
+                        borderPoints_Y1: 0,
+                        borderPoints_X2: 0,
+                        borderPoints_Y2: 0,
+                        selectionMarker: false,
+                        colorAlpha: 1,
+                        border: true
+                    };
+                    objectAdditionPreprocessing(cell, true);
+                    table.parts.push(cell);
+                }
+            }
         }
 
         function drawTable(table: ComplexShape, ctx: CanvasRenderingContext2D) {
@@ -2432,9 +2744,7 @@
                 drawRect(part as Rectangle, ctx);
                 updateConnectors(part as Rectangle);
                 enteringText(part as Rectangle);
-                //console.log("draw")
             });
-            //console.log("table border upd")
             table.borderPoints_X1 = table.x_C;
             table.borderPoints_Y1 = table.y_C;
             table.borderPoints_X2 = table.x_C + table.width;
@@ -2507,15 +2817,12 @@
                 const rectX = Math.min(line.startX, line.endX);
                 const rectY = Math.min(line.startY, line.endY);
 
-                // Вычисляем ширину и высоту прямоугольника
                 const rectWidth = Math.abs(line.endX - line.startX);
                 const rectHeight = Math.abs(line.endY - line.startY);
 
-                // Рисуем пунктирный прямоугольник вокруг линии
                 ctx.strokeRect(rectX, rectY, rectWidth, rectHeight);
                 ctx.setLineDash([]);
 
-                // Обновляем координаты крайних точек прямоугольника
                 line.borderPoints_X1 = rectX;
                 line.borderPoints_Y1 = rectY;
                 line.borderPoints_X2 = rectX + rectWidth;
@@ -2776,7 +3083,7 @@
             isSchemaLoaded = false;
         }
 
-
+        let userInput: any;
         // Управление объектами
         function rotateSelectedObject(angle: number) {
             if (selectedObject_buf) {
@@ -2787,7 +3094,7 @@
             }
         }
         function addInfo(selectedObject_buf_: Shape) {
-            showPrompt("Введите текст:");
+            showPrompt(userInput,"Введите текст:");
             selectedObject_buf_.info = userInput;
         }
         function pointInPolygon(x, y, points) {
@@ -2860,25 +3167,6 @@
                 container?.appendChild(table);
             }
         }
-        function additionGrid(obj: Shape) {
-            const x_grid1 = Math.floor(obj.borderPoints_X1 / canvas.width);
-            const y_grid1 = Math.floor(obj.borderPoints_Y1 / canvas.height);
-            const x_grid2 = Math.floor(obj.borderPoints_X2 / canvas.width);
-            const y_grid2 = Math.floor(obj.borderPoints_Y2 / canvas.height);
-
-            if (x_grid1 < 0 || y_grid1 < 0) {
-                const newWidth = canvas.width * Math.abs(x_grid1);
-                const newHeight = canvas.height * Math.abs(y_grid1);
-                drawGrid(gridCtx, canvas.width + newWidth, canvas.height + newHeight, 20);
-                logDebug(`additionGrid ${(canvas.width + newWidth)}, ${(canvas.height + newHeight)}`);
-            }
-
-            if (x_grid2 > 0 || y_grid2 > 0) {
-                const newWidth = canvas.width * x_grid2;
-                const newHeight = canvas.height * y_grid2;
-                drawGrid(gridCtx, canvas.width + newWidth, canvas.height + newHeight, 20);
-            }
-        }
 
         function isPointInRotatedRect(mouseX: number, mouseY: number, rect: Rectangle): boolean {
             // Центр вращения
@@ -2926,16 +3214,10 @@
         }
 
         function leftButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
-            //console.log("so - ", selectedObject);
-            //console.log("sob - ", selectedObject_buf);
-            //console.log("obj - ", objects)
-            //console.log("som - ", selectedObjectMass)
-            console.log("sob - ", selectedObject_buf)
             logDebug("mouse_down");
             let foundObject = false;
             hideContextMenu();
             if (highlight.length != 0) {
-                //console.log("i am here");
                 logDebug(`highlight - (${highlight})`);
                 highlight = [];
             }
@@ -3082,8 +3364,6 @@
                 selectionEndY = e.clientY - canvas.offsetTop;
                 //console.log("now is selecting");
             } else { // если клик был сделан по объекту не яляющимся частью группы выделенных, то чистим группу выделенных (не считая таблицы)
-                console.log("so, sob, sm - ", selectedObject, selectedObject_buf, selectedObjectMass)
-                //console.log("logic check - selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== table", selectedObjectMass.length > 0, !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id), selectedObject_buf.type !== 'table')
                 if (selectedObjectMass.length > 0 && !selectedObjectMass.some(selObj => selObj.id === selectedObject_buf.id) && selectedObject_buf.type !== 'table') {
                     selectedObjectMass = [];
                     for (let i = objects.length - 1; i >= 0; i--) {
@@ -3123,6 +3403,7 @@
             //console.log("status check - ", foundObject, selectedObject, )
         }
         function rigtButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
+            //e.preventDefault();
             for (let i = objects.length - 1; i >= 0; i--) {
                 const obj = objects[i];
                 if (obj.type === "table") {
@@ -3616,7 +3897,7 @@
 
 
         function leftButtonMove(selectedObject: Shape, mouseX: number, mouseY: number) {
-            console.log("selec - ", selectedObjectMass)
+            //console.log("selec - ", selectedObjectMass)
             if (selectedObjectMass.length > 0) {
 
                 //console.log("mx - ", mouseX, "my - ", mouseY, "sx - sy --", help_X, help_Y)
@@ -3624,7 +3905,7 @@
                 const dy = mouseY - help_Y;
 
                 let helper = false
-                console.log(helper)
+                //console.log(helper)
                 //if (selectedObject_buf.type === 'table') { // если перемещаем только таблицу
                     //selectedObject_buf.x_C += dx;
                     //selectedObject_buf.y_C += dy;
@@ -3669,7 +3950,7 @@
 
                 objects.forEach(obj => {
                     if (obj.type === "table") {
-                        console.log("there - ", (obj as ComplexShape).x_C, (obj as ComplexShape).y_C)
+                        //console.log("there - ", (obj as ComplexShape).x_C, (obj as ComplexShape).y_C)
                     }
                 })
 
@@ -3843,7 +4124,7 @@
             activeConnector = null;
             selectedObject = null;
             selectedLineEnd = null;
-            console.log(selectedObjectMass)
+            //console.log(selectedObjectMass)
         }
         function downloadFile(filename: string, content: string) {
             const blob = new Blob([content], { type: 'text/plain' }); //Создание нового объекта Blob (Binary Large Object)
@@ -4611,11 +4892,10 @@
 
         function drawObjects() {
             if (ctx) {
-                //logDebug("NOW I AM DRAWING OBJECTS");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid(ctx, canvas.width, canvas.height, 20);
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
-                ctx.drawImage(gridCanvas, 0, 0);
                 drawingConnection(objects, ctx);
 
                 // Затем отрисовываем сами объекты

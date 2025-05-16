@@ -9,7 +9,8 @@
 @inject IDialogService DialogService
 @inherits LayoutComponentBase
 @using BlazorWebAppAutoRendering.Client.Pages
-
+@inject HttpClient Http
+@using BlazorWebAppAutoRendering
 
 <PageTitle>GraphEditor</PageTitle>
 <link href="css/PageStyles.css" rel="stylesheet" />
@@ -29,7 +30,6 @@
                         Id="@tool.Id"
                         Icon="@tool.Icon"
                         Text="@tool.Text"
-                        TooltipTitle="@tool.Text"
                         TooltipDescription="@tool.Tooltip"
                         Style="@tool.Style" />
                         <br />
@@ -42,7 +42,6 @@
                     <Tool Id="@tool.Id"
                           Icon="@tool.Icon"
                           Text="@tool.Text"
-                          TooltipTitle="@tool.Text"
                           TooltipDescription="@tool.Tooltip"
                           Style="@tool.Style" />
                     <br />
@@ -55,7 +54,6 @@
                     <Tool Id="@tool.Id"
                           Icon="@tool.Icon"
                           Text="@tool.Text"
-                          TooltipTitle="@tool.Text"
                           TooltipDescription="@tool.Tooltip"
                           Style="@tool.Style"
                           OnClick="ShowDialog" />
@@ -69,7 +67,6 @@
                     <Tool Id="@tool.Id"
                           Icon="@tool.Icon"
                           Text="@tool.Text"
-                          TooltipTitle="@tool.Text"
                           TooltipDescription="@tool.Tooltip"
                           Style="@tool.Style" />
                     <br />
@@ -82,7 +79,6 @@
                     <Tool Id="@tool.Id"
                           Icon="@tool.Icon"
                           Text="@tool.Text"
-                          TooltipTitle="@tool.Text"
                           TooltipDescription="@tool.Tooltip"
                           Style="@tool.Style" />
                     <br />
@@ -279,8 +275,23 @@
     </div>
 </div>
 
+<h3>Список элементов</h3>
+
+<input @bind="newItemName" placeholder="Название" />
+<button @onclick="AddItem">Добавить</button>
+
+<ul>
+    @foreach (var item in items)
+    {
+        <li>
+            @item.Name
+            <button @onclick="() => DeleteItem(item.Id)">Удалить</button>
+        </li>
+    }
+</ul>
+
 @code {
-        record ToolDef(string Id, string Icon, string Text, string Tooltip, string Action, string Style = "width:80%;height:60px;", string? OnClick = null);  // напр., "ShowDialog" когда нужен вызов метода);
+    record ToolDef(string Id, string Icon, string Text, string Tooltip, string Action, string Style = "width:80%;height:60px;", string? OnClick = null);  // напр., "ShowDialog" когда нужен вызов метода);
 
     List<ToolDef> BaseTools = new() {
         new("addTable", Icons.Material.Filled.TableBar, "Добавить таблицу", "Нажмите, чтобы добавить таблицу", "addTable"),
@@ -333,10 +344,51 @@
             Console.WriteLine("Error: " + ex.Message);
         }
     }
+
+    List<Item> items = new(); // items — список объектов, полученных из API /api/items
+    string newItemName = ""; // newItemName — то, что пользователь ввёл в поле ввода
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadItems(); // вызов LoadItems(), чтобы загрузить список Item из API.
+    }
+
+    async Task LoadItems() // Выполняется HTTP-запрос GET /api/items
+    {
+        items = await Http.GetFromJsonAsync<List<Item>>("api/items") ?? new List<Item>();
+    } // Результат(List<Item>) сохраняется в items
+
+    async Task AddItem()
+    {
+        if (string.IsNullOrWhiteSpace(newItemName)) return;
+
+        var newItem = new Item { Name = newItemName }; // Создаётся Item с именем newItemName и отправляется в API (POST /api/items)
+        var response = await Http.PostAsJsonAsync("api/items", newItem);
+
+        if (response.IsSuccessStatusCode)
+        { // Если успешно - поле ввода очищается, и список перезагружается
+            newItemName = "";
+            await LoadItems();
+        }
+    }
+
+    async Task DeleteItem(int id)
+    {
+        var response = await Http.DeleteAsync($"api/items/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadItems();
+        }
+    }
+
+    public class Item 
+    {
+        public int Id { get; set; } = 0;
+        public string Name { get; set; } = string.Empty;
+    }
 }
 
 <script src="js/CookiesServ.js"></script>
 <script src="js/interface.js"></script>
 <script src="js/file.js"></script>
-<script src="js/file1.js"></script> 
 <script src="https://cdn.jsdelivr.net/npm/xml2js/dist/xml2js.min.js"></script>

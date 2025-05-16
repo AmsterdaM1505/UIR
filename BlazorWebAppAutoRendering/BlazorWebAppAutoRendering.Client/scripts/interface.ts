@@ -58,9 +58,8 @@ interface Star extends Shape {
     m: number;
 }
 
-interface Cloud extends Shape {
-    width: number;
-    height: number;
+interface Cloud extends Rectangle {
+
 }
 
 interface ComplexShape extends Rectangle {
@@ -68,6 +67,12 @@ interface ComplexShape extends Rectangle {
     cols: number;
     rows: number;
 }
+
+interface Item {
+    id: number;
+    name: string;
+}
+
 
 function logDebug(message: string) {
     const debugOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;
@@ -107,7 +112,7 @@ function measureTextWidth(text: string, font: string): number {
     const span = document.createElement('span');
 
     const help = document.getElementById("addRectBtn")
-    console.log("мой текст", help.style)
+    //console.log("мой текст", help.style)
 
     span.style.visibility = 'hidden';
     span.style.whiteSpace = 'nowrap';
@@ -123,9 +128,7 @@ function measureTextWidth(text: string, font: string): number {
     return width;
 }
 
-let userInput;
-
-function showPrompt(message: string): Promise<string> {
+function showPrompt(userInput: any, message: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
         userInput = prompt(message);
 

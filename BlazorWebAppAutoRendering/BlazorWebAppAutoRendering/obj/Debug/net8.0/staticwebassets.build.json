@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "MxZmS4SqdCeLHhf1N2HDpCPAhe3/Fq+xYCdb7wLy37s=",
+  "Hash": "vi11KVnr4oWaVkUlvhGPuesGUpSBkCCWRafK9tFw3+I=",
   "Source": "BlazorWebAppAutoRendering",
   "BasePath": "_content/BlazorWebAppAutoRendering",
   "Mode": "Default",
@@ -8054,25 +8054,6 @@
       "OriginalItemSpec": "wwwroot\\js\\file.js"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file1.js",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Project",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "js/file1.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\js\\file1.js"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\interface.js",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Project",
@@ -8090,25 +8071,6 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\interface.js"
-    },
-    {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\owl.js",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Project",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "js/owl.js",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\js\\owl.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BlazorWebAppAutoRendering.styles.css",

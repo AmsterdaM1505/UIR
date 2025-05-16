@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "IeJUxK7dVzGjLEEWkghO/31Pt3XMsiDqRv5owpkHmhg=",
+  "Hash": "oYqiyWRVFC6HjFIQQcEXPNhuS2t/5s/YAyx3psCP4jk=",
   "Source": "BlazorWebAppAutoRendering.Client",
   "BasePath": "/",
   "Mode": "Default",
@@ -17,10 +17,10 @@
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.css",
+      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\8.2.0\\staticwebassets\\MudBlazor.min.css",
       "SourceId": "MudBlazor",
       "SourceType": "Package",
-      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\",
+      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\8.2.0\\staticwebassets\\",
       "BasePath": "_content/MudBlazor",
       "RelativePath": "MudBlazor.min.css",
       "AssetKind": "All",
@@ -33,13 +33,13 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.css"
+      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\8.2.0\\staticwebassets\\MudBlazor.min.css"
     },
     {
-      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.js",
+      "Identity": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\8.2.0\\staticwebassets\\MudBlazor.min.js",
       "SourceId": "MudBlazor",
       "SourceType": "Package",
-      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\",
+      "ContentRoot": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\8.2.0\\staticwebassets\\",
       "BasePath": "_content/MudBlazor",
       "RelativePath": "MudBlazor.min.js",
       "AssetKind": "All",
@@ -52,7 +52,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\6.19.1\\staticwebassets\\MudBlazor.min.js"
+      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\mudblazor\\8.2.0\\staticwebassets\\MudBlazor.min.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\blazor.boot.json",
@@ -90,7 +90,7 @@
       "AssetTraitValue": "boot",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\8.0.5\\build\\net8.0\\blazor.webassembly.js"
+      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\8.0.7\\build\\net8.0\\blazor.webassembly.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\BlazorWebAppAutoRendering.Client.pdb",
@@ -147,7 +147,7 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\dotnet.js"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\dotnet.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js.map",
@@ -166,15 +166,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\dotnet.js.map"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\dotnet.js.map"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.8.0.2.7x324t2ttq.js",
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.8.0.7.37dkch2d2y.js",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
       "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
       "BasePath": "/",
-      "RelativePath": "_framework/dotnet.native.8.0.2.7x324t2ttq.js",
+      "RelativePath": "_framework/dotnet.native.8.0.7.37dkch2d2y.js",
       "AssetKind": "Build",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -185,7 +185,7 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\dotnet.native.js"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\dotnet.native.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.wasm",
@@ -204,15 +204,15 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\dotnet.native.wasm"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\dotnet.native.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.8.0.2.ltzaorhuh8.js",
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.8.0.7.urcsr75yt5.js",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
       "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
       "BasePath": "/",
-      "RelativePath": "_framework/dotnet.runtime.8.0.2.ltzaorhuh8.js",
+      "RelativePath": "_framework/dotnet.runtime.8.0.7.urcsr75yt5.js",
       "AssetKind": "Build",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -223,7 +223,7 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\dotnet.runtime.js"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\dotnet.runtime.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.js.map",
@@ -242,7 +242,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\dotnet.runtime.js.map"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\dotnet.runtime.js.map"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_CJK.dat",
@@ -261,7 +261,7 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\icudt_CJK.dat"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\icudt_CJK.dat"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_EFIGS.dat",
@@ -280,7 +280,7 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\icudt_EFIGS.dat"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\icudt_EFIGS.dat"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_no_CJK.dat",
@@ -299,7 +299,7 @@
       "AssetTraitValue": "native",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\8.0.2\\runtimes\\browser-wasm\\native\\icudt_no_CJK.dat"
+      "OriginalItemSpec": "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Runtime.Mono.browser-wasm\\8.0.7\\runtimes\\browser-wasm\\native\\icudt_no_CJK.dat"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\Microsoft.AspNetCore.Authorization.wasm",
@@ -4273,6 +4273,25 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Net.WebSockets.wasm"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\37dkch2d2y.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/dotnet.native.8.0.7.37dkch2d2y.js.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.8.0.7.37dkch2d2y.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.8.0.7.37dkch2d2y.js"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\3hzfcq2wbp.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -4311,6 +4330,25 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.IO.FileSystem.Watcher.wasm"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\3rrtxwix54.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/icudt_no_CJK.dat.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_no_CJK.dat",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_no_CJK.dat"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\3xkkn6zqdk.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -4347,6 +4385,25 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Net.Sockets.wasm"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\46wj3f8iim.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/dotnet.js.map.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js.map",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js.map"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\4mlsxzdp2j.gz",
@@ -4805,25 +4862,6 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Security.Cryptography.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\7x324t2ttq.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/dotnet.native.8.0.2.7x324t2ttq.js.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.8.0.2.7x324t2ttq.js",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.8.0.2.7x324t2ttq.js"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\80y9rkdhpb.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -5185,44 +5223,6 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Reflection.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\cberztqr8o.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/dotnet.js.map.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js.map",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js.map"
-    },
-    {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ce61mpnfli.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/dotnet.runtime.js.map.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.js.map",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.js.map"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ceeombb439.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -5297,44 +5297,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Linq.Parallel.wasm"
-    },
-    {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ctqrc74d94.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/dotnet.native.wasm.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.wasm",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.wasm"
-    },
-    {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\d5sb61nkvf.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/icudt_no_CJK.dat.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_no_CJK.dat",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_no_CJK.dat"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\d6851zxn7f.gz",
@@ -5432,23 +5394,23 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Text.Encoding.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\f7uxrr2vep.gz",
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\f23nu5hkfg.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
       "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
       "BasePath": "/",
-      "RelativePath": "_framework/blazor.webassembly.js.gz",
-      "AssetKind": "All",
+      "RelativePath": "_framework/dotnet.js.gz",
+      "AssetKind": "Build",
       "AssetMode": "All",
       "AssetRole": "Alternative",
       "AssetMergeBehavior": "",
       "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
       "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js"
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\feqmsjtmmj.gz",
@@ -5525,6 +5487,25 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\Microsoft.VisualBasic.Core.wasm"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\fya3d8ovfm.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/icudt_CJK.dat.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_CJK.dat",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_CJK.dat"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\fyiidc702l.gz",
@@ -5983,6 +5964,25 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.IO.Pipelines.wasm"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ka3w8hadk3.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/dotnet.runtime.js.map.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.js.map",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.js.map"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\kifplyz4jj.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -6230,25 +6230,6 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Console.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ltzaorhuh8.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/dotnet.runtime.8.0.2.ltzaorhuh8.js.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.8.0.2.ltzaorhuh8.js",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.8.0.2.ltzaorhuh8.js"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\lzez08uehg.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -6477,6 +6458,25 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Runtime.Serialization.Primitives.wasm"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ovzsgv6a1u.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/icudt_EFIGS.dat.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_EFIGS.dat",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_EFIGS.dat"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ox64vp73we.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -6570,44 +6570,6 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Text.RegularExpressions.wasm"
-    },
-    {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\pr6ivli8ff.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/icudt_CJK.dat.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_CJK.dat",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_CJK.dat"
-    },
-    {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\prws5blqhj.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/icudt_EFIGS.dat.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_EFIGS.dat",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\icudt_EFIGS.dat"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\ptedojyw0r.gz",
@@ -7275,6 +7237,25 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\Microsoft.Extensions.Logging.Abstractions.wasm"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\urcsr75yt5.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/dotnet.runtime.8.0.7.urcsr75yt5.js.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.8.0.7.urcsr75yt5.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.runtime.8.0.7.urcsr75yt5.js"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\v92vmy1q46.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -7387,6 +7368,25 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Transactions.wasm"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\vzhy5cblum.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/dotnet.native.wasm.gz",
+      "AssetKind": "Build",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.wasm",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "Never",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.native.wasm"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\vzqujb9353.gz",
@@ -7598,25 +7598,6 @@
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\System.Diagnostics.TraceSource.wasm"
     },
     {
-      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\xliombe9wk.gz",
-      "SourceId": "BlazorWebAppAutoRendering.Client",
-      "SourceType": "Computed",
-      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
-      "BasePath": "/",
-      "RelativePath": "_framework/dotnet.js.gz",
-      "AssetKind": "Build",
-      "AssetMode": "All",
-      "AssetRole": "Alternative",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js",
-      "AssetTraitName": "Content-Encoding",
-      "AssetTraitValue": "gzip",
-      "CopyToOutputDirectory": "PreserveNewest",
-      "CopyToPublishDirectory": "Never",
-      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\dotnet.js"
-    },
-    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\xtkdb7dsoa.gz",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Computed",
@@ -7653,6 +7634,25 @@
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\Microsoft.JSInterop.wasm"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\xycu92z8sk.gz",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Computed",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "_framework/blazor.webassembly.js.gz",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Alternative",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js",
+      "AssetTraitName": "Content-Encoding",
+      "AssetTraitValue": "gzip",
+      "CopyToOutputDirectory": "PreserveNewest",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\bin\\Release\\net8.0\\wwwroot\\_framework\\blazor.webassembly.js"
     },
     {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\obj\\Release\\net8.0\\compressed\\y4rmcjan3w.gz",
@@ -7959,6 +7959,25 @@
       "OriginalItemSpec": "wwwroot\\appsettings.json"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\css\\PageStyles.css",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "css/PageStyles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\PageStyles.css"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\img\\yyy.jpg",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Discovered",
@@ -7978,6 +7997,25 @@
       "OriginalItemSpec": "wwwroot\\img\\yyy.jpg"
     },
     {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\CookiesServ.js",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "js/CookiesServ.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\CookiesServ.js"
+    },
+    {
       "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file.js",
       "SourceId": "BlazorWebAppAutoRendering.Client",
       "SourceType": "Discovered",
@@ -7995,6 +8033,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\file.js"
+    },
+    {
+      "Identity": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\interface.js",
+      "SourceId": "BlazorWebAppAutoRendering.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "js/interface.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\interface.js"
     }
   ]
 }

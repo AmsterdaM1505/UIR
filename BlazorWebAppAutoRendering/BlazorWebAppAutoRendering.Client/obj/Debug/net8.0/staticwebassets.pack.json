@@ -33,16 +33,8 @@
       "PackagePath": "staticwebassets\\js\\file.js"
     },
     {
-      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\file1.js",
-      "PackagePath": "staticwebassets\\js\\file1.js"
-    },
-    {
       "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\interface.js",
       "PackagePath": "staticwebassets\\js\\interface.js"
-    },
-    {
-      "Id": "C:\\Users\\user\\source\\repos\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering\\BlazorWebAppAutoRendering.Client\\wwwroot\\js\\owl.js",
-      "PackagePath": "staticwebassets\\js\\owl.js"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BlazorWebAppAutoRendering.Client.Microsoft.AspNetCore.StaticWebAssets.props",

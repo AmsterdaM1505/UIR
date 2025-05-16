@@ -3,6 +3,9 @@ build_property.EnableAotAnalyzer =
 build_property.EnableSingleFileAnalyzer = 
 build_property.EnableTrimAnalyzer = false
 build_property.IncludeAllContentForSelfExtract = 
+build_property.MudDebugAnalyzer = 
+build_property.MudAllowedAttributePattern = 
+build_property.MudAllowedAttributeList = 
 build_property.TargetFramework = net8.0
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = 
@@ -22,8 +25,16 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\user\source\repos\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering\BlazorWebAppAutoRendering.Client
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Auth.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Component2.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29tcG9uZW50Mi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/Pages/Tool.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVG9vbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/user/source/repos/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering/BlazorWebAppAutoRendering.Client/_Imports.razor]

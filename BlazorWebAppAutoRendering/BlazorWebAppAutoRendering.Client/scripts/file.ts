@@ -43,6 +43,9 @@
     let undoStack: Shape[][] = [];
     let redoStack: Shape[][] = [];
     let flag: string; 
+
+    let gridVisible: boolean = true;
+
     function saveStateForUndo() {
         console.log(flag);
         function cleanShape(shape: Shape): any {
@@ -732,25 +735,52 @@
         debugPanel.style.right = rightWidth + "px";
     }
 
+    let deltaWidth: number = 0;
+
+    const buttons = document.querySelectorAll('._button') as NodeListOf<HTMLElement>;
+    const check = document.getElementById("mudpanel").getBoundingClientRect();
+    let maxWidth = 0;
+    let maxHeight = 0;
+    logDebug("button resize")
+    buttons.forEach(button => {
+        const rect = button.getBoundingClientRect();
+        if (rect.width > maxWidth) {
+            maxWidth = rect.width;
+        }
+        if (rect.height > maxHeight) {
+            maxHeight = rect.height;
+        }
+    });
+    deltaWidth = check.width - maxWidth + 24;
+    buttons.forEach(button => {
+        button.style.width = `${maxWidth}px`;
+        button.style.height = `${maxHeight}px`;
+    });
+    console.log("mudpanel", check);
     function uniformizeButtons(selector: string): void {
         const buttons = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
-        let maxWidth = 0;
-        let maxHeight = 0;
-        logDebug("button resize")
-        buttons.forEach(button => {
-            const rect = button.getBoundingClientRect();
-            if (rect.width > maxWidth) {
-                maxWidth = rect.width;
-            }
-            if (rect.height > maxHeight) {
-                maxHeight = rect.height;
-            }
-        });
+        const check = document.getElementById("mudpanel").getBoundingClientRect();
+        //let maxWidth = 0;
+        //let maxHeight = 0;
+        //logDebug("button resize")
+        //buttons.forEach(button => {
+        //    const rect = button.getBoundingClientRect();
+        //    if (rect.width > maxWidth) {
+        //        maxWidth = rect.width;
+        //    }
+        //    if (rect.height > maxHeight) {
+        //        maxHeight = rect.height;
+        //    }
+        //});
+        
+        let maxWidth = check.width - deltaWidth;
 
         buttons.forEach(button => {
             button.style.width = `${maxWidth}px`;
             button.style.height = `${maxHeight}px`;
         });
+        //deltaWidth = check.width - maxWidth;
+        console.log("mudpanel, maxWidth, deltaWidth", check.width, maxWidth, deltaWidth);
     }
     
     window.addEventListener("resize", function () {
@@ -763,6 +793,7 @@
         drawObjects();
         //updateLeftAndRightPanelHeight(canvas)
     });
+    uniformizeButtons('._button');
     updateDebugPanelOffsets();
     resizeCanvas(canvas)
     updateOffsets(canvas);
@@ -841,6 +872,11 @@
             document.addEventListener("mouseup", stopResizing);
         });
 
+        document.getElementById("checkbox")?.addEventListener('change', function () {
+            gridVisible = !gridVisible;
+            drawObjects();
+        })
+
         function resizeLeftPanel(e: MouseEvent) {
             if (!isResizingLeft) return;
             const newWidth = e.clientX;
@@ -848,6 +884,7 @@
                 leftPanel.style.width = `${newWidth}px`;
                 debugPanel.style.left = `${newWidth}px`; // Корректируем отладочную панель
                 resizeHandleLeft.style.left = `${newWidth}px`;
+                uniformizeButtons('._button');
             }
         }
 
@@ -1259,7 +1296,7 @@
                     }
 
                     formatString += `    <background color="${shape.color}"/>\n`;
-                    formatString += `    <style alpha="${shape.colorAlpha ?? 1}"/>\n`;
+                    formatString += `    <style alpha="${shape.colorAlpha ?? 1}" border="${shape.border ? 'true' : 'false'}"/>\n`;
                     formatString += `    <arealRect x1="${shape.borderPoints_X1}" y1="${shape.borderPoints_Y1}" x2="${shape.borderPoints_X2}" y2="${shape.borderPoints_Y2}"/>\n`;
 
                     // Добавляем lineConnectionStart
@@ -1504,6 +1541,7 @@
                     borderPoints_X2: parseFloat(nodeEl.getElementsByTagName("arealRect")[0]?.getAttribute("x2") || "0"),
                     borderPoints_Y2: parseFloat(nodeEl.getElementsByTagName("arealRect")[0]?.getAttribute("y2") || "0"),
                     colorAlpha: parseFloat(nodeEl.getElementsByTagName("style")[0]?.getAttribute("alpha") || "1"),
+                    border: nodeEl.getElementsByTagName("style")[0]?.getAttribute("border") === "true"
                 };
                 switch (type) {
                     case "rectangle":
@@ -4474,13 +4512,15 @@
                     if (
                         key === "imageSrc" ||
                         (object as any)[key] === "" ||
+                        (object as any)[key].length === 0 ||
                         key === "connectors" ||
                         key === "borderPoints_X1" ||
                         key === "borderPoints_Y1" ||
                         key === "borderPoints_X2" ||
                         key === "borderPoints_Y2" ||
                         key === "lineConnectionStart" ||
-                        key === "lineConnectionEnd"
+                        key === "lineConnectionEnd" ||
+                        key === "parts"
                     ) {
                         continue;
                     }
@@ -4511,7 +4551,8 @@
                         key === "arrowDirection" ||
                         key === "punctuation" ||
                         key === "startArrowType" ||
-                        key === "endArrowType"
+                        key === "endArrowType" ||
+                        key === "border"
                     ) {
                         cellValue.style.cursor = "pointer";
 
@@ -4553,6 +4594,10 @@
                                 input = document.createElement('select');
                                 const options = ["-|->", "-0->", "-*->", ">", "none"];
                                 optionsEntering(object, options, input);
+                            } else if (key === "border") {
+                                input = document.createElement('select');
+                                const options = ["false", "true"];
+                                optionsEntering(object, options, input);
                             } else {
                                 input = document.createElement('input');
                                 input.type = 'text';
@@ -4584,6 +4629,9 @@
                                     valueElement.innerText = parsed.toString();
                                 } else if (typeof (object as any)[key] === 'string') {
                                     (object as any)[key] = newValue;
+                                    valueElement.innerText = newValue;
+                                } else if (typeof (object as any)[key] === 'boolean') {
+                                    (object as any)[key] = newValue === "true";
                                     valueElement.innerText = newValue;
                                 }
 
@@ -4889,11 +4937,12 @@
             ctx.stroke();
         }
 
-
         function drawObjects() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawGrid(ctx, canvas.width, canvas.height, 20);
+                if (gridVisible) {
+                    drawGrid(ctx, canvas.width, canvas.height, 20);
+                }
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
                 drawingConnection(objects, ctx);
@@ -4917,6 +4966,7 @@
                             break;
                         case 'rectangle':
                             const rect = obj as Rectangle;
+                            console.log("rect - ", rect);
                             drawRect(rect, ctx);
                             updateConnectors(rect);
                             enteringText(obj);
@@ -4958,7 +5008,6 @@
                 logDebug("Canvas context is not available");
             }
         }
-
 
     } else {
         console.error("Canvas context is not supported");

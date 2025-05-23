@@ -25,6 +25,7 @@
     selectionMarker?: boolean;
 
     colorAlpha?: number;
+    border?: boolean;
 
     isHighlighted?: boolean;
 }
@@ -32,7 +33,6 @@
 interface Rectangle extends Shape {
     width: number;
     height: number;
-    border?: boolean;
 }
 
 interface Circle extends Shape {

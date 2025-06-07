@@ -2783,6 +2783,43 @@ var __rest = (this && this.__rest) || function (s, e) {
             tableObjectCheck(selectedObject_buf);
             return foundObject_;
         }
+        function mouseLineCheck(mouse_x, mouse_y, line) {
+            const x = mouse_x;
+            const y = mouse_y;
+            const minX = Math.min(line.startX, line.endX) - 2;
+            const maxX = Math.max(line.startX, line.endX) + 2;
+            const minY = Math.min(line.startY, line.endY) - 2;
+            const maxY = Math.max(line.startY, line.endY) + 2;
+            return x >= minX && x <= maxX && y >= minY && y <= maxY;
+        }
+        function distancePointToSegment(px, py, x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            if (dx === 0 && dy === 0) {
+                // Отрезок вырожден в точку
+                return Math.hypot(px - x1, py - y1);
+            }
+            // Вычисляем t (положение проекции точки на прямую относительно отрезка)
+            const t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
+            let closestX, closestY;
+            if (t < 0) {
+                // Ближайшая точка — x1, y1
+                closestX = x1;
+                closestY = y1;
+            }
+            else if (t > 1) {
+                // Ближайшая точка — x2, y2
+                closestX = x2;
+                closestY = y2;
+            }
+            else {
+                // Проекция попадает на отрезок
+                closestX = x1 + t * dx;
+                closestY = y1 + t * dy;
+            }
+            // Расстояние от точки до ближайшей точки на отрезке
+            return Math.hypot(px - closestX, py - closestY);
+        }
         function leftButtonDown(e, mouseX, mouseY) {
             logDebug("mouse_down");
             let foundObject = false;
@@ -2850,11 +2887,21 @@ var __rest = (this && this.__rest) || function (s, e) {
                 }
                 else if (obj.type === 'line') {
                     const line = obj;
-                    const distStart = Math.sqrt(Math.pow((mouseX - line.startX), 2) + Math.pow((mouseY - line.startY), 2));
-                    const distEnd = Math.sqrt(Math.pow((mouseX - line.endX), 2) + Math.pow((mouseY - line.endY), 2));
-                    const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
-                        Math.sqrt(Math.pow((line.endY - line.startY), 2) + Math.pow((line.endX - line.startX), 2));
-                    if (distStart < 5 || distEnd < 5 || distToLine < 10) {
+                    //if (!mouseLineCheck(mouseX, mouseY, line)) continue;
+                    //const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
+                    //const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
+                    //const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                    //    Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
+                    const dx = line.endX - line.startX;
+                    const dy = line.endY - line.startY;
+                    const length = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const distStart = Math.hypot(mouseX - line.startX, mouseY - line.startY);
+                    const distEnd = Math.hypot(mouseX - line.endX, mouseY - line.endY);
+                    //const distToLine = Math.abs(dy * mouseX - dx * mouseY + line.endX * line.startY - line.endY * line.startX) / length;
+                    const distToLine = distancePointToSegment(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
+                    console.log("leftbuttondown check - obj, mX, mY, sob", objects, mouseX, mouseY, selectedObject_buf);
+                    console.log("leftbuttondown check c - distStart, distEnd, distToLine", distStart, distEnd, distToLine);
+                    if (distStart < 5 || distEnd < 5 || distToLine < 5) {
                         if (!selectedObjectMass.some(object => object.id === obj.id)) {
                             for (let i = objects.length - 1; i >= 0; i--) {
                                 objects[i].selectionMarker = false;
@@ -2886,6 +2933,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                             startY = mouseY - line.y_C;
                             logDebug(`Line body selected`);
                         }
+                        break;
                     }
                 }
                 else if (obj.type === 'star') {
@@ -4310,7 +4358,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                             break;
                         case 'rectangle':
                             const rect = obj;
-                            console.log("rect - ", rect);
+                            //console.log("rect - ", rect);
                             drawRect(rect, ctx);
                             updateConnectors(rect);
                             enteringText(obj);

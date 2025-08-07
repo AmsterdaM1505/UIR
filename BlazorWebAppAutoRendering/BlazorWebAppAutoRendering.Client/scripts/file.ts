@@ -43,6 +43,136 @@
     let undoStack: Shape[][] = [];
     let redoStack: Shape[][] = [];
     let flag: string; 
+
+    let gridVisible: boolean = true;
+
+    ////////////////// test
+
+    function resetEditorState(): void {
+        objects = [];
+        highlight = [];
+        ctx = null;
+        selectedObject = null;
+        selectedObject_canv = null;
+        selectedObject_buf = null;
+        selectedObject_buf_connect = null;
+        startX = 0;
+        startY = 0;
+        isPanning = false;
+        panStartX = 0;
+        panStartY = 0;
+        offsetX = 0;
+        offsetY = 0;
+        mouse_meaning_check = 0;
+        connectionServ = 2;
+        selectedObjectMass = [];
+        selectedLineStart = null;
+        selectedLineEnd = null;
+        selectedLineMid = null;
+        isResizingLeft = false;
+        isResizingRight = false;
+        isSchemaLoaded = false;
+        isSelecting = false;
+        selectionStartX = 0;
+        selectionStartY = 0;
+        selectionEndX = 0;
+        selectionEndY = 0;
+        activeConnector = null;
+        undoStack = [];
+        redoStack = [];
+        flag = '';
+        gridVisible = true;
+    }
+
+    function saveMetricsAsCSV(data: string, filename: string = 'performance_metrics.csv') {
+        const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    }
+
+
+    function graphGenerationForTest(): void {
+        const results: string[] = ['Size,ElapsedTimeSec,ObjectCount,MoveTimeMs'];
+
+        for (let i = 1; i <= 100; i += 1) {
+            console.log("i - ", i);
+            const start = performance.now();
+
+            for (let j = 0; j < i; j++) {
+                addCircle();
+                addLine();
+                addRect();
+                addTable();
+                addStar();
+                addCloud();
+            }
+
+            drawObjects();
+            const end = performance.now();
+            const elapsed = Math.round(end - start) / 1000;
+            const objectCount = objects.length + (objects.length / 6) * 8; // добавил остальные прямоугольники кол-во таблиц + колво таблиц на 8 ячеек
+
+            console.log(objects, selectedObjectMass);
+
+            let moveTime = 0;
+            if (objects.length > 0) {
+                const moveStart = performance.now();
+                const last = objects[objects.length - 1];
+                
+                if ('x_C' in last && 'y_C' in last) {
+                    last.x_C += 10;
+                    last.y_C += 10;
+                }
+
+                drawObjects();
+                const moveEnd = performance.now();
+                moveTime = +(moveEnd - moveStart).toFixed(2) / 1000;
+            }
+
+            if (elapsed > 10) {
+                break;
+            }
+
+            results.push(`${i},${elapsed},${objectCount},${moveTime}`);
+            objects = [];
+        }
+
+        saveMetricsAsCSV(results.join('\n'));
+        console.log("выгружено");
+    }
+
+
+
+
+
+    document.getElementById('mytest')?.addEventListener('click', function () {
+        saveStateForUndo();
+        console.log("button pressed");
+        graphGenerationForTest();
+    });
+
+
+
+
+
+
+
+
+
+
+
+    ////////////////// test
+
+
     function saveStateForUndo() {
         console.log(flag);
         function cleanShape(shape: Shape): any {
@@ -144,7 +274,8 @@
             container.innerHTML = "";
 
             const title = document.createElement("h6");
-            title.innerText = `Редактирование объекта: ${target.type}`;
+            const t: ShapeType = target.type as ShapeType;
+            title.innerText = `Редактирование объекта: ${shapeLabels[t]}`;
             title.style.userSelect = "none";
             container.appendChild(title);
 
@@ -732,25 +863,52 @@
         debugPanel.style.right = rightWidth + "px";
     }
 
+    let deltaWidth: number = 0;
+
+    const buttons = document.querySelectorAll('._button') as NodeListOf<HTMLElement>;
+    const check = document.getElementById("mudpanel").getBoundingClientRect();
+    let maxWidth = 0;
+    let maxHeight = 0;
+    logDebug("button resize")
+    buttons.forEach(button => {
+        const rect = button.getBoundingClientRect();
+        if (rect.width > maxWidth) {
+            maxWidth = rect.width;
+        }
+        if (rect.height > maxHeight) {
+            maxHeight = rect.height;
+        }
+    });
+    deltaWidth = check.width - maxWidth + 24;
+    buttons.forEach(button => {
+        button.style.width = `${maxWidth}px`;
+        button.style.height = `${maxHeight}px`;
+    });
+    console.log("mudpanel", check);
     function uniformizeButtons(selector: string): void {
         const buttons = document.querySelectorAll(selector) as NodeListOf<HTMLElement>;
-        let maxWidth = 0;
-        let maxHeight = 0;
-        logDebug("button resize")
-        buttons.forEach(button => {
-            const rect = button.getBoundingClientRect();
-            if (rect.width > maxWidth) {
-                maxWidth = rect.width;
-            }
-            if (rect.height > maxHeight) {
-                maxHeight = rect.height;
-            }
-        });
+        const check = document.getElementById("mudpanel").getBoundingClientRect();
+        //let maxWidth = 0;
+        //let maxHeight = 0;
+        //logDebug("button resize")
+        //buttons.forEach(button => {
+        //    const rect = button.getBoundingClientRect();
+        //    if (rect.width > maxWidth) {
+        //        maxWidth = rect.width;
+        //    }
+        //    if (rect.height > maxHeight) {
+        //        maxHeight = rect.height;
+        //    }
+        //});
+        
+        let maxWidth = check.width - deltaWidth;
 
         buttons.forEach(button => {
             button.style.width = `${maxWidth}px`;
             button.style.height = `${maxHeight}px`;
         });
+        //deltaWidth = check.width - maxWidth;
+        console.log("mudpanel, maxWidth, deltaWidth", check.width, maxWidth, deltaWidth);
     }
     
     window.addEventListener("resize", function () {
@@ -763,6 +921,7 @@
         drawObjects();
         //updateLeftAndRightPanelHeight(canvas)
     });
+    uniformizeButtons('._button');
     updateDebugPanelOffsets();
     resizeCanvas(canvas)
     updateOffsets(canvas);
@@ -841,6 +1000,11 @@
             document.addEventListener("mouseup", stopResizing);
         });
 
+        document.getElementById("checkbox")?.addEventListener('change', function () {
+            gridVisible = !gridVisible;
+            drawObjects();
+        })
+
         function resizeLeftPanel(e: MouseEvent) {
             if (!isResizingLeft) return;
             const newWidth = e.clientX;
@@ -848,6 +1012,7 @@
                 leftPanel.style.width = `${newWidth}px`;
                 debugPanel.style.left = `${newWidth}px`; // Корректируем отладочную панель
                 resizeHandleLeft.style.left = `${newWidth}px`;
+                uniformizeButtons('._button');
             }
         }
 
@@ -1259,7 +1424,7 @@
                     }
 
                     formatString += `    <background color="${shape.color}"/>\n`;
-                    formatString += `    <style alpha="${shape.colorAlpha ?? 1}"/>\n`;
+                    formatString += `    <style alpha="${shape.colorAlpha ?? 1}" border="${shape.border ? 'true' : 'false'}"/>\n`;
                     formatString += `    <arealRect x1="${shape.borderPoints_X1}" y1="${shape.borderPoints_Y1}" x2="${shape.borderPoints_X2}" y2="${shape.borderPoints_Y2}"/>\n`;
 
                     // Добавляем lineConnectionStart
@@ -1504,6 +1669,7 @@
                     borderPoints_X2: parseFloat(nodeEl.getElementsByTagName("arealRect")[0]?.getAttribute("x2") || "0"),
                     borderPoints_Y2: parseFloat(nodeEl.getElementsByTagName("arealRect")[0]?.getAttribute("y2") || "0"),
                     colorAlpha: parseFloat(nodeEl.getElementsByTagName("style")[0]?.getAttribute("alpha") || "1"),
+                    border: nodeEl.getElementsByTagName("style")[0]?.getAttribute("border") === "true"
                 };
                 switch (type) {
                     case "rectangle":
@@ -2630,7 +2796,7 @@
             color: string = getRandomColor(),
             rotation: number = 0
         ): ComplexShape {
-            console.log("begin", rows, cols);
+            //console.log("begin", rows, cols);
             const newTable: ComplexShape = {
                 dialect,
                 id: generateRandomId(16),
@@ -2679,7 +2845,7 @@
                 }
             }
             objects.push(newTable);
-            console.log(objects, "\n");
+            //console.log(objects, "\n");
             drawObjects();
             return newTable;
         }
@@ -3213,6 +3379,55 @@
             return foundObject_;
         }
 
+        function mouseLineCheck(mouse_x: number, mouse_y: number, line: Line): boolean {
+            const x = mouse_x;
+            const y = mouse_y;
+
+            const minX = Math.min(line.startX, line.endX) - 2;
+            const maxX = Math.max(line.startX, line.endX) + 2;
+            const minY = Math.min(line.startY, line.endY) - 2;
+            const maxY = Math.max(line.startY, line.endY) + 2;
+
+            return x >= minX && x <= maxX && y >= minY && y <= maxY;
+        }
+
+        function distancePointToSegment(
+            px: number, py: number,
+            x1: number, y1: number,
+            x2: number, y2: number
+        ): number {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+
+            if (dx === 0 && dy === 0) {
+                // Отрезок вырожден в точку
+                return Math.hypot(px - x1, py - y1);
+            }
+
+            // Вычисляем t (положение проекции точки на прямую относительно отрезка)
+            const t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
+
+            let closestX: number, closestY: number;
+
+            if (t < 0) {
+                // Ближайшая точка — x1, y1
+                closestX = x1;
+                closestY = y1;
+            } else if (t > 1) {
+                // Ближайшая точка — x2, y2
+                closestX = x2;
+                closestY = y2;
+            } else {
+                // Проекция попадает на отрезок
+                closestX = x1 + t * dx;
+                closestY = y1 + t * dy;
+            }
+
+            // Расстояние от точки до ближайшей точки на отрезке
+            return Math.hypot(px - closestX, py - closestY);
+        }
+
+
         function leftButtonDown(e: MouseEvent, mouseX: number, mouseY: number) {
             logDebug("mouse_down");
             let foundObject = false;
@@ -3281,13 +3496,26 @@
                     }
                 } else if (obj.type === 'line') {
                     const line = obj as Line;
-                    const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
-                    const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
+                    //if (!mouseLineCheck(mouseX, mouseY, line)) continue;
+                    //const distStart = Math.sqrt((mouseX - line.startX) ** 2 + (mouseY - line.startY) ** 2);
+                    //const distEnd = Math.sqrt((mouseX - line.endX) ** 2 + (mouseY - line.endY) ** 2);
 
-                    const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
-                        Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
+                    //const distToLine = Math.abs((line.endY - line.startY) * mouseX - (line.endX - line.startX) * mouseY + line.endX * line.startY - line.endY * line.startX) /
+                    //    Math.sqrt((line.endY - line.startY) ** 2 + (line.endX - line.startX) ** 2);
 
-                    if (distStart < 5 || distEnd < 5 || distToLine < 10) {
+                    const dx = line.endX - line.startX;
+                    const dy = line.endY - line.startY;
+                    const length = Math.sqrt(dx * dx + dy * dy) || 1;
+
+                    const distStart = Math.hypot(mouseX - line.startX, mouseY - line.startY);
+                    const distEnd = Math.hypot(mouseX - line.endX, mouseY - line.endY);
+                    //const distToLine = Math.abs(dy * mouseX - dx * mouseY + line.endX * line.startY - line.endY * line.startX) / length;
+
+                    const distToLine = distancePointToSegment(mouseX, mouseY, line.startX, line.startY, line.endX, line.endY);
+
+                    console.log("leftbuttondown check - obj, mX, mY, sob", objects, mouseX, mouseY, selectedObject_buf);
+                    console.log("leftbuttondown check c - distStart, distEnd, distToLine", distStart, distEnd, distToLine);
+                    if (distStart < 5 || distEnd < 5 || distToLine < 5) {
                         if (!selectedObjectMass.some(object => object.id === obj.id)) {
                             for (let i = objects.length - 1; i >= 0; i--) {
                                 objects[i].selectionMarker = false;
@@ -3317,6 +3545,7 @@
                             startY = mouseY - line.y_C;
                             logDebug(`Line body selected`);
                         }
+                        break;
                     }
                 } else if (obj.type === 'star') {
                     const star = obj as Star;
@@ -4124,7 +4353,7 @@
             activeConnector = null;
             selectedObject = null;
             selectedLineEnd = null;
-            //console.log(selectedObjectMass)
+            console.log(selectedObjectMass)
         }
         function downloadFile(filename: string, content: string) {
             const blob = new Blob([content], { type: 'text/plain' }); //Создание нового объекта Blob (Binary Large Object)
@@ -4474,13 +4703,15 @@
                     if (
                         key === "imageSrc" ||
                         (object as any)[key] === "" ||
+                        (object as any)[key].length === 0 ||
                         key === "connectors" ||
                         key === "borderPoints_X1" ||
                         key === "borderPoints_Y1" ||
                         key === "borderPoints_X2" ||
                         key === "borderPoints_Y2" ||
                         key === "lineConnectionStart" ||
-                        key === "lineConnectionEnd"
+                        key === "lineConnectionEnd" ||
+                        key === "parts"
                     ) {
                         continue;
                     }
@@ -4492,7 +4723,9 @@
                     cellKey.style.border = '1px solid black';
                     cellKey.style.padding = '5px';
                     cellKey.style.width = '40%';
-                    cellKey.innerText = key;
+
+                    const label = (propertyLabels as Record<string, string>)[key] || key;
+                    cellKey.innerText = label;
 
                     // Ячейка со значением свойства
                     const cellValue = row.insertCell();
@@ -4511,7 +4744,8 @@
                         key === "arrowDirection" ||
                         key === "punctuation" ||
                         key === "startArrowType" ||
-                        key === "endArrowType"
+                        key === "endArrowType" ||
+                        key === "border"
                     ) {
                         cellValue.style.cursor = "pointer";
 
@@ -4553,6 +4787,10 @@
                                 input = document.createElement('select');
                                 const options = ["-|->", "-0->", "-*->", ">", "none"];
                                 optionsEntering(object, options, input);
+                            } else if (key === "border") {
+                                input = document.createElement('select');
+                                const options = ["false", "true"];
+                                optionsEntering(object, options, input);
                             } else {
                                 input = document.createElement('input');
                                 input.type = 'text';
@@ -4584,6 +4822,9 @@
                                     valueElement.innerText = parsed.toString();
                                 } else if (typeof (object as any)[key] === 'string') {
                                     (object as any)[key] = newValue;
+                                    valueElement.innerText = newValue;
+                                } else if (typeof (object as any)[key] === 'boolean') {
+                                    (object as any)[key] = newValue === "true";
                                     valueElement.innerText = newValue;
                                 }
 
@@ -4792,21 +5033,118 @@
 
             return path;
         }
-        function enteringText(obj: Shape) {
-            if (obj.info) {
-                ctx.fillStyle = 'black';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
-                let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
-                if (obj.type === "rectangle") {
-                    textX = obj.x_C + (obj as Rectangle).width / 2;
-                    textY = obj.y_C + (obj as Rectangle).height / 2;
+        //function enteringText(obj: Shape) {
+        //    if (obj.info) {
+        //        ctx.fillStyle = 'black';
+        //        ctx.font = '16px Arial';
+        //        ctx.textAlign = 'center';
+        //        ctx.textBaseline = 'middle';
+        //        let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
+        //        let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
+        //        if (obj.type === "rectangle") {
+        //            textX = obj.x_C + (obj as Rectangle).width / 2;
+        //            textY = obj.y_C + (obj as Rectangle).height / 2;
+        //        }
+        //        ctx.fillText(obj.info, textX, textY/*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
+        //    }
+        //}
+
+        //function wrapTextForRectangle(
+        //    ctx: CanvasRenderingContext2D,
+        //    text: string,
+        //    x: number,
+        //    y: number,
+        //    maxWidth: number,
+        //    lineHeight: number
+        //) {
+        //    const words = text.split(' ');
+        //    let line = '';
+            
+        //    const lines: string[] = [];
+
+        //    for (let n = 0; n < words.length; n++) {
+        //        const testLine = line + words[n] + ' ';
+        //        const testWidth = ctx.measureText(testLine).width;
+        //        if (testWidth > maxWidth && n > 0) {
+        //            lines.push(line.trim());
+        //            line = words[n] + ' ';
+        //        } else {
+        //            line = testLine;
+        //        }
+        //    }
+        //    lines.push(line.trim());
+        //    console.log(lines, lines.length);
+        //    if (lines.length == 1) {
+        //        //console.log("line.length === 1");
+        //        ctx.fillText(lines[0], x, y);
+        //    } else {
+        //        for (let i = 0; i < lines.length; i++) {
+        //            ctx.fillText(lines[i], x, y - lineHeight + i * lineHeight);
+        //        }
+        //    }
+            
+        //}
+        function wrapTextForRectangle(
+            ctx: CanvasRenderingContext2D,
+            text: string,
+            x: number,
+            y: number,
+            maxWidth: number,
+            lineHeight: number
+        ) {
+            const words = text.split(' ');
+            let line = '';
+            const lines: string[] = [];
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth > maxWidth && n > 0) {
+                    lines.push(line.trim());
+                    line = words[n] + ' ';
+                } else {
+                    line = testLine;
                 }
-                ctx.fillText(obj.info, textX, textY/*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
+            }
+            lines.push(line.trim());
+
+            // Центрируем блок: поправка — (lines.length - 1) вместо lines.length
+            const totalHeight = (lines.length - 1) * lineHeight;
+            const startY = y - totalHeight / 2;
+
+            for (let i = 0; i < lines.length; i++) {
+                ctx.fillText(lines[i], x, startY + i * lineHeight);
             }
         }
+
+
+        function enteringText(obj: Shape) {
+            if (!obj.info) return;
+
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            let textX = obj.x_C;
+            let textY = obj.y_C;
+            let maxWidth = 150;
+            let lineHeight = 18;
+
+            if (obj.type === "rectangle") {
+                const rect = obj as Rectangle;
+                maxWidth = rect.width - 8; // небольшой отступ с боков
+                textX = rect.x_C + rect.width / 2;
+                textY = rect.y_C + rect.height / 2; // начальная Y-координата
+
+                wrapTextForRectangle(ctx, obj.info, textX, textY, maxWidth, lineHeight);
+            } else {
+                // для других фигур — одна строка, как раньше
+                ctx.fillText(obj.info, textX, textY);
+            }
+        }
+
+
         function drawingConnection(obj_s: Shape[], ctx: CanvasRenderingContext2D) {
             // Сначала отрисовываем связи между объектами
             for (const obj of obj_s) {
@@ -4889,11 +5227,12 @@
             ctx.stroke();
         }
 
-
         function drawObjects() {
             if (ctx) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawGrid(ctx, canvas.width, canvas.height, 20);
+                if (gridVisible) {
+                    drawGrid(ctx, canvas.width, canvas.height, 20);
+                }
                 ctx.save();
                 ctx.translate(offsetX, offsetY);
                 drawingConnection(objects, ctx);
@@ -4917,6 +5256,7 @@
                             break;
                         case 'rectangle':
                             const rect = obj as Rectangle;
+                            //console.log("rect - ", rect);
                             drawRect(rect, ctx);
                             updateConnectors(rect);
                             enteringText(obj);
@@ -4958,7 +5298,6 @@
                 logDebug("Canvas context is not available");
             }
         }
-
 
     } else {
         console.error("Canvas context is not supported");

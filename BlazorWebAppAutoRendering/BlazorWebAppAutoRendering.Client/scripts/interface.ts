@@ -25,6 +25,7 @@
     selectionMarker?: boolean;
 
     colorAlpha?: number;
+    border?: boolean;
 
     isHighlighted?: boolean;
 }
@@ -32,7 +33,6 @@
 interface Rectangle extends Shape {
     width: number;
     height: number;
-    border?: boolean;
 }
 
 interface Circle extends Shape {
@@ -73,6 +73,67 @@ interface Item {
     name: string;
 }
 
+type ShapeType = 'rectangle' | 'circle' | 'line' | 'star' | 'cloud' | 'table';
+const shapeLabels: Record<ShapeType, string> = {
+    rectangle: 'прямоугольник',
+    circle: 'круг',
+    line: 'линия',
+    star: 'звезда',
+    cloud: 'облако',
+    table: 'таблица'    
+};
+
+type ShapeProperty = keyof Shape | keyof Rectangle | keyof Circle | keyof Line | keyof Star | keyof ComplexShape;
+
+const propertyLabels: Record<ShapeProperty, string> = {
+    dialect: 'Диалект',
+    id: 'Идентификатор',
+    type: 'Тип',
+    rotation: 'Поворот',
+    info: 'Информация',
+    linkedObjects: 'Связанные объекты',
+    outgoingLinks: 'Исходящие ссылки',
+    incomingLinks: 'Входящие ссылки',
+    lineConnectionStart: 'Начало соединения линий',
+    lineConnectionEnd: 'Конец соединения линий',
+    color: 'Цвет',
+    image: 'Изображение',
+    imageSrc: 'Код изображения',
+    x_C: 'Центр X',
+    y_C: 'Центр Y',
+    borderPoints_X1: 'Граница X1',
+    borderPoints_Y1: 'Граница Y1',
+    borderPoints_X2: 'Граница X2',
+    borderPoints_Y2: 'Граница Y2',
+    connectors: 'Коннекторы',
+    selectionMarker: 'Индикатор выделения',
+    colorAlpha: 'Прозрачность',
+    border: 'Граница',
+    isHighlighted: 'Подсветка',
+
+    width: 'Ширина',
+    height: 'Высота',
+
+    radius: 'Радиус',
+
+    startX: 'Начало X',
+    startY: 'Начало Y',
+    endX: 'Конец X',
+    endY: 'Конец Y',
+    arrowDirection: 'Направление стрелки',
+    punctuation: 'Пунктуация',
+    lineWidth: 'Ширина линии',
+    startArrowType: 'Тип стрелки в начале',
+    endArrowType: 'Тип стрелки в конце',
+
+    rad: 'Радиус звезды',
+    amount_points: 'Количество точек',
+    m: 'Параметр m',
+
+    parts: 'Части',
+    cols: 'Столбцы',
+    rows: 'Строки',
+};
 
 function logDebug(message: string) {
     const debugOutput = document.getElementById('debugOutput') as HTMLTextAreaElement;

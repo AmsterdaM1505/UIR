@@ -23,7 +23,7 @@
     
     <div id="button-panel" class="left-div-style">
 
-        <MudExpansionPanels>
+        <MudExpansionPanels id="mudpanel">
             <MudExpansionPanel Text="Базовые фигуры">
                 @foreach(var tool in BaseTools) {
                     <Tool
@@ -73,7 +73,7 @@
                 }
             </MudExpansionPanel>
 
-            <MudExpansionPanel Text="Анализ схемы">
+            @* <MudExpansionPanel Text="Анализ схемы">
                 @foreach (var tool in AnalysisTools)
                 {
                     <Tool Id="@tool.Id"
@@ -83,11 +83,11 @@
                           Style="@tool.Style" />
                     <br />
                 }
-            </MudExpansionPanel>
+            </MudExpansionPanel> *@
 
             <MudExpansionPanel Text="Управление файлами">
-                <MudTooltip> 
-                    @* проверено *@
+                @* <MudTooltip> 
+                     проверено 
                     <ChildContent>
                         <MudButton id="owlExport" Class="_button" data-action="owlExport" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
                             <MudText Typo="Typo.body2">OWL скачивание</MudText>
@@ -101,7 +101,7 @@
                 </MudTooltip>
                 <br />
                 <MudTooltip> 
-                    @* проверено *@
+                     проверено
                     <ChildContent>
                         <label for="owlImport" class="custom-file-upload">
                             Загрузить диаграмму в виде OWL
@@ -114,12 +114,12 @@
                         <MudIcon Icon="@Icons.Material.Filled.Upload" />
                     </TooltipContent>
                 </MudTooltip>
-                <br />
+                <br /> *@
                 <MudTooltip>
                     @* проверено *@
                     <ChildContent> 
-                        <MudButton id="customJsonExport" Class="_button" data-action="customJsonExport" Variant="Variant.Filled" Style="width: 80%; height: 60px;" Color="Color.Primary">
-                            <MudText Typo="Typo.body2">Скачать диаграмму</MudText>
+                        <MudButton id="customJsonExport" Class="_button" data-action="customJsonExport" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Скачать диаграмму в JSON</MudText>
                         </MudButton>
                     </ChildContent>
                     <TooltipContent>
@@ -133,7 +133,7 @@
                     @* проверено *@
                     <ChildContent>
                         <label for="customJsonImport" class="custom-file-upload">
-                            Загрузить диаграмму в обычном виде
+                            Загрузить диаграмму в JSON
                         </label>
                         <input type="file" id="customJsonImport" style="display: none;" />
                     </ChildContent>
@@ -146,14 +146,14 @@
                 <br />
                 <MudTooltip>
                     <ChildContent>
-                        <MudButton id="formatExport" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Color="Color.Primary" Style="width: 80%; height: 60px;">
-                            <MudText Typo="Typo.body2">Выгрузить файл в формате</MudText>
+                        <MudButton id="formatExport" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+                            <MudText Typo="Typo.body2">Скачать файл в формате</MudText>
                         </MudButton>
                     </ChildContent>
                     <TooltipContent>
-                        <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
-                        <MudText Typo="Typo.body2">Выберите файл CSS для загрузки</MudText>
-                        <MudIcon Icon="@Icons.Material.Filled.Upload" />
+                        <MudText Typo="Typo.body2">Скачать файл в формате</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы скачать диаграмму в формате</MudText>
+                        <MudIcon Icon="@Icons.Material.Filled.Download" />
                     </TooltipContent>
                 </MudTooltip>
                 <br />
@@ -165,13 +165,13 @@
                         <input type="file" id="formatImport" style="display: none;" />
                     </ChildContent>
                     <TooltipContent>
-                        <MudText Typo="Typo.body2">Загрузить файл CSS</MudText>
-                        <MudText Typo="Typo.body2">Выберите файл CSS для загрузки</MudText>
+                        <MudText Typo="Typo.body2">Загрузить файл в формате</MudText>
+                        <MudText Typo="Typo.body2">Выберитефайл в формате для загрузки</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.Upload" />
                     </TooltipContent>
                 </MudTooltip>
                 <br />
-                <MudTooltip>
+                @* <MudTooltip>
                     <ChildContent>
                         <MudButton id="uploadCssBtn2" Class="_button" data-action="uploadCssBtn2" Variant="Variant.Filled" Color="Color.Primary" Style="width: 80%; height: 60px;">
                             <MudText Typo="Typo.body2">Загрузить CSS (лх)</MudText>
@@ -224,9 +224,13 @@
                         <MudIcon Icon="@Icons.Material.Filled.Upload" />
                     </TooltipContent>
                 </MudTooltip>
-                <br />
+                <br /> *@
             </MudExpansionPanel>
         </MudExpansionPanels>
+        <MudCheckBox id="checkbox" Label="Показать сетку" Checked="@showGrid" CheckedChanged="OnShowGridChanged" T="bool" @bind-Value="showGrid" />
+        <MudButton id="mytest" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+            Тест
+        </MudButton>
     </div>
     <div id="resize-handle-left"></div>
     <!-- Контекстное меню (оставляем без изменений) -->
@@ -291,6 +295,7 @@
 </ul>
 
 @code {
+    private bool showGrid { get; set; } = true;
     record ToolDef(string Id, string Icon, string Text, string Tooltip, string Action, string Style = "width:80%;height:60px;", string? OnClick = null);  // напр., "ShowDialog" когда нужен вызов метода);
 
     List<ToolDef> BaseTools = new() {
@@ -391,4 +396,3 @@
 <script src="js/CookiesServ.js"></script>
 <script src="js/interface.js"></script>
 <script src="js/file.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xml2js/dist/xml2js.min.js"></script>

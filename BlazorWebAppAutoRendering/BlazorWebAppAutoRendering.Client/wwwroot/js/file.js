@@ -19,7 +19,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 (function () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15;
     let objects = [];
     let highlight = [];
     let ctx = null;
@@ -58,6 +58,99 @@ var __rest = (this && this.__rest) || function (s, e) {
     let redoStack = [];
     let flag;
     let gridVisible = true;
+    ////////////////// test
+    function resetEditorState() {
+        objects = [];
+        highlight = [];
+        ctx = null;
+        selectedObject = null;
+        selectedObject_canv = null;
+        selectedObject_buf = null;
+        selectedObject_buf_connect = null;
+        startX = 0;
+        startY = 0;
+        isPanning = false;
+        panStartX = 0;
+        panStartY = 0;
+        offsetX = 0;
+        offsetY = 0;
+        mouse_meaning_check = 0;
+        connectionServ = 2;
+        selectedObjectMass = [];
+        selectedLineStart = null;
+        selectedLineEnd = null;
+        selectedLineMid = null;
+        isResizingLeft = false;
+        isResizingRight = false;
+        isSchemaLoaded = false;
+        isSelecting = false;
+        selectionStartX = 0;
+        selectionStartY = 0;
+        selectionEndX = 0;
+        selectionEndY = 0;
+        activeConnector = null;
+        undoStack = [];
+        redoStack = [];
+        flag = '';
+        gridVisible = true;
+    }
+    function saveMetricsAsCSV(data, filename = 'performance_metrics.csv') {
+        const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    function graphGenerationForTest() {
+        const results = ['Size,ElapsedTimeSec,ObjectCount,MoveTimeMs'];
+        for (let i = 1; i <= 100; i += 1) {
+            console.log("i - ", i);
+            const start = performance.now();
+            for (let j = 0; j < i; j++) {
+                addCircle();
+                addLine();
+                addRect();
+                addTable();
+                addStar();
+                addCloud();
+            }
+            drawObjects();
+            const end = performance.now();
+            const elapsed = Math.round(end - start) / 1000;
+            const objectCount = objects.length + (objects.length / 6) * 8; // добавил остальные прямоугольники кол-во таблиц + колво таблиц на 8 ячеек
+            console.log(objects, selectedObjectMass);
+            let moveTime = 0;
+            if (objects.length > 0) {
+                const moveStart = performance.now();
+                const last = objects[objects.length - 1];
+                if ('x_C' in last && 'y_C' in last) {
+                    last.x_C += 10;
+                    last.y_C += 10;
+                }
+                drawObjects();
+                const moveEnd = performance.now();
+                moveTime = +(moveEnd - moveStart).toFixed(2) / 1000;
+            }
+            if (elapsed > 10) {
+                break;
+            }
+            results.push(`${i},${elapsed},${objectCount},${moveTime}`);
+            objects = [];
+        }
+        saveMetricsAsCSV(results.join('\n'));
+        console.log("выгружено");
+    }
+    (_a = document.getElementById('mytest')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
+        saveStateForUndo();
+        console.log("button pressed");
+        graphGenerationForTest();
+    });
+    ////////////////// test
     function saveStateForUndo() {
         console.log(flag);
         function cleanShape(shape) {
@@ -139,7 +232,8 @@ var __rest = (this && this.__rest) || function (s, e) {
             const container = popupText;
             container.innerHTML = "";
             const title = document.createElement("h6");
-            title.innerText = `Редактирование объекта: ${target.type}`;
+            const t = target.type;
+            title.innerText = `Редактирование объекта: ${shapeLabels[t]}`;
             title.style.userSelect = "none";
             container.appendChild(title);
             // Создаём форму параметров по типу
@@ -381,7 +475,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             return objects;
         }
     }
-    (_a = document.getElementById('customJsonImport')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', function (event) {
+    (_b = document.getElementById('customJsonImport')) === null || _b === void 0 ? void 0 : _b.addEventListener('change', function (event) {
         var _a;
         try {
             const input = event.target;
@@ -695,7 +789,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         drawGrid(ctx, canvas.width, canvas.height, 20);
         flag = "body";
         saveStateForUndo();
-        (_b = document.getElementById('recovery-scheme')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', function () {
+        (_c = document.getElementById('recovery-scheme')) === null || _c === void 0 ? void 0 : _c.addEventListener('click', function () {
             logDebug("recovery-scheme button clicked");
             loadFromLocalStorage();
         });
@@ -720,7 +814,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             document.addEventListener("mousemove", resizeRightPanel);
             document.addEventListener("mouseup", stopResizing);
         });
-        (_c = document.getElementById("checkbox")) === null || _c === void 0 ? void 0 : _c.addEventListener('change', function () {
+        (_d = document.getElementById("checkbox")) === null || _d === void 0 ? void 0 : _d.addEventListener('change', function () {
             gridVisible = !gridVisible;
             drawObjects();
         });
@@ -753,19 +847,19 @@ var __rest = (this && this.__rest) || function (s, e) {
             document.removeEventListener("mouseup", stopResizing);
         }
         ////////////
-        (_d = document.getElementById('short')) === null || _d === void 0 ? void 0 : _d.addEventListener('click', function () {
+        (_e = document.getElementById('short')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', function () {
             logDebug("Поиск кратчайшего пути (неориентированный граф)");
             highlightShortestPath("A", "D", false);
         });
-        (_e = document.getElementById('cycle')) === null || _e === void 0 ? void 0 : _e.addEventListener('click', function () {
+        (_f = document.getElementById('cycle')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
             logDebug("Проверка циклов (неориентированный граф)");
             highlightCycles(false);
         });
-        (_f = document.getElementById('shortor')) === null || _f === void 0 ? void 0 : _f.addEventListener('click', function () {
+        (_g = document.getElementById('shortor')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', function () {
             logDebug("Поиск кратчайшего пути (ориентированный граф)");
             highlightShortestPath("A", "D", true);
         });
-        (_g = document.getElementById('cycleor')) === null || _g === void 0 ? void 0 : _g.addEventListener('click', function () {
+        (_h = document.getElementById('cycleor')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function () {
             logDebug("Проверка циклов (ориентированный граф)");
             highlightCycles(true);
         });
@@ -917,7 +1011,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         //        }
         //    }
         //});
-        (_h = document.getElementById('longWayCheck')) === null || _h === void 0 ? void 0 : _h.addEventListener('click', function (event) {
+        (_j = document.getElementById('longWayCheck')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function (event) {
             const button = document.getElementById('longWayCheck'); // Получаем кнопку
             const computedStyle = window.getComputedStyle(button); // Получаем стили
             const fontSize = computedStyle.fontSize; // Размер шрифта
@@ -1399,11 +1493,11 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
         let currentDialect = 'none';
         let dialectButtonClickedFlag = 'none';
-        (_j = document.getElementById('formatExport')) === null || _j === void 0 ? void 0 : _j.addEventListener('click', function () {
+        (_k = document.getElementById('formatExport')) === null || _k === void 0 ? void 0 : _k.addEventListener('click', function () {
             logDebug("Add table button clicked");
             exportGraphToFile(objects, "shapes");
         });
-        (_k = document.getElementById('formatImport')) === null || _k === void 0 ? void 0 : _k.addEventListener('change', function () {
+        (_l = document.getElementById('formatImport')) === null || _l === void 0 ? void 0 : _l.addEventListener('change', function () {
             var _a;
             try {
                 const fileInput = this;
@@ -1445,73 +1539,73 @@ var __rest = (this && this.__rest) || function (s, e) {
             return currentDialect_;
         }
         // DB dialect
-        (_l = document.getElementById('addLineBtnDB')) === null || _l === void 0 ? void 0 : _l.addEventListener('click', function () {
+        (_m = document.getElementById('addLineBtnDB')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add line button clicked");
             console.log("1 - ", currentDialect);
             dialectButtonClickedFlag = "DB";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, dialectButtonClickedFlag => addLine(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
-        (_m = document.getElementById('addTableDB')) === null || _m === void 0 ? void 0 : _m.addEventListener('click', function () {
+        (_o = document.getElementById('addTableDB')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "DB";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
         // Base dialect
-        (_o = document.getElementById('addTable')) === null || _o === void 0 ? void 0 : _o.addEventListener('click', function () {
+        (_p = document.getElementById('addTable')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add table button clicked");
             dialectButtonClickedFlag = "base";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addTable(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
-        (_p = document.getElementById('addRectBtn')) === null || _p === void 0 ? void 0 : _p.addEventListener('click', function () {
+        (_q = document.getElementById('addRectBtn')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add rectangle button clicked");
             dialectButtonClickedFlag = "base";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addRect(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
-        (_q = document.getElementById('addCircleBtn')) === null || _q === void 0 ? void 0 : _q.addEventListener('click', function () {
+        (_r = document.getElementById('addCircleBtn')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add circle button clicked");
             dialectButtonClickedFlag = "base";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCircle(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
-        (_r = document.getElementById('addLineBtn')) === null || _r === void 0 ? void 0 : _r.addEventListener('click', function () {
+        (_s = document.getElementById('addLineBtn')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add line button clicked");
             dialectButtonClickedFlag = "base";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addLine(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
-        (_s = document.getElementById('addCloudBtn')) === null || _s === void 0 ? void 0 : _s.addEventListener('click', function () {
+        (_t = document.getElementById('addCloudBtn')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add cloud button clicked");
             dialectButtonClickedFlag = "base";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addCloud(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
-        (_t = document.getElementById('addStarBtn')) === null || _t === void 0 ? void 0 : _t.addEventListener('click', function () {
+        (_u = document.getElementById('addStarBtn')) === null || _u === void 0 ? void 0 : _u.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Add star button clicked");
             dialectButtonClickedFlag = "base";
             currentDialect = dialectControl(dialectButtonClickedFlag, currentDialect, (dialectButtonClickedFlag) => addStar(dialectButtonClickedFlag), (added) => openPopup(added, "editing"));
         });
         //
-        (_u = document.getElementById('delShapeBtn')) === null || _u === void 0 ? void 0 : _u.addEventListener('click', function () {
+        (_v = document.getElementById('delShapeBtn')) === null || _v === void 0 ? void 0 : _v.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Delete shape button clicked");
             deleteShape();
         });
-        (_v = document.getElementById('rotateLeftBtn')) === null || _v === void 0 ? void 0 : _v.addEventListener('click', function () {
+        (_w = document.getElementById('rotateLeftBtn')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Rotate left button clicked");
             rotateSelectedObject(-10);
         });
-        (_w = document.getElementById('rotateRightBtn')) === null || _w === void 0 ? void 0 : _w.addEventListener('click', function () {
+        (_x = document.getElementById('rotateRightBtn')) === null || _x === void 0 ? void 0 : _x.addEventListener('click', function () {
             saveStateForUndo();
             logDebug("Rotate right button clicked");
             rotateSelectedObject(10);
         });
-        (_x = document.getElementById('deleteItem')) === null || _x === void 0 ? void 0 : _x.addEventListener('click', function () {
+        (_y = document.getElementById('deleteItem')) === null || _y === void 0 ? void 0 : _y.addEventListener('click', function () {
             saveStateForUndo();
             if (selectedObject_buf) {
                 deleteShape();
@@ -1537,7 +1631,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                 deleteShape();
             }
         });
-        (_y = document.getElementById('rotateLeftItem')) === null || _y === void 0 ? void 0 : _y.addEventListener('click', function () {
+        (_z = document.getElementById('rotateLeftItem')) === null || _z === void 0 ? void 0 : _z.addEventListener('click', function () {
             saveStateForUndo();
             if (selectedObject_buf) {
                 rotateSelectedObject(-10);
@@ -1545,7 +1639,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             selectedObject_buf = null;
             drawObjects();
         });
-        (_z = document.getElementById('rotateRightItem')) === null || _z === void 0 ? void 0 : _z.addEventListener('click', function () {
+        (_0 = document.getElementById('rotateRightItem')) === null || _0 === void 0 ? void 0 : _0.addEventListener('click', function () {
             saveStateForUndo();
             if (selectedObject_buf) {
                 rotateSelectedObject(10);
@@ -1553,7 +1647,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             selectedObject_buf = null;
             drawObjects();
         });
-        (_0 = document.getElementById('cycleCheck')) === null || _0 === void 0 ? void 0 : _0.addEventListener('click', function () {
+        (_1 = document.getElementById('cycleCheck')) === null || _1 === void 0 ? void 0 : _1.addEventListener('click', function () {
             const cycles = detectCycles(objects); // Находим все циклы
             highlight = []; // Сбрасываем выделение перед каждым новым поиском циклов
             if (cycles.length > 0) {
@@ -1569,47 +1663,47 @@ var __rest = (this && this.__rest) || function (s, e) {
                 console.log("Циклы не найдены");
             }
         });
-        (_1 = document.getElementById('connect_objects')) === null || _1 === void 0 ? void 0 : _1.addEventListener('click', function () {
+        (_2 = document.getElementById('connect_objects')) === null || _2 === void 0 ? void 0 : _2.addEventListener('click', function () {
             saveStateForUndo();
             logDebug(`connectionObjects button clicked`);
             connectionServ = 1;
             connectionObjects();
         });
-        (_2 = document.getElementById('remove_connection')) === null || _2 === void 0 ? void 0 : _2.addEventListener('click', function () {
+        (_3 = document.getElementById('remove_connection')) === null || _3 === void 0 ? void 0 : _3.addEventListener('click', function () {
             saveStateForUndo();
             logDebug(`remove_connection button clicked`);
             connectionServ = 0;
             removeObjects();
         });
-        (_3 = document.getElementById('outgoing_connect')) === null || _3 === void 0 ? void 0 : _3.addEventListener('click', function () {
+        (_4 = document.getElementById('outgoing_connect')) === null || _4 === void 0 ? void 0 : _4.addEventListener('click', function () {
             saveStateForUndo();
             logDebug(`outgoingConnectionObjects button clicked`);
             connectionServ = 3;
             connectionObjects();
         });
-        (_4 = document.getElementById('remove_outgoing_connection')) === null || _4 === void 0 ? void 0 : _4.addEventListener('click', function () {
+        (_5 = document.getElementById('remove_outgoing_connection')) === null || _5 === void 0 ? void 0 : _5.addEventListener('click', function () {
             saveStateForUndo();
             logDebug(`remove_connection button clicked`);
             connectionServ = 4;
             removeObjects();
         });
-        (_5 = document.getElementById('additionInfo')) === null || _5 === void 0 ? void 0 : _5.addEventListener('click', function () {
+        (_6 = document.getElementById('additionInfo')) === null || _6 === void 0 ? void 0 : _6.addEventListener('click', function () {
             saveStateForUndo();
             addInfo(selectedObject_buf);
         });
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
         });
-        (_6 = document.getElementById('insert_img')) === null || _6 === void 0 ? void 0 : _6.addEventListener('click', function () {
+        (_7 = document.getElementById('insert_img')) === null || _7 === void 0 ? void 0 : _7.addEventListener('click', function () {
             var _a;
             logDebug("Insert img button clicked");
             (_a = document.getElementById('imageInput')) === null || _a === void 0 ? void 0 : _a.click(); // Открываем диалог выбора файлов
         });
-        (_7 = document.getElementById('debugInfo')) === null || _7 === void 0 ? void 0 : _7.addEventListener('click', function () {
+        (_8 = document.getElementById('debugInfo')) === null || _8 === void 0 ? void 0 : _8.addEventListener('click', function () {
             logDebug("debugInfo clicked");
             debugHide();
         });
-        (_8 = document.getElementById('imageInput')) === null || _8 === void 0 ? void 0 : _8.addEventListener('change', function (event) {
+        (_9 = document.getElementById('imageInput')) === null || _9 === void 0 ? void 0 : _9.addEventListener('change', function (event) {
             var _a, _b;
             const file = (_b = (_a = event.target) === null || _a === void 0 ? void 0 : _a.files) === null || _b === void 0 ? void 0 : _b[0];
             if (file && selectedObject_buf) {
@@ -2257,7 +2351,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             return newCloud;
         }
         function addTable(dialect = "base", x_C = canvas.width / 2, y_C = canvas.height / 2, rows = 3, cols = 3, cellWidth = 50, cellHeight = 50, color = getRandomColor(), rotation = 0) {
-            console.log("begin", rows, cols);
+            //console.log("begin", rows, cols);
             const newTable = {
                 dialect,
                 id: generateRandomId(16),
@@ -2303,7 +2397,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                 }
             }
             objects.push(newTable);
-            console.log(objects, "\n");
+            //console.log(objects, "\n");
             drawObjects();
             return newTable;
         }
@@ -3675,7 +3769,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             activeConnector = null;
             selectedObject = null;
             selectedLineEnd = null;
-            //console.log(selectedObjectMass)
+            console.log(selectedObjectMass);
         }
         function downloadFile(filename, content) {
             const blob = new Blob([content], { type: 'text/plain' }); //Создание нового объекта Blob (Binary Large Object)
@@ -3686,14 +3780,14 @@ var __rest = (this && this.__rest) || function (s, e) {
             link.click(); // Программное кликанье по ссылке
             document.body.removeChild(link); //Удаление ссылки из документа. Это делается для очистки DOM после скачивания файла, так как ссылка больше не нужна
         }
-        (_9 = document.getElementById('customJsonExport')) === null || _9 === void 0 ? void 0 : _9.addEventListener('click', function () {
+        (_10 = document.getElementById('customJsonExport')) === null || _10 === void 0 ? void 0 : _10.addEventListener('click', function () {
             const size = { width: canvas.width, height: canvas.height };
             const shapes = JSON.stringify(objects, null, 2);
             const content = `Size:${JSON.stringify(size)}\nObjects:(${shapes.slice(1, -1)})`;
             downloadFile('shapes.txt', content);
         });
         //пробуем сделать с загрузкой на сервер
-        (_10 = document.getElementById('uploadCssBtn')) === null || _10 === void 0 ? void 0 : _10.addEventListener('click', function () {
+        (_11 = document.getElementById('uploadCssBtn')) === null || _11 === void 0 ? void 0 : _11.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -3743,7 +3837,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                 console.error('No CSS found in local storage');
             }
         }
-        (_11 = document.getElementById('uploadCssBtn2')) === null || _11 === void 0 ? void 0 : _11.addEventListener('click', function () {
+        (_12 = document.getElementById('uploadCssBtn2')) === null || _12 === void 0 ? void 0 : _12.addEventListener('click', function () {
             var _a;
             const fileInput = document.getElementById('cssFileInput2');
             const file = (_a = fileInput === null || fileInput === void 0 ? void 0 : fileInput.files) === null || _a === void 0 ? void 0 : _a[0];
@@ -3754,7 +3848,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                 logDebug("No file selected for upload");
             }
         });
-        (_12 = document.getElementById('cssFileInput2')) === null || _12 === void 0 ? void 0 : _12.addEventListener('change', function (event) {
+        (_13 = document.getElementById('cssFileInput2')) === null || _13 === void 0 ? void 0 : _13.addEventListener('change', function (event) {
             const input = event.target;
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -3902,7 +3996,7 @@ var __rest = (this && this.__rest) || function (s, e) {
             }).join('\n');
             return `<diagram>\n${sizeXML}\n${objectsXML}\n</diagram>`;
         }
-        (_13 = document.getElementById('owlImport')) === null || _13 === void 0 ? void 0 : _13.addEventListener('change', function (event) {
+        (_14 = document.getElementById('owlImport')) === null || _14 === void 0 ? void 0 : _14.addEventListener('change', function (event) {
             var _a;
             try {
                 const input = event.target;
@@ -3934,7 +4028,7 @@ var __rest = (this && this.__rest) || function (s, e) {
                 console.error('Error reading file:', error);
             }
         });
-        (_14 = document.getElementById('owlExport')) === null || _14 === void 0 ? void 0 : _14.addEventListener('click', function () {
+        (_15 = document.getElementById('owlExport')) === null || _15 === void 0 ? void 0 : _15.addEventListener('click', function () {
             const owlContent = convertObjectsToOWL(objects);
             downloadFile('shapes.owl', owlContent);
         });
@@ -3965,7 +4059,8 @@ var __rest = (this && this.__rest) || function (s, e) {
                     cellKey.style.border = '1px solid black';
                     cellKey.style.padding = '5px';
                     cellKey.style.width = '40%';
-                    cellKey.innerText = key;
+                    const label = propertyLabels[key] || key;
+                    cellKey.innerText = label;
                     // Ячейка со значением свойства
                     const cellValue = row.insertCell();
                     cellValue.style.border = '1px solid black';
@@ -4239,19 +4334,97 @@ var __rest = (this && this.__rest) || function (s, e) {
             }
             return path;
         }
-        function enteringText(obj) {
-            if (obj.info) {
-                ctx.fillStyle = 'black';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
-                let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
-                if (obj.type === "rectangle") {
-                    textX = obj.x_C + obj.width / 2;
-                    textY = obj.y_C + obj.height / 2;
+        //function enteringText(obj: Shape) {
+        //    if (obj.info) {
+        //        ctx.fillStyle = 'black';
+        //        ctx.font = '16px Arial';
+        //        ctx.textAlign = 'center';
+        //        ctx.textBaseline = 'middle';
+        //        let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
+        //        let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
+        //        if (obj.type === "rectangle") {
+        //            textX = obj.x_C + (obj as Rectangle).width / 2;
+        //            textY = obj.y_C + (obj as Rectangle).height / 2;
+        //        }
+        //        ctx.fillText(obj.info, textX, textY/*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
+        //    }
+        //}
+        //function wrapTextForRectangle(
+        //    ctx: CanvasRenderingContext2D,
+        //    text: string,
+        //    x: number,
+        //    y: number,
+        //    maxWidth: number,
+        //    lineHeight: number
+        //) {
+        //    const words = text.split(' ');
+        //    let line = '';
+        //    const lines: string[] = [];
+        //    for (let n = 0; n < words.length; n++) {
+        //        const testLine = line + words[n] + ' ';
+        //        const testWidth = ctx.measureText(testLine).width;
+        //        if (testWidth > maxWidth && n > 0) {
+        //            lines.push(line.trim());
+        //            line = words[n] + ' ';
+        //        } else {
+        //            line = testLine;
+        //        }
+        //    }
+        //    lines.push(line.trim());
+        //    console.log(lines, lines.length);
+        //    if (lines.length == 1) {
+        //        //console.log("line.length === 1");
+        //        ctx.fillText(lines[0], x, y);
+        //    } else {
+        //        for (let i = 0; i < lines.length; i++) {
+        //            ctx.fillText(lines[i], x, y - lineHeight + i * lineHeight);
+        //        }
+        //    }
+        //}
+        function wrapTextForRectangle(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            const lines = [];
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth > maxWidth && n > 0) {
+                    lines.push(line.trim());
+                    line = words[n] + ' ';
                 }
-                ctx.fillText(obj.info, textX, textY /*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
+                else {
+                    line = testLine;
+                }
+            }
+            lines.push(line.trim());
+            // Центрируем блок: поправка — (lines.length - 1) вместо lines.length
+            const totalHeight = (lines.length - 1) * lineHeight;
+            const startY = y - totalHeight / 2;
+            for (let i = 0; i < lines.length; i++) {
+                ctx.fillText(lines[i], x, startY + i * lineHeight);
+            }
+        }
+        function enteringText(obj) {
+            if (!obj.info)
+                return;
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            let textX = obj.x_C;
+            let textY = obj.y_C;
+            let maxWidth = 150;
+            let lineHeight = 18;
+            if (obj.type === "rectangle") {
+                const rect = obj;
+                maxWidth = rect.width - 8; // небольшой отступ с боков
+                textX = rect.x_C + rect.width / 2;
+                textY = rect.y_C + rect.height / 2; // начальная Y-координата
+                wrapTextForRectangle(ctx, obj.info, textX, textY, maxWidth, lineHeight);
+            }
+            else {
+                // для других фигур — одна строка, как раньше
+                ctx.fillText(obj.info, textX, textY);
             }
         }
         function drawingConnection(obj_s, ctx) {

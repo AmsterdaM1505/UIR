@@ -73,7 +73,7 @@
                 }
             </MudExpansionPanel>
 
-            <MudExpansionPanel Text="Анализ схемы">
+            @* <MudExpansionPanel Text="Анализ схемы">
                 @foreach (var tool in AnalysisTools)
                 {
                     <Tool Id="@tool.Id"
@@ -83,7 +83,7 @@
                           Style="@tool.Style" />
                     <br />
                 }
-            </MudExpansionPanel>
+            </MudExpansionPanel> *@
 
             <MudExpansionPanel Text="Управление файлами">
                 @* <MudTooltip> 
@@ -119,7 +119,7 @@
                     @* проверено *@
                     <ChildContent> 
                         <MudButton id="customJsonExport" Class="_button" data-action="customJsonExport" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
-                            <MudText Typo="Typo.body2">Скачать диаграмму</MudText>
+                            <MudText Typo="Typo.body2">Скачать диаграмму в JSON</MudText>
                         </MudButton>
                     </ChildContent>
                     <TooltipContent>
@@ -133,7 +133,7 @@
                     @* проверено *@
                     <ChildContent>
                         <label for="customJsonImport" class="custom-file-upload">
-                            Загрузить диаграмму в обычном виде
+                            Загрузить диаграмму в JSON
                         </label>
                         <input type="file" id="customJsonImport" style="display: none;" />
                     </ChildContent>
@@ -147,12 +147,12 @@
                 <MudTooltip>
                     <ChildContent>
                         <MudButton id="formatExport" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
-                            <MudText Typo="Typo.body2">Выгрузить файл в формате</MudText>
+                            <MudText Typo="Typo.body2">Скачать файл в формате</MudText>
                         </MudButton>
                     </ChildContent>
                     <TooltipContent>
-                        <MudText Typo="Typo.body2">Выгрузить файл в формате</MudText>
-                        <MudText Typo="Typo.body2">Выберите файл для выгрузки в формате</MudText>
+                        <MudText Typo="Typo.body2">Скачать файл в формате</MudText>
+                        <MudText Typo="Typo.body2">Нажмите, чтобы скачать диаграмму в формате</MudText>
                         <MudIcon Icon="@Icons.Material.Filled.Download" />
                     </TooltipContent>
                 </MudTooltip>
@@ -228,6 +228,9 @@
             </MudExpansionPanel>
         </MudExpansionPanels>
         <MudCheckBox id="checkbox" Label="Показать сетку" Checked="@showGrid" CheckedChanged="OnShowGridChanged" T="bool" @bind-Value="showGrid" />
+        <MudButton id="mytest" Class="_button" data-action="uploadCssBtn" Variant="Variant.Filled" Style="width: 80%; height: 60px;">
+            Тест
+        </MudButton>
     </div>
     <div id="resize-handle-left"></div>
     <!-- Контекстное меню (оставляем без изменений) -->
@@ -393,4 +396,3 @@
 <script src="js/CookiesServ.js"></script>
 <script src="js/interface.js"></script>
 <script src="js/file.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xml2js/dist/xml2js.min.js"></script>

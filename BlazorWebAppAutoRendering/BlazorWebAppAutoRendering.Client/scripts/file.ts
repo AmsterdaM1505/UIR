@@ -46,6 +46,133 @@
 
     let gridVisible: boolean = true;
 
+    ////////////////// test
+
+    function resetEditorState(): void {
+        objects = [];
+        highlight = [];
+        ctx = null;
+        selectedObject = null;
+        selectedObject_canv = null;
+        selectedObject_buf = null;
+        selectedObject_buf_connect = null;
+        startX = 0;
+        startY = 0;
+        isPanning = false;
+        panStartX = 0;
+        panStartY = 0;
+        offsetX = 0;
+        offsetY = 0;
+        mouse_meaning_check = 0;
+        connectionServ = 2;
+        selectedObjectMass = [];
+        selectedLineStart = null;
+        selectedLineEnd = null;
+        selectedLineMid = null;
+        isResizingLeft = false;
+        isResizingRight = false;
+        isSchemaLoaded = false;
+        isSelecting = false;
+        selectionStartX = 0;
+        selectionStartY = 0;
+        selectionEndX = 0;
+        selectionEndY = 0;
+        activeConnector = null;
+        undoStack = [];
+        redoStack = [];
+        flag = '';
+        gridVisible = true;
+    }
+
+    function saveMetricsAsCSV(data: string, filename: string = 'performance_metrics.csv') {
+        const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    }
+
+
+    function graphGenerationForTest(): void {
+        const results: string[] = ['Size,ElapsedTimeSec,ObjectCount,MoveTimeMs'];
+
+        for (let i = 1; i <= 100; i += 1) {
+            console.log("i - ", i);
+            const start = performance.now();
+
+            for (let j = 0; j < i; j++) {
+                addCircle();
+                addLine();
+                addRect();
+                addTable();
+                addStar();
+                addCloud();
+            }
+
+            drawObjects();
+            const end = performance.now();
+            const elapsed = Math.round(end - start) / 1000;
+            const objectCount = objects.length + (objects.length / 6) * 8; // добавил остальные прямоугольники кол-во таблиц + колво таблиц на 8 ячеек
+
+            console.log(objects, selectedObjectMass);
+
+            let moveTime = 0;
+            if (objects.length > 0) {
+                const moveStart = performance.now();
+                const last = objects[objects.length - 1];
+                
+                if ('x_C' in last && 'y_C' in last) {
+                    last.x_C += 10;
+                    last.y_C += 10;
+                }
+
+                drawObjects();
+                const moveEnd = performance.now();
+                moveTime = +(moveEnd - moveStart).toFixed(2) / 1000;
+            }
+
+            if (elapsed > 10) {
+                break;
+            }
+
+            results.push(`${i},${elapsed},${objectCount},${moveTime}`);
+            objects = [];
+        }
+
+        saveMetricsAsCSV(results.join('\n'));
+        console.log("выгружено");
+    }
+
+
+
+
+
+    document.getElementById('mytest')?.addEventListener('click', function () {
+        saveStateForUndo();
+        console.log("button pressed");
+        graphGenerationForTest();
+    });
+
+
+
+
+
+
+
+
+
+
+
+    ////////////////// test
+
+
     function saveStateForUndo() {
         console.log(flag);
         function cleanShape(shape: Shape): any {
@@ -147,7 +274,8 @@
             container.innerHTML = "";
 
             const title = document.createElement("h6");
-            title.innerText = `Редактирование объекта: ${target.type}`;
+            const t: ShapeType = target.type as ShapeType;
+            title.innerText = `Редактирование объекта: ${shapeLabels[t]}`;
             title.style.userSelect = "none";
             container.appendChild(title);
 
@@ -2668,7 +2796,7 @@
             color: string = getRandomColor(),
             rotation: number = 0
         ): ComplexShape {
-            console.log("begin", rows, cols);
+            //console.log("begin", rows, cols);
             const newTable: ComplexShape = {
                 dialect,
                 id: generateRandomId(16),
@@ -2717,7 +2845,7 @@
                 }
             }
             objects.push(newTable);
-            console.log(objects, "\n");
+            //console.log(objects, "\n");
             drawObjects();
             return newTable;
         }
@@ -4225,7 +4353,7 @@
             activeConnector = null;
             selectedObject = null;
             selectedLineEnd = null;
-            //console.log(selectedObjectMass)
+            console.log(selectedObjectMass)
         }
         function downloadFile(filename: string, content: string) {
             const blob = new Blob([content], { type: 'text/plain' }); //Создание нового объекта Blob (Binary Large Object)
@@ -4595,7 +4723,9 @@
                     cellKey.style.border = '1px solid black';
                     cellKey.style.padding = '5px';
                     cellKey.style.width = '40%';
-                    cellKey.innerText = key;
+
+                    const label = (propertyLabels as Record<string, string>)[key] || key;
+                    cellKey.innerText = label;
 
                     // Ячейка со значением свойства
                     const cellValue = row.insertCell();
@@ -4903,21 +5033,118 @@
 
             return path;
         }
-        function enteringText(obj: Shape) {
-            if (obj.info) {
-                ctx.fillStyle = 'black';
-                ctx.font = '16px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
-                let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
-                if (obj.type === "rectangle") {
-                    textX = obj.x_C + (obj as Rectangle).width / 2;
-                    textY = obj.y_C + (obj as Rectangle).height / 2;
+        //function enteringText(obj: Shape) {
+        //    if (obj.info) {
+        //        ctx.fillStyle = 'black';
+        //        ctx.font = '16px Arial';
+        //        ctx.textAlign = 'center';
+        //        ctx.textBaseline = 'middle';
+        //        let textX = obj.x_C /*+ (obj.width || obj.radius * 2) / 2*/;
+        //        let textY = obj.y_C /*+ (obj.height || obj.radius * 2) / 2*/;
+        //        if (obj.type === "rectangle") {
+        //            textX = obj.x_C + (obj as Rectangle).width / 2;
+        //            textY = obj.y_C + (obj as Rectangle).height / 2;
+        //        }
+        //        ctx.fillText(obj.info, textX, textY/*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
+        //    }
+        //}
+
+        //function wrapTextForRectangle(
+        //    ctx: CanvasRenderingContext2D,
+        //    text: string,
+        //    x: number,
+        //    y: number,
+        //    maxWidth: number,
+        //    lineHeight: number
+        //) {
+        //    const words = text.split(' ');
+        //    let line = '';
+            
+        //    const lines: string[] = [];
+
+        //    for (let n = 0; n < words.length; n++) {
+        //        const testLine = line + words[n] + ' ';
+        //        const testWidth = ctx.measureText(testLine).width;
+        //        if (testWidth > maxWidth && n > 0) {
+        //            lines.push(line.trim());
+        //            line = words[n] + ' ';
+        //        } else {
+        //            line = testLine;
+        //        }
+        //    }
+        //    lines.push(line.trim());
+        //    console.log(lines, lines.length);
+        //    if (lines.length == 1) {
+        //        //console.log("line.length === 1");
+        //        ctx.fillText(lines[0], x, y);
+        //    } else {
+        //        for (let i = 0; i < lines.length; i++) {
+        //            ctx.fillText(lines[i], x, y - lineHeight + i * lineHeight);
+        //        }
+        //    }
+            
+        //}
+        function wrapTextForRectangle(
+            ctx: CanvasRenderingContext2D,
+            text: string,
+            x: number,
+            y: number,
+            maxWidth: number,
+            lineHeight: number
+        ) {
+            const words = text.split(' ');
+            let line = '';
+            const lines: string[] = [];
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth > maxWidth && n > 0) {
+                    lines.push(line.trim());
+                    line = words[n] + ' ';
+                } else {
+                    line = testLine;
                 }
-                ctx.fillText(obj.info, textX, textY/*, 70*/); // убрал ограничение || надо реализовать возможность разбиения на строки
+            }
+            lines.push(line.trim());
+
+            // Центрируем блок: поправка — (lines.length - 1) вместо lines.length
+            const totalHeight = (lines.length - 1) * lineHeight;
+            const startY = y - totalHeight / 2;
+
+            for (let i = 0; i < lines.length; i++) {
+                ctx.fillText(lines[i], x, startY + i * lineHeight);
             }
         }
+
+
+        function enteringText(obj: Shape) {
+            if (!obj.info) return;
+
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            let textX = obj.x_C;
+            let textY = obj.y_C;
+            let maxWidth = 150;
+            let lineHeight = 18;
+
+            if (obj.type === "rectangle") {
+                const rect = obj as Rectangle;
+                maxWidth = rect.width - 8; // небольшой отступ с боков
+                textX = rect.x_C + rect.width / 2;
+                textY = rect.y_C + rect.height / 2; // начальная Y-координата
+
+                wrapTextForRectangle(ctx, obj.info, textX, textY, maxWidth, lineHeight);
+            } else {
+                // для других фигур — одна строка, как раньше
+                ctx.fillText(obj.info, textX, textY);
+            }
+        }
+
+
         function drawingConnection(obj_s: Shape[], ctx: CanvasRenderingContext2D) {
             // Сначала отрисовываем связи между объектами
             for (const obj of obj_s) {

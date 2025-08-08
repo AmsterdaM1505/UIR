@@ -1,1 +1,26 @@
+# Visual Studio
 .vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+
+# NuGet
+.nuget/
+packages/
+
+# VS Code
+.vscode/
+
+# Other
+*.cache
+*.log
+*.dll
+*.pdb
+*.exe
+*.wasm
+*.gz
